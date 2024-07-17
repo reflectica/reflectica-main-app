@@ -1,6 +1,9 @@
 # OSX
 #
 .DS_Store
+GoogleService-Info.plist
+.env
+node_modules/
 
 # Xcode
 #
