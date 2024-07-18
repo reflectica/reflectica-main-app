@@ -6,7 +6,6 @@ import {
   View,
   Dimensions,
   TouchableOpacity,
-  Image,
 } from 'react-native';
 import {ButtonTemplate} from '../../components/index';
 

@@ -1,16 +1,16 @@
 import React from 'react';
-import {View, Text, StyleSheet, Dimensions} from 'react-native';
+import {Text, StyleSheet, Dimensions} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {ButtonTemplate} from '../components';
 
-const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height as number;
+const screenWidth = Dimensions.get('window').width as number;
 
 export default function SupportScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Insights & Referrals</Text>
-      <View style={styles.body}></View>
+      {/* <View style={styles.body}></View> */}
       <ButtonTemplate
         title="Call our team"
         stylebtn={'purple'}
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   body: {
-    background: '#FFFFFF',
+    backgroundColor: '#FFFFFF',
     screenWidth: screenWidth * 0.8,
     height: screenHeight * 0.7,
   },

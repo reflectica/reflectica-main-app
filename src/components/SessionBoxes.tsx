@@ -1,22 +1,9 @@
 import React from 'react';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  TouchableOpacity,
-  Image,
-} from 'react-native';
-import sampleData from '../data/sampleData.json';
+import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
+import {SessionBoxesProp} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
-
-interface SessionBoxesProp {
-  sessionID: string;
-  index: number;
-  description: string;
-}
 
 export default function SessionBoxes({
   sessionID,

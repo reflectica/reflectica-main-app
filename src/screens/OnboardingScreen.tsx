@@ -25,6 +25,12 @@ const items = [
   },
 ];
 
+type ItemProps = {
+  title: string;
+  description: string;
+  image: string;
+}
+
 export default function OnboardingScreen() {
   const [activeSlide, setActiveSlide] = React.useState(0);
   const navigation = useNavigation();
@@ -82,7 +88,11 @@ export default function OnboardingScreen() {
         </View>
         <Pagination dotsLength={items.length} activeDotIndex={activeSlide} />
       </View>
-      <ButtonTemplate title="Create an account" stylebtn="purple" />
+      <ButtonTemplate
+        title="Create an account"
+        stylebtn="purple"
+        action={() => {}}
+      />
       <View style={{flexDirection: 'row', marginTop: '5%'}}>
         <Text
           style={{

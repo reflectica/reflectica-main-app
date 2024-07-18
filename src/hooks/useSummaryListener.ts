@@ -1,7 +1,6 @@
 import {useState, useEffect, useCallback} from 'react';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs} from 'firebase/firestore';
-import {orderBy} from 'lodash';
 
 export const useAllSummaryListener = (userId: string) => {
   const [sessionSummary, setSessionSummary] = useState([]);

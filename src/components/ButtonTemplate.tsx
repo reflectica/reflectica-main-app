@@ -8,7 +8,7 @@ interface ButtonTemplateProps {
   title: string;
   stylebtn: string;
   action: () => void;
-  styling?: string;
+  styling?: Object;
 }
 export default function ButtonTemplate({
   title,

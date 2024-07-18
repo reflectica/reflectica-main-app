@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
@@ -10,7 +10,6 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {MainTemplate} from '../components/index.js';
 import {useRecentSummaryListener} from '../hooks/useSummaryListener.js';
 import {useAuth} from '../context/AuthContext.js';
 import {getEmojiByRating} from '../utils/emojiHelper.js';
@@ -154,7 +153,7 @@ const recentJournal = StyleSheet.create({
     flexShrink: 1,
     padding: 10,
     borderRadius: 10,
-    justifyContent: 'space-between',
+    // justifyContent: 'space-between',
     gap: 10,
   },
   sessionCards: {

@@ -41,11 +41,11 @@ const calendarTheme = {
 };
 
 export default function ProfileScreen({navigation}) {
-  const [firstName, setFirstName] = useState(null);
-  const [lastName, setLastName] = useState(null);
-  const [birthday, setBirthday] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [selected, setSelected] = useState('');
+  const [firstName, setFirstName] = useState<string>('');
+  const [lastName, setLastName] = useState<string>('');
+  const [birthday, setBirthday] = useState<string>('');
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selected, setSelected] = useState<string>('');
   const user = useSelector(selectUser);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ export default function ProfileScreen({navigation}) {
     }
   };
 
-  const formatDate = dateString => {
+  const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       year: 'numeric',
@@ -176,11 +176,11 @@ export default function ProfileScreen({navigation}) {
                   }}
                   theme={calendarTheme}
                   hideDayNames={true}
-                  onDayPress={day => {
+                  onDayPress={(day: any) => {
                     console.log('Selected Date:', day.dateString);
                     setSelected(day.dateString);
                   }}
-                  renderHeader={date => {
+                  renderHeader={(date: any) => {
                     return (
                       <View
                         style={{

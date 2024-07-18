@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback, ReactNode } from 'react';
 import { fbAuth, db, userCollection, app } from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
 import { addDoc } from "firebase/firestore";
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
@@ -8,7 +8,11 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { FirebaseRecaptchaVerifierModal } from 'expo-firebase-recaptcha';
 import { UserProps } from '../constants';
 
-export const AuthProvider = ({ children }) => {
+interface AuthProviderProps {
+    children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [currentUser, setCurrentUser] = useState<UserProps | null>(null);
     const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
     const [newUser, setNewUser] = useState<boolean>(false)
@@ -38,14 +42,14 @@ export const AuthProvider = ({ children }) => {
             // console.log("additionalUserInfo", userCredential.additionalUserInfo.profile)
 
 
-            if (userCredential?.isNewUser) {
+            if (userCredential.additionalUserInfo?.isNewUser) {
                 console.log("WELCOME NOOBIE!")
                 setNewUser(true)
                 const userDocData = {
                     uid: userCredential.user.uid,
                     email: userCredential.user.email,
-                    firstname: additionalUserInfo.profile.given_name || null,
-                    lastname: additionalUserInfo.profile.family_name || null,
+                    firstname: userCredential.additionalUserInfo?.profile?.given_name || null,
+                    lastname: userCredential.additionalUserInfo?.profile?.family_name || null,
                     imageUrl: userCredential.user?.photoURL || null
                 }
 
@@ -64,7 +68,7 @@ export const AuthProvider = ({ children }) => {
 
             // return result
         } catch (error) {
-            if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+            if (error?.code === statusCodes.SIGN_IN_CANCELLED) {
                 alert("Cancel")
                 console.log('Google Sign-In Cancelled');
             } else if (error.code === statusCodes.IN_PROGRESS) {
@@ -168,8 +172,8 @@ export const AuthProvider = ({ children }) => {
         isLoggedIn,
         currentUser,
         newUser,
-        recaptchaVerifier
-    };
+        recaptchaVerifier,
+      };
 
     return (
         <AuthContext.Provider value={value}>
@@ -182,5 +186,5 @@ export const AuthProvider = ({ children }) => {
             />
             {children}
         </AuthContext.Provider>
-    );
-};
+    )
+}
