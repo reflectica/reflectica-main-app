@@ -9,12 +9,12 @@ import {
 } from 'react-native';
 import {SessionBoxes} from '../../components';
 import {useAllSummaryListener} from '../../hooks/useSummaryListener';
-import {NavigationProps} from '../../constants';
+import {JournalScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 // const screenWidth = Dimensions.get('window').width;
 
-export default function JournalScreen({navigation}: NavigationProps) {
+export default function JournalScreen({navigation}: JournalScreenProps) {
   const {sessionSummary, loading, error} = useAllSummaryListener(
     'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
   );

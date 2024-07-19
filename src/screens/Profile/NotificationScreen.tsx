@@ -8,12 +8,14 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import {ButtonTemplate} from '../../components/index';
-import {NavigationProps} from '../../constants';
+import {NotificationScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function NotificationScreen({navigation}: NavigationProps) {
+export default function NotificationScreen({
+  navigation,
+}: NotificationScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       <TouchableOpacity

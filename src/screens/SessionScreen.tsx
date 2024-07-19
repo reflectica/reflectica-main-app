@@ -10,7 +10,7 @@ import Voice from '@react-native-voice/voice';
 import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
 import {ButtonTemplate} from '../components/index.js';
 import * as FileSystem from 'expo-file-system';
-import {Audio} from 'expo-av';
+// import {Audio} from 'expo-av';
 import {UserProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
@@ -119,7 +119,7 @@ export default function SessionScreen() {
             title={isRecording ? 'Stop Recording' : 'Start Recording'}
             onPress={isRecording ? stopRecording : startRecording}
           />
-          {/* STYLE doesn't exist for transcript */}
+          {/* STYLE doesn't exist for 'transcript' */}
           <Text style={styles.transcript}>Transcript: {transcript}</Text>
         </View>
         {/* <ButtonTemplate title='Send' action={handleSubmit} stylebtn={'purple'} styling={{alignSelf:'center'}} /> */}

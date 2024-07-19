@@ -7,12 +7,12 @@ import {View, Text, StyleSheet, Dimensions, Image} from 'react-native';
 // import { loginUser } from "../features/auth/authSlices";
 import ButtonTemplate from '../../components/ButtonTemplate';
 import {useAuth} from '../../context/AuthContext';
-import {NavigationProps} from '../../constants';
+import {SignupScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function Signup({navigation}: NavigationProps) {
+export default function Signup({navigation}: SignupScreenProps) {
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState();
   const {signInWithGoogle} = useAuth();

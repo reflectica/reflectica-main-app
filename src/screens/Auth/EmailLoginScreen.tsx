@@ -14,12 +14,12 @@ import {
 } from 'react-native';
 import {ButtonTemplate} from '../../components';
 import {useAuth} from '../../context/AuthContext';
-import {NavigationProps} from '../../constants';
+import {EmailLoginScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function EmailLoginScreen({navigation}: NavigationProps) {
+export default function EmailLoginScreen({navigation}: EmailLoginScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

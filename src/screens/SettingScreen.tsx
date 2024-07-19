@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-import {NavigationProps} from '../constants';
+import {SettingScreenProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SettingScreen({navigation}: NavigationProps) {
+export default function SettingScreen({navigation}: SettingScreenProps) {
   const options = [
     {
       icon: require('../assets/settings/profile.png'),

@@ -13,22 +13,26 @@ import {
 import {useRecentSummaryListener} from '../hooks/useSummaryListener.js';
 import {useAuth} from '../context/AuthContext.js';
 import {getEmojiByRating} from '../utils/emojiHelper.js';
-import {NavigationProps} from '../constants';
+import {DashboardScreenProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function DashboardScreen({route, navigation}: NavigationProps) {
+export default function DashboardScreen({
+  route,
+  navigation,
+}: DashboardScreenProps) {
   const user = useSelector(selectUser);
   const {currentUser} = useAuth();
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {recentSessionSummary, recentFeeling, loading, error} =
     useRecentSummaryListener('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser.uid);
 
   console.log('session summary', recentSessionSummary);
   // console.log("USER ", currentUser.uid)
 
-  const handleStartSessionPress = () => navigation.navigate('In-Session');
+  const handleStartSessionPress = () => navigation.navigate('InSession');
 
   return (
     <SafeAreaView style={styles.container}>

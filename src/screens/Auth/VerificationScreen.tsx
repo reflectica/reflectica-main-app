@@ -14,7 +14,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {loginUser} from '../../features/auth/authSlices.js';
 import {collection, addDoc, getDocs, where, query} from 'firebase/firestore';
 import {db} from '../../firebase/firebaseConfig.js';
-import {VerificationScrenProps} from '../../constants';
+import {VerificationScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -22,7 +22,7 @@ const screenWidth = Dimensions.get('window').width;
 export default function VerificationScreen({
   route,
   navigation,
-}: VerificationScrenProps) {
+}: VerificationScreenProps) {
   const dispatch = useDispatch();
   const [time, setTime] = useState(300);
   const [verificationCode, setVerificationCode] = useState([
@@ -60,13 +60,20 @@ export default function VerificationScreen({
     };
   }, [time]);
 
-  if (verificationCode.length === 6) {
-    useEffect(() => {
+  // if (verificationCode.length === 6) {
+  //   useEffect(() => {
+  //     const code = verificationCode.join('');
+  //     console.log('CODEEEE:', code);
+  //     checkVerificationCode(code);
+  //   }, [verificationCode]);
+  // }
+  useEffect(() => {
+    if (verificationCode.join('').length === 6) {
       const code = verificationCode.join('');
       console.log('CODEEEE:', code);
       checkVerificationCode(code);
-    }, [verificationCode]);
-  }
+    }
+  }, [verificationCode]);
 
   const handleVerificationCodeChange = (text: string, index: number) => {
     if (text.length <= 1) {
@@ -79,7 +86,7 @@ export default function VerificationScreen({
     }
   };
 
-  const handleFocus = index => {
+  const handleFocus = (index: any) => {
     setFocusedIndex(index);
   };
 
@@ -179,7 +186,7 @@ export default function VerificationScreen({
     }
   };
 
-  const handleNumberPress = number => {
+  const handleNumberPress = (number: string) => {
     if (focusedIndex >= 0 && focusedIndex < verificationCode.length) {
       const newVerificationCode = [...verificationCode];
 

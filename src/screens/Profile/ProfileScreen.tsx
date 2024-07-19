@@ -17,7 +17,7 @@ import {useSelector} from 'react-redux';
 import {selectUser} from '../../features/auth/authSelectors.js'; // import the selector
 import {db} from '../../firebase/firebaseConfig.js';
 import {collection, getDocs, setDoc, where, query} from 'firebase/firestore';
-import {NavigationProps} from '../../constants';
+import {ProfileScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -32,7 +32,7 @@ const calendarTheme = {
   lineHeight: 17.07,
 };
 
-export default function ProfileScreen({navigation}: NavigationProps) {
+export default function ProfileScreen({navigation}: ProfileScreenProps) {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');

@@ -15,10 +15,12 @@ import {getAuth, onAuthStateChanged} from 'firebase/auth';
 import {ButtonTemplate} from '../../components';
 // import { useNavigation } from '@react-navigation/native';
 import {useAuth} from '../../context/AuthContext';
+import {LoginScreenProps} from '../../constants';
+
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function LoginScreen({navigation}) {
+export default function LoginScreen({navigation}: LoginScreenProps) {
   // const navigation = useNavigation();
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState();

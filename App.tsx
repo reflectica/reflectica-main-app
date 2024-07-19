@@ -116,7 +116,7 @@ function App(): React.JSX.Element {
                 options={{headerShown: false}}
               />
               <Stack.Screen
-                name="In-Session"
+                name="InSession"
                 component={SessionScreen}
                 options={{headerShown: false}}
               />
