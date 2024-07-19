@@ -9,11 +9,12 @@ import {
 } from 'react-native';
 import {SessionBoxes} from '../../components';
 import {useAllSummaryListener} from '../../hooks/useSummaryListener';
+import {NavigationProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
-const screenWidth = Dimensions.get('window').width;
+// const screenWidth = Dimensions.get('window').width;
 
-export default function JournalScreen({navigation}) {
+export default function JournalScreen({navigation}: NavigationProps) {
   const {sessionSummary, loading, error} = useAllSummaryListener(
     'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
   );
@@ -29,7 +30,7 @@ export default function JournalScreen({navigation}) {
         {Array.isArray(sessionSummary) &&
           sessionSummary.map((data, index) => (
             <TouchableOpacity
-              index={index}
+              // index={index}
               onPress={() => {
                 console.log('LOGGING SESSION ID:', data.sessionId);
                 navigation.navigate('SessionDetail', {

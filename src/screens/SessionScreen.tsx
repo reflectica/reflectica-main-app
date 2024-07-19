@@ -17,7 +17,7 @@ const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 export default function SessionScreen() {
-  const [inputText, setInputText] = useState<string>('');
+  // const [inputText, setInputText] = useState<string>('');
   const [listening, setListening] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   // const user: UserProps = useSelector(selectUser); // use the selector to get the current user

@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: '#FFFFFF',
-    screenWidth: screenWidth * 0.8,
+    width: screenWidth * 0.8,
     height: screenHeight * 0.7,
   },
 });

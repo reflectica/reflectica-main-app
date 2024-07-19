@@ -1,11 +1,25 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Dimensions,
+  Image,
+  ImageSourcePropType,
+} from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {useNavigation} from '@react-navigation/native'; // Import useNavigation
 import {ButtonTemplate} from '../components';
 
-const items = [
+type ItemProps = {
+  image: ImageSourcePropType;
+  title: string;
+  description: string;
+};
+
+const items: ItemProps = [
   {
     image: require('../assets/onboarding/Onboarding1.jpg'),
     title: 'Hyper-Realistic',
@@ -25,17 +39,11 @@ const items = [
   },
 ];
 
-type ItemProps = {
-  title: string;
-  description: string;
-  image: string;
-}
-
 export default function OnboardingScreen() {
   const [activeSlide, setActiveSlide] = React.useState(0);
   const navigation = useNavigation();
 
-  const renderItem = ({item, index}) => {
+  const renderItem = (item: ItemProps) => {
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.images} />
@@ -108,7 +116,6 @@ export default function OnboardingScreen() {
           style={{
             fontFamily: 'Montserrat',
             color: '#5271FF',
-            fontWeight: 'bold',
             lineHeight: 21,
             fontSize: 14,
             fontWeight: '400',

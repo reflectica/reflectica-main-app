@@ -9,26 +9,20 @@ import {
   TextInput,
   Dimensions,
 } from 'react-native';
-import {ButtonTemplate} from '../../components/index';
 import {formatTime} from '../../utils/formatTime.js';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginUser} from '../../features/auth/authSlices.js';
-import {
-  doc,
-  collection,
-  addDoc,
-  getDoc,
-  getDocs,
-  setDoc,
-  where,
-  query,
-} from 'firebase/firestore';
-import {auth, db} from '../../firebase/firebaseConfig.js';
+import {collection, addDoc, getDocs, where, query} from 'firebase/firestore';
+import {db} from '../../firebase/firebaseConfig.js';
+import {VerificationScrenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function VerificationScreen({route, navigation}) {
+export default function VerificationScreen({
+  route,
+  navigation,
+}: VerificationScrenProps) {
   const dispatch = useDispatch();
   const [time, setTime] = useState(300);
   const [verificationCode, setVerificationCode] = useState([
@@ -49,8 +43,10 @@ export default function VerificationScreen({route, navigation}) {
   ];
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  // const confirmationResult = useSelector((state) => state.auth.setConfirmationResult);
-  // const { fullPhoneNumber, confirmationResult } = route.params;
+  const confirmationResult = useSelector(
+    state => state.auth.setConfirmationResult,
+  );
+  const {fullPhoneNumber, confirmationResult} = route.params;
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -72,7 +68,7 @@ export default function VerificationScreen({route, navigation}) {
     }, [verificationCode]);
   }
 
-  const handleVerificationCodeChange = (text, index) => {
+  const handleVerificationCodeChange = (text: string, index: number) => {
     if (text.length <= 1) {
       const newVerificationCode = [...verificationCode];
       newVerificationCode[index] = text;
@@ -128,7 +124,7 @@ export default function VerificationScreen({route, navigation}) {
     );
   };
 
-  const checkVerificationCode = async code => {
+  const checkVerificationCode = async (code: string | number) => {
     try {
       if (confirmationResult) {
         const result = await confirmationResult.confirm(code);
@@ -224,7 +220,7 @@ export default function VerificationScreen({route, navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View styles={styles.btnContainer}>
+      <View style={styles.btnContainer}>
         <TouchableOpacity
           style={styles.backBtn}
           onPress={() => navigation.goBack()}>
@@ -236,30 +232,9 @@ export default function VerificationScreen({route, navigation}) {
           />
         </TouchableOpacity>
       </View>
-      <View
-        style={{
-          alignSelf: 'center',
-          alignItems: 'center',
-          width: screenWidth * 0.7,
-        }}>
-        <Text
-          style={{
-            fontFamily: 'Montserrat',
-            fontWeight: '700',
-            fontSize: 34,
-            lineHeight: 51,
-          }}>
-          {formatTime(time)}
-        </Text>
-        <Text
-          style={{
-            fontFamily: 'Montserrat',
-            fontWeight: '400',
-            fontSize: 18,
-            lineHeight: 27,
-            textAlign: 'center',
-            color: 'rgba(0, 0, 0, 0.7)',
-          }}>
+      <View style={verificationStyles.container}>
+        <Text style={verificationStyles.timeDisplay}>{formatTime(time)}</Text>
+        <Text style={verificationStyles.instructionText}>
           Type the verification code we've sent you
         </Text>
       </View>
@@ -285,16 +260,8 @@ export default function VerificationScreen({route, navigation}) {
 
       <View style={styles.codeContainer}>{renderNumberPad()}</View>
 
-      <TouchableOpacity style={{marginTop: '-10'}}>
-        <Text
-          style={{
-            color: '#5271FF',
-            fontWeight: 'bold',
-            fontSize: 20,
-            alignSelf: 'center',
-          }}>
-          Send again
-        </Text>
+      <TouchableOpacity style={againBtn.container}>
+        <Text style={againBtn.text}>Send again</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -357,5 +324,39 @@ const styles = StyleSheet.create({
   backIcon: {
     width: 25,
     height: 25,
+  },
+});
+
+const verificationStyles = StyleSheet.create({
+  container: {
+    alignSelf: 'center',
+    alignItems: 'center',
+    width: screenWidth * 0.7,
+  },
+  timeDisplay: {
+    fontFamily: 'Montserrat',
+    fontWeight: '700',
+    fontSize: 34,
+    lineHeight: 51,
+  },
+  instructionText: {
+    fontFamily: 'Montserrat',
+    fontWeight: '400',
+    fontSize: 18,
+    lineHeight: 27,
+    textAlign: 'center',
+    color: 'rgba(0, 0, 0, 0.7)',
+  },
+});
+
+const againBtn = StyleSheet.create({
+  container: {
+    marginTop: -10,
+  },
+  text: {
+    color: '#5271FF',
+    fontWeight: 'bold',
+    fontSize: 20,
+    alignSelf: 'center',
   },
 });

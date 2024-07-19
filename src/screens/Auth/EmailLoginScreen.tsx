@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -9,16 +10,19 @@ import {
   TextInput,
   Pressable,
   Image,
+  Platform,
 } from 'react-native';
 import {ButtonTemplate} from '../../components';
 import {useAuth} from '../../context/AuthContext';
+import {NavigationProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function EmailLoginScreen({navigation}) {
+export default function EmailLoginScreen({navigation}: NavigationProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState<boolean>(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
 
@@ -64,7 +68,7 @@ export default function EmailLoginScreen({navigation}) {
               onChangeText={text => setEmail(text)}
               style={styles.textInput}
               placeholder="Email"
-              type="email"
+              // type="email"
               autoCapitalize="none"
               keyboardType="email-address"
             />
@@ -79,7 +83,7 @@ export default function EmailLoginScreen({navigation}) {
               secureTextEntry={!isPasswordVisible}
               value={password}
               onChangeText={text => setPassword(text)}
-              type="password"
+              // type="password"
               style={styles.textInput}
               placeholder="Enter your Password"
             />
@@ -154,7 +158,7 @@ const styles = StyleSheet.create({
     borderColor: 'gray',
     borderRadius: 10,
     padding: 15,
-    color: 'black',
+    // color: 'black',
     height: 50,
     paddingRight: 45,
     fontFamily: 'Poppins',

@@ -7,12 +7,12 @@ import {
   TouchableOpacity,
   Image,
 } from 'react-native';
-// import { MenuBar } from '../components';
+import {NavigationProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SettingScreen({navigation}) {
+export default function SettingScreen({navigation}: NavigationProps) {
   const options = [
     {
       icon: require('../assets/settings/profile.png'),
@@ -32,7 +32,8 @@ export default function SettingScreen({navigation}) {
     {
       icon: require('../assets/settings/notification.png'),
       title: 'Notifications',
-      action: navigation.navigate(''),
+      action: '',
+      // navigation.navigate(''),
     },
     {
       icon: require('../assets/settings/privacy.png'),

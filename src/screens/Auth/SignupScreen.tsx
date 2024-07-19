@@ -1,25 +1,19 @@
-import React, {useEffect, useState} from 'react';
+import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {
-  View,
-  Text,
-  StyleSheet,
-  Dimensions,
-  Image,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, Dimensions, Image} from 'react-native';
 // import { app, auth } from '../firebase/firebaseConfig'
 // import { getFirestore, doc, getDoc, setDoc } from "firebase/firestore";
 // import { useDispatch, useSelector } from 'react-redux';
 // import { loginUser } from "../features/auth/authSlices";
 import ButtonTemplate from '../../components/ButtonTemplate';
 import {useAuth} from '../../context/AuthContext';
+import {NavigationProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function Signup({navigation}) {
-  const [loading, setLoading] = useState(false);
+export default function Signup({navigation}: NavigationProps) {
+  const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState();
   const {signInWithGoogle} = useAuth();
 

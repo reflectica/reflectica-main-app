@@ -15,17 +15,9 @@ import {ButtonTemplate} from '../../components/index';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../features/auth/authSelectors.js'; // import the selector
-import {auth, db} from '../../firebase/firebaseConfig.js';
-import {
-  doc,
-  collection,
-  addDoc,
-  getDoc,
-  getDocs,
-  setDoc,
-  where,
-  query,
-} from 'firebase/firestore';
+import {db} from '../../firebase/firebaseConfig.js';
+import {collection, getDocs, setDoc, where, query} from 'firebase/firestore';
+import {NavigationProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -40,7 +32,7 @@ const calendarTheme = {
   lineHeight: 17.07,
 };
 
-export default function ProfileScreen({navigation}) {
+export default function ProfileScreen({navigation}: NavigationProps) {
   const [firstName, setFirstName] = useState<string>('');
   const [lastName, setLastName] = useState<string>('');
   const [birthday, setBirthday] = useState<string>('');
@@ -158,7 +150,8 @@ export default function ProfileScreen({navigation}) {
         </Text>
       </TouchableOpacity>
 
-      <ButtonTemplate title="Confirm" stylebtn="purple" />
+      {/* Confirm button doesn't have any action yet! */}
+      <ButtonTemplate title="Confirm" stylebtn="purple" action={() => {}} /> 
 
       {showModal ? (
         <Modal
@@ -298,7 +291,6 @@ const styles = StyleSheet.create({
     padding: 15,
     alignItems: 'center',
     marginTop: 20,
-    alignItems: 'center',
     // justifyContent:'center',
     marginBottom: 100,
   },

@@ -1,6 +1,6 @@
 export interface SessionBoxesProp {
   sessionID: number;
-  index: number;
+  // index: number;
   description: string;
 }
 

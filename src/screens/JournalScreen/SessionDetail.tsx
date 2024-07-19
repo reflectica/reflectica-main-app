@@ -7,14 +7,15 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
+import {NavigationProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionDetail({route}) {
+export default function SessionDetail({route}: NavigationProps) {
   const {session, sessionNumber} = route.params;
   const [sessionDetails, setSessionDetails] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {

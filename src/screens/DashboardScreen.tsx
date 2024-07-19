@@ -13,11 +13,12 @@ import {
 import {useRecentSummaryListener} from '../hooks/useSummaryListener.js';
 import {useAuth} from '../context/AuthContext.js';
 import {getEmojiByRating} from '../utils/emojiHelper.js';
+import {NavigationProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function DashboardScreen({route, navigation}) {
+export default function DashboardScreen({route, navigation}: NavigationProps) {
   const user = useSelector(selectUser);
   const {currentUser} = useAuth();
 
