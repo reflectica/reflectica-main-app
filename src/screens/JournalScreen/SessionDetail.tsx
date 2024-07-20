@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {SessionDetailScreenProps} from '../../constants';
+import {Error} from '../../components';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -39,11 +40,7 @@ export default function SessionDetail({
   }
 
   if (error) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Error: {error}</Text>
-      </SafeAreaView>
-    );
+    return <Error error={error} />;
   }
 
   return (
