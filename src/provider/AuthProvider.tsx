@@ -7,16 +7,16 @@ import {
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
+import {UserCredential} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
 import {onAuthStateChanged} from 'firebase/auth';
-import {UserProps} from '../constants';
 
 interface AuthProviderProps {
   children: ReactNode;
 }
 
 export const AuthProvider = ({children}: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<UserProps | null>(null);
+  const [currentUser, setCurrentUser] = useState<UserCredential | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<boolean>(false);
   const recaptchaVerifier = useRef(null);
@@ -161,7 +161,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     }
   }, []);
 
-  const confirmPhoneAuthCode = useCallback(async confirmationResults => {
+  const confirmPhoneAuthCode = useCallback(async (confirmationResults: any) => {
     if (!confirmationResults) {
       return;
     }
