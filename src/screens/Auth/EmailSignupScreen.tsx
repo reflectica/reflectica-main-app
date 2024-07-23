@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -9,15 +10,20 @@ import {
   Dimensions,
   TextInput,
   Pressable,
+  Alert,
+  Platform,
 } from 'react-native';
 import {ButtonTemplate} from '../../components';
 import {createUserWithEmailAndPassword} from 'firebase/auth';
 import {useAuth} from '../../context/AuthContext';
+import {EmailSignupScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function EmailSignupScreen({navigation}) {
+export default function EmailSignupScreen({
+  navigation,
+}: EmailSignupScreenProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -28,11 +34,11 @@ export default function EmailSignupScreen({navigation}) {
 
   const {signupWithEmail} = useAuth();
 
-  const togglePeek = () => setPeekPass(!peekPass);
+  // const togglePeek = () => setPeekPass(!peekPass);
 
   const handleEmailLogin = () => {
     if (password !== confirmPassword) {
-      alert('Password does not match!');
+      Alert.alert('Password does not match!');
       return;
     }
     if (
@@ -40,7 +46,7 @@ export default function EmailSignupScreen({navigation}) {
       password.length === 0 &&
       confirmPassword.length === 0
     ) {
-      alert('Form needs to be filled out!');
+      Alert.alert('Form needs to be filled out!');
       return;
     }
 
@@ -54,7 +60,9 @@ export default function EmailSignupScreen({navigation}) {
     }
   };
 
-  if (loading) return <View>Loading...</View>;
+  if (loading) {
+    return <View>Loading...</View>;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -75,7 +83,7 @@ export default function EmailSignupScreen({navigation}) {
               onChangeText={text => setEmail(text)}
               style={styles.textInput}
               placeholder="Email"
-              type="email"
+              // type="email"
             />
           </View>
         </View>
@@ -88,7 +96,7 @@ export default function EmailSignupScreen({navigation}) {
               secureTextEntry={!isPasswordVisible}
               value={password}
               onChangeText={text => setPassword(text)}
-              type="password"
+              // type="password"
               style={styles.textInput}
               placeholder="Enter Password"
             />
@@ -113,7 +121,7 @@ export default function EmailSignupScreen({navigation}) {
               secureTextEntry={!isPasswordVisible}
               value={confirmPassword}
               onChangeText={text => setConfirmPassword(text)}
-              type="password"
+              // type="password"
               style={styles.textInput}
               placeholder="Confirm Password"
             />

@@ -5,13 +5,9 @@ import {SessionBoxesProp} from '../constants';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionBoxes({
-  sessionID,
-  index,
-  description,
-}: SessionBoxesProp) {
+export default function SessionBoxes({id, description}: SessionBoxesProp) {
   return (
-    <View style={sessionStyles.sessionCards} key={index}>
+    <View style={sessionStyles.sessionCards} key={id}>
       <View style={sessionStyles.checkmarkContainer}>
         <Image
           style={sessionStyles.checkIcon}
@@ -20,7 +16,7 @@ export default function SessionBoxes({
       </View>
       <Text style={sessionStyles.titleDescription}>
         {' '}
-        Session #{sessionID} | {description}
+        Session #{id} | {description}
       </Text>
     </View>
   );

@@ -1,4 +1,5 @@
-import React, {useState, useContext, useEffect} from 'react';
+/* eslint-disable react-native/no-inline-styles */
+import React, {useState, useContext} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   StyleSheet,
@@ -11,19 +12,21 @@ import {
 import {useDispatch} from 'react-redux';
 import {ButtonTemplate} from '../../components/index';
 import ModalDropdown from 'react-native-modal-dropdown';
-import {FirebaseRecaptchaVerifierModal} from 'expo-firebase-recaptcha';
-import {app} from '../../firebase/firebaseConfig';
-import {setConfirmationResult} from '../../features/auth/authSlices';
+// import {app} from '../../firebase/firebaseConfig';
+// import {setConfirmationResult} from '../../features/auth/authSlices';
 import {AuthContext} from '../../context/AuthContext';
 
-const countryData = require('../../data/countryData.json');
+import countryData from '../../data/countryData.json';
+import {PhonenumberScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function PhonenumberScreen({navigation}) {
+export default function PhonenumberScreen({
+  navigation,
+}: PhonenumberScreenProps) {
   const [countryCode, setCountryCode] = useState('+1');
-  const [phoneNumber, setPhoneNumber] = useState(null);
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [confirm, setConfirm] = useState(null);
   const dispatch = useDispatch();
   const {phoneNumberAuth} = useContext(AuthContext);
@@ -33,7 +36,7 @@ export default function PhonenumberScreen({navigation}) {
     value: country.dial_code,
   }));
 
-  const isValidPhoneNumber = phoneNumber => {
+  const isValidPhoneNumber = (phoneNumber: string) => {
     // Implement your validation logic here
     // For example, you can use a regular expression to check the format
     const phoneRegex = /^\+\d{1,3}\s?\d{1,14}$/;

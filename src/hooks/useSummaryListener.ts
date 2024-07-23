@@ -1,11 +1,12 @@
 import {useState, useEffect, useCallback} from 'react';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs} from 'firebase/firestore';
+import {SessionBoxesProp, SessionDetailProp} from '../constants';
 
 export const useAllSummaryListener = (userId: string) => {
-  const [sessionSummary, setSessionSummary] = useState([]);
+  const [sessionSummary, setSessionSummary] = useState<SessionDetailProp[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<Error | string | null>(null);
 
   const fetchSessions = useCallback(async () => {
     setLoading(true);
@@ -22,7 +23,7 @@ export const useAllSummaryListener = (userId: string) => {
       const q = query(summaryCollection, where('uid', '==', userId));
       const querySnapshot = await getDocs(q);
 
-      const sessionDataArray = [];
+      const sessionDataArray: any = [];
 
       querySnapshot.forEach(doc => {
         const sessionData = doc.data();
@@ -36,9 +37,9 @@ export const useAllSummaryListener = (userId: string) => {
         console.log('No sessions found for the given UID.');
         setSessionSummary([]);
       }
-    } catch (error) {
+    } catch (err) {
       setError(
-        error instanceof Error ? error : new Error('Error fetching sessions'),
+        err instanceof Error ? err : new Error('Error fetching sessions'),
       );
     } finally {
       setLoading(false);
@@ -53,10 +54,12 @@ export const useAllSummaryListener = (userId: string) => {
 };
 
 export const useRecentSummaryListener = (userId: string) => {
-  const [recentSessionSummary, setRecentSessionSummary] = useState([]);
+  const [recentSessionSummary, setRecentSessionSummary] = useState<
+    SessionBoxesProp[]
+  >([]);
   const [recentFeeling, setRecentFeeling] = useState();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<Error | string | null>(null);
 
   const fetchRecentSessions = useCallback(async () => {
     setLoading(true);
@@ -71,7 +74,7 @@ export const useRecentSummaryListener = (userId: string) => {
     try {
       const q = query(summaryCollection, where('uid', '==', userId));
       const querySnapshot = await getDocs(q);
-      const sessionDataArray = [];
+      const sessionDataArray: any = [];
 
       querySnapshot.forEach(doc => {
         const sessionData = doc.data();
@@ -91,10 +94,10 @@ export const useRecentSummaryListener = (userId: string) => {
         console.log('No recent sessions found for the given UID.');
         setRecentSessionSummary([]);
       }
-    } catch (error) {
+    } catch (err) {
       setError(
-        error instanceof Error
-          ? error
+        err instanceof Error
+          ? err
           : new Error('Error fetching recent sessions'),
       );
     } finally {

@@ -1,17 +1,24 @@
 import React, {useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
-import {StyleSheet, Button, Text, View, Dimensions, GestureResponderEvent} from 'react-native';
+import {
+  StyleSheet,
+  Button,
+  Text,
+  View,
+  Dimensions,
+  GestureResponderEvent,
+} from 'react-native';
 import 'react-native-get-random-values';
-import {useSelector} from 'react-redux';
+// import {useSelector} from 'react-redux';
 import {useAuth} from '../context/AuthContext.js';
 import {v4 as uuidv4} from 'uuid';
 import axios from 'axios';
 import Voice from '@react-native-voice/voice';
-import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
+// import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
 import {ButtonTemplate} from '../components/index.js';
-import * as FileSystem from 'expo-file-system';
+// import * as FileSystem from 'expo-file-system';
 // import {Audio} from 'expo-av';
-import {UserProps} from '../constants';
+// import {UserProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -200,7 +207,5 @@ const styles = StyleSheet.create({
     fontSize: 11,
     lineHeight: 16.5,
   },
-  transcript: {
-
-  },
+  transcript: {},
 });

@@ -50,6 +50,7 @@ function MyTabs() {
     <Tab.Navigator
       screenOptions={({route}) => ({
         tabBarShowLabel: false,
+        // eslint-disable-next-line react/no-unstable-nested-components
         tabBarIcon: ({color}) => {
           let iconSource: any;
 

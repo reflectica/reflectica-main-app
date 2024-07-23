@@ -7,7 +7,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import {SessionDetailScreenProps} from '../../constants';
+import {SessionDetailScreenProps, SessionDetailProp} from '../../constants';
 import {Error} from '../../components';
 
 const screenHeight = Dimensions.get('window').height;
@@ -18,13 +18,17 @@ export default function SessionDetail({
   route,
 }: SessionDetailScreenProps) {
   const {session, sessionNumber} = route.params;
-  const [sessionDetails, setSessionDetails] = useState(null);
+  const [sessionDetails, setSessionDetails] =
+    useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     // Fetch session details using sessionId
     // Simulate fetching data with a timeout
+    // let details : {
+    //   session:
+    // }
     setTimeout(() => {
       setSessionDetails({id: session.sessionId, details: session.session});
       setLoading(false);
@@ -42,7 +46,7 @@ export default function SessionDetail({
   if (error) {
     return <Error error={error} />;
   }
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Session Summary</Text>

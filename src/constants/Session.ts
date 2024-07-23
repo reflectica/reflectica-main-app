@@ -1,15 +1,9 @@
-export interface SessionBoxesProp {
-  sessionID: number;
-  // index: number;
-  description: string;
-}
-
-interface SessionScore {
+interface SessionScoreProp {
   score: number;
   day: string;
 }
 
-interface EmotionalStateModeling {
+interface EmotionalStateModelingProp {
   happy: number;
   excited: number;
   nervous: number;
@@ -18,7 +12,7 @@ interface EmotionalStateModeling {
 export interface SessionDetailProp {
   id: string;
   sessionID: number;
-  sessionScore: SessionScore[];
+  sessionScore: SessionScoreProp[];
   phq9: number[];
   gad7: number[];
   cbt: number[];
@@ -26,6 +20,12 @@ export interface SessionDetailProp {
   pss: number;
   ssrs: number;
   esteemBar: number[];
-  emotionalStateModeling: EmotionalStateModeling[];
+  emotionalStateModeling: EmotionalStateModelingProp[];
   keyConversationTopics: string[];
+}
+
+export interface SessionBoxesProp {
+  id: number;
+  // index: number;
+  description: string;
 }

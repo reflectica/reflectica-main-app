@@ -38,10 +38,7 @@ export default function JournalScreen({navigation}: JournalScreenProps) {
                   sessionNumber: index + 1,
                 });
               }}>
-              <SessionBoxes
-                sessionID={index + 1}
-                description={data.shortSummary}
-              />
+              <SessionBoxes id={index + 1} description={data.shortSummary} />
             </TouchableOpacity>
           ))}
 
