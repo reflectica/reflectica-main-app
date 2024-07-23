@@ -39,7 +39,10 @@ export default function SessionDetail({
     );
   }
 
-  if (error) return <Error error={error} />;
+  if (error) {
+    return <Error error={error} />;
+  }
+  
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Session Summary</Text>
