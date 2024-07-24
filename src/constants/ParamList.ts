@@ -9,7 +9,7 @@ export type RootStackParamList = {
   Support: undefined;
   Setting: undefined;
   Profile: undefined;
-  MainApp: undefined;
+  MainApp: {screen?: string} | undefined;
   InSession: undefined;
   Onboarding: undefined;
   Login: undefined;

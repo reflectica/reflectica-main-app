@@ -3,7 +3,7 @@ import UserCredential from '@react-native-firebase/auth';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: typeof UserCredential | null;
+  user: any | null;
   confirmationResult: any;
 }
 

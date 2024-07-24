@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -46,7 +47,7 @@ export default function ProfileScreen({navigation}: ProfileScreenProps) {
 
   const addUserInfo = async () => {
     const userRef = collection(db, 'users');
-    const querying = query(userRef, where('uid', '==', user.uid));
+    const querying = query(userRef, where('uid', '==', user?.uid));
 
     if (!firstName && !lastName) {
       try {
@@ -151,7 +152,11 @@ export default function ProfileScreen({navigation}: ProfileScreenProps) {
       </TouchableOpacity>
 
       {/* Confirm button doesn't have any action yet! */}
-      <ButtonTemplate title="Confirm" stylebtn="purple" action={() => {}} /> 
+      <ButtonTemplate
+        title="Confirm"
+        stylebtn="purple"
+        action={() => addUserInfo()}
+      />
 
       {showModal ? (
         <Modal
