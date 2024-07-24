@@ -76,7 +76,7 @@ export type NotificationScreenProps = {
   navigation: NotificationScreenNavigationProp;
 };
 
-type OnboardingScreenNavigationProp = StackNavigationProp<
+export type OnboardingScreenNavigationProp = StackNavigationProp<
   RootStackParamList,
   'Onboarding'
 >;

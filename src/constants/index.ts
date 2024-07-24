@@ -8,7 +8,10 @@ export {type JournalScreenProps} from './ParamList';
 export {type DashboardScreenProps} from './ParamList';
 export {type SignupScreenProps} from './ParamList';
 export {type NotificationScreenProps} from './ParamList';
+
 export {type OnboardingScreenProps} from './ParamList';
+export {type OnboardingScreenNavigationProp} from './ParamList';
+
 export {type PhonenumberScreenProps} from './ParamList';
 export {type ProfileScreenProps} from './ParamList';
 export {type SessionScreenProps} from './ParamList';
