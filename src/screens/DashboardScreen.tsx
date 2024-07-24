@@ -28,7 +28,9 @@ export default function DashboardScreen({
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const {recentSessionSummary, recentFeeling, loading, error} =
-    useRecentSummaryListener('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser.uid);
+    useRecentSummaryListener(
+      'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser?.uid,
+    );
 
   console.log('session summary', recentSessionSummary);
   // console.log("USER ", currentUser.uid)

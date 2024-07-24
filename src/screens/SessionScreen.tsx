@@ -135,7 +135,7 @@ export default function SessionScreen() {
         <ButtonTemplate
           title="End Session"
           action={() =>
-            handleEndSession('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser.uid)
+            handleEndSession('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser?.uid)
           }
           stylebtn={'purple'}
           styling={{alignSelf: 'center'}}

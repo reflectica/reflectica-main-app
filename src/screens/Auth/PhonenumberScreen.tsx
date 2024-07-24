@@ -14,7 +14,7 @@ import {ButtonTemplate} from '../../components/index';
 import ModalDropdown from 'react-native-modal-dropdown';
 // import {app} from '../../firebase/firebaseConfig';
 // import {setConfirmationResult} from '../../features/auth/authSlices';
-import {AuthContext} from '../../context/AuthContext';
+import {useAuth} from '../../context/AuthContext';
 
 import countryData from '../../data/countryData.json';
 import {PhonenumberScreenProps} from '../../constants';
@@ -29,7 +29,7 @@ export default function PhonenumberScreen({
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   // const [confirm, setConfirm] = useState(null);
   // const dispatch = useDispatch();
-  const {phoneNumberAuth} = useContext(AuthContext);
+  const {phoneNumberAuth} = useAuth();
 
   const countryCodes = countryData.map(country => ({
     label: `${country.flag} (${country.dial_code})`,

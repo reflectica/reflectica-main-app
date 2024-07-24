@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {Image} from 'react-native';
 // import type {PropsWithChildren} from 'react';
@@ -67,7 +68,7 @@ function MyTabs() {
             <Image
               source={iconSource}
               style={{height: 30, width: 30}}
-              color={color}
+              // color={color}
             />
           );
         },

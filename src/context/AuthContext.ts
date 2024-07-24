@@ -1,7 +1,7 @@
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {createContext, useContext} from 'react';
 interface AuthContextProps {
-  currentUser: any; // Replace `any` with your user type
+  currentUser: FirebaseAuthTypes.User | null; // Replace `any` with your user type
   isLoggedIn: boolean;
   newUser: boolean;
   signInWithGoogle: () => Promise<void>;
