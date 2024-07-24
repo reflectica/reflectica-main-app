@@ -19,7 +19,7 @@ type ItemProps = {
   description: string;
 };
 
-const items: ItemProps = [
+const items: ItemProps[] = [
   {
     image: require('../assets/onboarding/Onboarding1.jpg'),
     title: 'Hyper-Realistic',
@@ -43,7 +43,7 @@ export default function OnboardingScreen() {
   const [activeSlide, setActiveSlide] = React.useState(0);
   const navigation = useNavigation();
 
-  const renderItem = (item: ItemProps) => {
+  const renderItem = ({item}: {item: ItemProps}) => {
     return (
       <View style={styles.slide}>
         <Image source={item.image} style={styles.images} />

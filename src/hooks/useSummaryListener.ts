@@ -81,7 +81,9 @@ export const useRecentSummaryListener = (userId: string) => {
         sessionDataArray.push(sessionData);
       });
 
-      sessionDataArray.sort((a, b) => new Date(b.time) - new Date(a.time));
+      sessionDataArray.sort(
+        (a: any, b: any) => new Date(b.time) - new Date(a.time),
+      );
       const mostRecentSessions = sessionDataArray.slice(0, 3);
       const mostRecentFeeling = sessionDataArray[0].moodPercentage;
 
