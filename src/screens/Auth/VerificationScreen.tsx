@@ -35,19 +35,19 @@ export default function VerificationScreen({
     '',
   ]);
   const inputRefs = [
-    useRef(),
-    useRef(),
-    useRef(),
-    useRef(),
-    useRef(),
-    useRef(),
+    useRef<TextInput>(null),
+    useRef<TextInput>(null),
+    useRef<TextInput>(null),
+    useRef<TextInput>(null),
+    useRef<TextInput>(null),
+    useRef<TextInput>(null),
   ];
 
   const [focusedIndex, setFocusedIndex] = useState(0);
 
-  const confirmationResult = useSelector(
-    state => state.auth.setConfirmationResult,
-  );
+  // const confirmationResult = useSelector(
+  //   state => state.auth.setConfirmationResult,
+  // );
   const {fullPhoneNumber, confirmationResult} = route.params;
 
   useEffect(() => {
@@ -84,7 +84,7 @@ export default function VerificationScreen({
       setVerificationCode(newVerificationCode);
     }
     if (text.length === 1 && index < 5) {
-      inputRefs[index + 1].current.focus();
+      inputRefs[index + 1]?.current?.focus();
     }
   };
 
@@ -113,7 +113,8 @@ export default function VerificationScreen({
     return (
       <View style={styles.numberPad}>
         {Array.from({length: columns}, (_, colIndex) => (
-          <View key={colIndex} style={styles.numberRow}>
+          // style={styles.numberRow} this belonged in the view under
+          <View key={colIndex}>
             {Array.from({length: rows}, (_, rowIndex) => {
               const index = rowIndex * columns + colIndex;
               const number = numbers[index];
@@ -177,7 +178,7 @@ export default function VerificationScreen({
             navigation.navigate('Profile');
           }
         } catch (queryError) {
-          console.error('Error executing firestore query:', queryError.stack);
+          console.error('Error executing firestore query:', queryError);
         }
       } else {
         console.error('Confirmation result is undefined');
@@ -203,7 +204,7 @@ export default function VerificationScreen({
             inputRefs[focusedIndex - 1] &&
             inputRefs[focusedIndex - 1].current
           ) {
-            inputRefs[focusedIndex - 1].current.focus();
+            inputRefs[focusedIndex - 1]?.current?.focus();
           }
         }
       } else {
@@ -215,7 +216,7 @@ export default function VerificationScreen({
             inputRefs[focusedIndex + 1] &&
             inputRefs[focusedIndex + 1].current
           ) {
-            inputRefs[focusedIndex + 1].current.focus();
+            inputRefs[focusedIndex + 1]?.current?.focus();
           }
         }
         // else {

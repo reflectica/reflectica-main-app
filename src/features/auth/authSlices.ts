@@ -1,5 +1,4 @@
 import {createSlice, PayloadAction} from '@reduxjs/toolkit';
-import UserCredential from '@react-native-firebase/auth';
 
 interface AuthState {
   isAuthenticated: boolean;
@@ -17,7 +16,7 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
-    loginUser: (state, action: PayloadAction<typeof UserCredential>) => {
+    loginUser: (state, action: PayloadAction<any>) => {
       state.isAuthenticated = true;
       state.user = action.payload;
     },
