@@ -1,11 +1,14 @@
 import React from 'react';
 import {StyleSheet, Text, View, Dimensions, Image} from 'react-native';
-import {SessionBoxesProp} from '../constants';
 
 // const screenHeight = Dimensions.get('window').height;
 // const screenWidth = Dimensions.get('window').width;
+interface SessionBoxesProps {
+  id: number;
+  description: string;
+}
 
-export default function SessionBoxes({id, description}: SessionBoxesProp) {
+export default function SessionBoxes({id, description}: SessionBoxesProps) {
   return (
     <View style={sessionStyles.sessionCards} key={id}>
       <View style={sessionStyles.checkmarkContainer}>

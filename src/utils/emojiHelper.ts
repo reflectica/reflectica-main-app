@@ -13,6 +13,6 @@ const emojiRatings: Record<Rating, string> = {
   '10': '😂',
 };
 
-export const getEmojiByRating = (rating: Rating): string | undefined => {
-  return emojiRatings[rating];
+export const getEmojiByRating = (rating: number): string | undefined => {
+  return emojiRatings[rating.toString() as Rating];
 };

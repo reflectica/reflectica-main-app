@@ -9,7 +9,7 @@ import {
   Alert,
   Text,
 } from 'react-native';
-import {useDispatch} from 'react-redux';
+// import {useDispatch} from 'react-redux';
 import {ButtonTemplate} from '../../components/index';
 import ModalDropdown from 'react-native-modal-dropdown';
 // import {app} from '../../firebase/firebaseConfig';
@@ -27,8 +27,8 @@ export default function PhonenumberScreen({
 }: PhonenumberScreenProps) {
   const [countryCode, setCountryCode] = useState('+1');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
-  const [confirm, setConfirm] = useState(null);
-  const dispatch = useDispatch();
+  // const [confirm, setConfirm] = useState(null);
+  // const dispatch = useDispatch();
   const {phoneNumberAuth} = useContext(AuthContext);
 
   const countryCodes = countryData.map(country => ({
@@ -36,11 +36,11 @@ export default function PhonenumberScreen({
     value: country.dial_code,
   }));
 
-  const isValidPhoneNumber = (phoneNumber: string) => {
+  const isValidPhoneNumber = (phone: string) => {
     // Implement your validation logic here
     // For example, you can use a regular expression to check the format
     const phoneRegex = /^\+\d{1,3}\s?\d{1,14}$/;
-    return phoneRegex.test(phoneNumber);
+    return phoneRegex.test(phone);
   };
 
   const sendVerification = async () => {

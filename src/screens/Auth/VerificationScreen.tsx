@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect, useRef} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -41,6 +42,7 @@ export default function VerificationScreen({
     useRef(),
     useRef(),
   ];
+
   const [focusedIndex, setFocusedIndex] = useState(0);
 
   const confirmationResult = useSelector(

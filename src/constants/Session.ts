@@ -1,3 +1,5 @@
+import {Key, ReactNode} from 'react';
+
 interface SessionScoreProp {
   score: number;
   day: string;
@@ -10,6 +12,7 @@ interface EmotionalStateModelingProp {
   other: string;
 }
 export interface SessionDetailProp {
+  shortSummary: string;
   id: string;
   sessionID: number;
   sessionScore: SessionScoreProp[];
@@ -25,6 +28,8 @@ export interface SessionDetailProp {
 }
 
 export interface SessionBoxesProp {
+  sessionId: Key | null | undefined;
+  shortSummary: ReactNode;
   id: number;
   // index: number;
   description: string;

@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
@@ -12,17 +13,17 @@ import {
 } from 'react-native';
 import {useRecentSummaryListener} from '../hooks/useSummaryListener.js';
 import {useAuth} from '../context/AuthContext.js';
-import {getEmojiByRating} from '../utils/emojiHelper.js';
+// import {getEmojiByRating} from '../utils/emojiHelper.js';
 import {DashboardScreenProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 export default function DashboardScreen({
-  route,
+  // route,
   navigation,
 }: DashboardScreenProps) {
-  const user = useSelector(selectUser);
+  // const user = useSelector(selectUser);
   const {currentUser} = useAuth();
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -40,9 +41,9 @@ export default function DashboardScreen({
       <View style={styles.firstRowContainer}>
         <View style={styles.lastFeelingBox}>
           <Text style={styles.boxTitle}>Last feeling...</Text>
-          <Text style={{fontSize: 50, textAlign: 'center'}}>
+          {/* <Text style={{fontSize: 50, textAlign: 'center'}}>
             {getEmojiByRating(recentFeeling)}
-          </Text>
+          </Text> */}
           <Image
             style={styles.iIcon}
             source={require('../assets/dashboard/i.png')}

@@ -30,7 +30,7 @@ export default function SessionDetail({
     //   session:
     // }
     setTimeout(() => {
-      setSessionDetails({id: session.sessionId, details: session.session});
+      setSessionDetails(session);
       setLoading(false);
     }, 1000);
   }, [session]);

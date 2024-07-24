@@ -1,13 +1,13 @@
 import React, {useRef, useState, useCallback, ReactNode} from 'react';
 import {Alert} from 'react-native';
-import {fbAuth, db, userCollection, app} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
+import {userCollection} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
 import {addDoc} from 'firebase/firestore';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
 import auth from '@react-native-firebase/auth';
-import {UserCredential} from '@react-native-firebase/auth';
+import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
 import {onAuthStateChanged} from 'firebase/auth';
 
@@ -16,7 +16,9 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({children}: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<UserCredential | null>(null);
+  const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
+    null,
+  );
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<boolean>(false);
   const recaptchaVerifier = useRef(null);
@@ -161,17 +163,23 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     }
   }, []);
 
-  const confirmPhoneAuthCode = useCallback(async (confirmationResults: any) => {
-    if (!confirmationResults) {
-      return;
-    }
+  const confirmPhoneAuthCode = useCallback(
+    async (
+      confirmationResults: FirebaseAuthTypes.ConfirmationResult,
+      code: string,
+    ) => {
+      if (!confirmationResults) {
+        return;
+      }
 
-    try {
-      await confirmationResults.confirm(code);
-    } catch (error) {
-      console.error('Invalid code:', error);
-    }
-  }, []);
+      try {
+        await confirmationResults.confirm(code);
+      } catch (error) {
+        console.error('Invalid code:', error);
+      }
+    },
+    [],
+  );
 
   const handleLogout = useCallback(async () => {
     setCurrentUser(null);

@@ -32,7 +32,7 @@ export default function JournalScreen({navigation}: JournalScreenProps) {
             <TouchableOpacity
               // index={index}
               onPress={() => {
-                console.log('LOGGING SESSION ID:', data.sessionId);
+                console.log('LOGGING SESSION ID:', data.sessionID);
                 navigation.navigate('SessionDetail', {
                   session: data,
                   sessionNumber: index + 1,

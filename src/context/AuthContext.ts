@@ -1,4 +1,5 @@
-import React, {createContext, useContext, ReactNode} from 'react';
+import {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import {createContext, useContext} from 'react';
 interface AuthContextProps {
   currentUser: any; // Replace `any` with your user type
   isLoggedIn: boolean;
@@ -6,9 +7,11 @@ interface AuthContextProps {
   signInWithGoogle: () => Promise<void>;
   signupWithEmail: (email: string, password: string) => Promise<void>;
   loginWithEmail: (email: string, password: string) => Promise<void>;
-  phoneNumberAuth: (phone: string) => Promise<any>;
+  phoneNumberAuth: (
+    phone: string,
+  ) => Promise<FirebaseAuthTypes.ConfirmationResult | null>;
   confirmPhoneAuthCode: (
-    confirmationResults: any,
+    confirmationResults: FirebaseAuthTypes.ConfirmationResult,
     code: string,
   ) => Promise<void>;
   handleLogout: () => Promise<void>;
