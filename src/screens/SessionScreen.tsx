@@ -13,7 +13,7 @@ import 'react-native-get-random-values';
 import {useAuth} from '../context/AuthContext.js';
 import {v4 as uuidv4} from 'uuid';
 import axios from 'axios';
-import Voice from '@react-native-voice/voice';
+import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
 // import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
 import {ButtonTemplate} from '../components/index.js';
 // import * as FileSystem from 'expo-file-system';
@@ -34,8 +34,10 @@ export default function SessionScreen() {
 
   useEffect(() => {
     // Function to handle the voice recognition results
-    const onSpeechResults = (e: {value: string[]}) => {
-      setTranscript(e.value.join(' ')); // Joining the array of strings into a single string
+    const onSpeechResults = (e: SpeechResultsEvent) => {
+      if (e.value) {
+        setTranscript(e.value.join(' ')); // Joining the array of strings into a single string
+      }
     };
 
     // Adding the event listener

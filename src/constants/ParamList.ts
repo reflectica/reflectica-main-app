@@ -1,6 +1,6 @@
 // src/navigation/ParamList.ts
-import { RouteProp } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import {RouteProp} from '@react-navigation/native';
+import {StackNavigationProp} from '@react-navigation/stack';
 
 export type RootStackParamList = {
   Dashboard: undefined;
