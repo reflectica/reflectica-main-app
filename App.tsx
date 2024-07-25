@@ -126,16 +126,16 @@ function App(): React.JSX.Element {
           )
         ) : (
           <>
-            <Stack.Screen
+            {/* <Stack.Screen
               name="In-Session"
               component={SessionScreen}
               options={{headerShown: false}}
-            />
-            <Stack.Screen
+            /> */}
+            {/* <Stack.Screen
               name="MainApp"
               component={MyTabs}
               options={{headerShown: false}}
-            />
+            /> */}
 
             <Stack.Screen
               name="Onboarding"
