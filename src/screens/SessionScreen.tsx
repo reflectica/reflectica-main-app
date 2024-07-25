@@ -10,12 +10,12 @@ import {
 } from 'react-native';
 import 'react-native-get-random-values';
 // import {useSelector} from 'react-redux';
-import {useAuth} from '../context/AuthContext.js';
+import {useAuth} from '../context/AuthContext.ts';
 import {v4 as uuidv4} from 'uuid';
 import axios from 'axios';
-import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
-// import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
-import {ButtonTemplate} from '../components/index.js';
+import Voice, {SpeechResultsEvent} from '@react-native-voice/voice';
+// import {selectUser} from '../features/auth/authSelectors.ts'; // import the selector
+import {ButtonTemplate} from '../components/index.ts';
 // import * as FileSystem from 'expo-file-system';
 // import {Audio} from 'expo-av';
 // import {UserProps} from '../constants';

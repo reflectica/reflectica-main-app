@@ -2,7 +2,7 @@
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {useSelector} from 'react-redux';
-import {selectUser} from '../features/auth/authSelectors.js'; // import the selector
+import {selectUser} from '../features/auth/authSelectors.ts'; // import the selector
 import {
   StyleSheet,
   Text,
@@ -11,9 +11,9 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import {useRecentSummaryListener} from '../hooks/useSummaryListener.js';
-import {useAuth} from '../context/AuthContext.js';
-// import {getEmojiByRating} from '../utils/emojiHelper.js';
+import {useRecentSummaryListener} from '../hooks/useSummaryListener.ts';
+import {useAuth} from '../context/AuthContext.ts';
+// import {getEmojiByRating} from '../utils/emojiHelper.ts';
 import {DashboardScreenProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;

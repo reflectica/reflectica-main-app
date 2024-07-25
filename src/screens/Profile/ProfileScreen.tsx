@@ -15,8 +15,8 @@ import {
 import {ButtonTemplate} from '../../components/index';
 import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
-import {selectUser} from '../../features/auth/authSelectors.js'; // import the selector
-import {db} from '../../firebase/firebaseConfig.js';
+import {selectUser} from '../../features/auth/authSelectors.ts'; // import the selector
+import {db} from '../../firebase/firebaseConfig.ts';
 import {collection, getDocs, setDoc, where, query} from 'firebase/firestore';
 import {ProfileScreenProps} from '../../constants';
 

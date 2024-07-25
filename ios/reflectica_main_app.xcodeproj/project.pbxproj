@@ -12,6 +12,7 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		460909CB30C047B58ED1FED6 /* Pods_reflectica_main_app_reflectica_main_appTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EEDBCE0A37D352A212CCC48 /* Pods_reflectica_main_app_reflectica_main_appTests.framework */; };
+		609253C92C51E519008307EB /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 609253C82C51E519008307EB /* GoogleService-Info.plist */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		C56D70E6309F4156BB1DF3C1 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 359F054001DBE0559C9AC062 /* PrivacyInfo.xcprivacy */; };
 		F2F0CBE65C1C7DFE7D6EE733 /* Pods_reflectica_main_app.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E17AB8D7D94AF6474DAFF748 /* Pods_reflectica_main_app.framework */; };
@@ -38,11 +39,12 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = reflectica_main_app/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = reflectica_main_app/main.m; sourceTree = "<group>"; };
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = reflectica_main_app/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		359F054001DBE0559C9AC062 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; name = PrivacyInfo.xcprivacy; path = reflectica_main_app/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		359F054001DBE0559C9AC062 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xml; name = PrivacyInfo.xcprivacy; path = reflectica_main_app/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		3B4392A12AC88292D35C810B /* Pods-reflectica_main_app.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reflectica_main_app.debug.xcconfig"; path = "Target Support Files/Pods-reflectica_main_app/Pods-reflectica_main_app.debug.xcconfig"; sourceTree = "<group>"; };
 		3EEDBCE0A37D352A212CCC48 /* Pods_reflectica_main_app_reflectica_main_appTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_reflectica_main_app_reflectica_main_appTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		5709B34CF0A7D63546082F79 /* Pods-reflectica_main_app.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reflectica_main_app.release.xcconfig"; path = "Target Support Files/Pods-reflectica_main_app/Pods-reflectica_main_app.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-reflectica_main_app-reflectica_main_appTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reflectica_main_app-reflectica_main_appTests.debug.xcconfig"; path = "Target Support Files/Pods-reflectica_main_app-reflectica_main_appTests/Pods-reflectica_main_app-reflectica_main_appTests.debug.xcconfig"; sourceTree = "<group>"; };
+		609253C82C51E519008307EB /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = reflectica_main_app/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-reflectica_main_app-reflectica_main_appTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-reflectica_main_app-reflectica_main_appTests.release.xcconfig"; path = "Target Support Files/Pods-reflectica_main_app-reflectica_main_appTests/Pods-reflectica_main_app-reflectica_main_appTests.release.xcconfig"; sourceTree = "<group>"; };
 		E17AB8D7D94AF6474DAFF748 /* Pods_reflectica_main_app.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_reflectica_main_app.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -121,6 +123,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				609253C82C51E519008307EB /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* reflectica_main_app */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* reflectica_main_appTests */,
@@ -248,6 +251,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				609253C92C51E519008307EB /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				C56D70E6309F4156BB1DF3C1 /* PrivacyInfo.xcprivacy in Resources */,
 			);
