@@ -19,3 +19,4 @@ export {default as JournalScreen} from './JournalScreen/JournalScreen';
 export {default as SessionDetail} from './JournalScreen/SessionDetail';
 
 export {default as SettingScreen} from './SettingScreen';
+export {default as PostSessionJournal} from './PostSessionJournal';

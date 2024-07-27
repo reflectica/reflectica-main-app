@@ -14,7 +14,7 @@ import {
   SelfEsteemBarComponent,
 } from '../components';
 import {useRoute} from '@react-navigation/native'; // Import useRoute to get the passed parameters
-import {useRecentMentalHealthScores} from '../hooks/useSummaryListener'; // Import the hook
+import {useRecentMentalHealthScores} from '../hooks';
 
 export default function PostSessionJournal() {
   const route = useRoute();

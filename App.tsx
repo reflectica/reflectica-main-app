@@ -21,6 +21,7 @@ import {
   SettingScreen,
   SupportScreen,
   EmailSignupScreen,
+  PostSessionJournal,
 } from './src/screens';
 import {cloud, log, question, setting} from './src/assets/nav';
 import {useAuth} from './src/context/AuthContext';
@@ -120,6 +121,11 @@ function App(): React.JSX.Element {
               <Stack.Screen
                 name="InSession"
                 component={SessionScreen}
+                options={{headerShown: false}}
+              />
+              <Stack.Screen
+                name="Post-Session"
+                component={PostSessionJournal}
                 options={{headerShown: false}}
               />
             </>
