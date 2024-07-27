@@ -72,7 +72,7 @@ export default function PostSessionJournal() {
 
   const mentalHealthScore = session.mentalHealthScore;
 
-  const calculateMentalHealthScore = scores => {
+  const calculateMentalHealthScore = (scores: any) => {
     const weights = {
       'PHQ-9 Score': 3,
       'GAD-7 Score': 3,
