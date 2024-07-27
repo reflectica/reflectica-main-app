@@ -6,11 +6,13 @@ import {
   Mukta_400Regular,
   Mukta_700Bold,
 } from '@expo-google-fonts/mukta';
-import LineChartWithInteraction from '../components/LineChartWithInteraction';
-import BarGraph from '../components/BarGraph';
-import SelfEsteemBarComponent from '../components/SelfEsteemBarComponent';
-import PieChartComponent from '../components/PieChartComponent';
-import ReflecticaScoreIncrease from '../components/ReflecticaScoreIncrease';
+import {
+  DonutChartComponent,
+  ReflecticaScoreIncrease,
+  LineChartWithInteraction,
+  BarGraph,
+  SelfEsteemBarComponent,
+} from '../components';
 import {useRoute} from '@react-navigation/native'; // Import useRoute to get the passed parameters
 import {useRecentMentalHealthScores} from '../hooks/useSummaryListener'; // Import the hook
 
@@ -248,7 +250,7 @@ export default function PostSessionJournal() {
           <View style={styles.pieChartContainer}>
             <Text style={styles.sectionTitle}>Emotional State Modeling</Text>
             <View style={styles.pieChartWrapper}>
-              <PieChartComponent data={pieData} />
+              <DonutChartComponent data={pieData} />
               <View style={styles.legendContainer}>
                 {pieData.map((item, index) => (
                   <Text
