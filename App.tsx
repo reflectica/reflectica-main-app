@@ -14,7 +14,6 @@ import {
   PhonenumberScreen,
   ProfileScreen,
   SessionScreen,
-  SessionDetail,
   VerificationScreen,
   LoginScreen,
   EmailLoginScreen,
@@ -22,6 +21,7 @@ import {
   SupportScreen,
   EmailSignupScreen,
   PostSessionJournal,
+  SessionDetail,
 } from './src/screens';
 import {cloud, log, question, setting} from './src/assets/nav';
 import {useAuth} from './src/context/AuthContext';

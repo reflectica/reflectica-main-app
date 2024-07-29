@@ -13,7 +13,10 @@ import {SessionDetailScreenProps, SessionDetailProp} from '../../constants';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const SessionDetail: React.FC<SessionDetailScreenProps> = ({route}) => {
+const SessionDetail: React.FC<SessionDetailScreenProps> = ({
+  route,
+  navigation,
+}) => {
   const {session, sessionNumber} = route.params;
   const [sessionDetails, setSessionDetails] =
     useState<SessionDetailProp | null>(null);

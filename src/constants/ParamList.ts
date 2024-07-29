@@ -4,7 +4,7 @@ import {StackNavigationProp} from '@react-navigation/stack';
 export type RootStackParamList = {
   Dashboard: undefined;
   Journal: undefined;
-  SessionDetail: {session: any; sessionNumber: number}; // Define params for SessionDetail
+  SessionDetail: {session: any; sessionNumber: number};
   Support: undefined;
   Setting: undefined;
   Profile: undefined;

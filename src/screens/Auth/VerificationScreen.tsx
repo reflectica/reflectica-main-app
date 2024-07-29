@@ -26,14 +26,17 @@ export default function VerificationScreen({
 }: VerificationScreenProps) {
   const dispatch = useDispatch();
   const [time, setTime] = useState(300);
-  const [verificationCode, setVerificationCode] = useState([
-    '',
-    '',
-    '',
-    '',
-    '',
-    '',
-  ]);
+  const [verificationCode, setVerificationCode] = useState<string[]>(
+    Array(6).fill(''),
+  );
+  //   '',
+  //   '',
+  //   '',
+  //   '',
+  //   '',
+  //   '',
+  // ]);
+
   const inputRefs = [
     useRef<TextInput>(null),
     useRef<TextInput>(null),
