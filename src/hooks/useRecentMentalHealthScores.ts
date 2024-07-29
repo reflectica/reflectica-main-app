@@ -3,9 +3,9 @@ import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs, orderBy, limit} from 'firebase/firestore';
 
 export const useRecentMentalHealthScores = (userId: string) => {
-  const [mentalHealthScores, setMentalHealthScores] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [mentalHealthScores, setMentalHealthScores] = useState<number[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchRecentScores = useCallback(async () => {
     setLoading(true);
@@ -26,7 +26,7 @@ export const useRecentMentalHealthScores = (userId: string) => {
       );
 
       const querySnapshot = await getDocs(q);
-      const scoresArray = [];
+      const scoresArray: number[] = [];
 
       querySnapshot.forEach(doc => {
         const sessionData = doc.data();
@@ -42,10 +42,8 @@ export const useRecentMentalHealthScores = (userId: string) => {
         console.log('No sessions found for the given UID.');
         setMentalHealthScores([]);
       }
-    } catch (error) {
-      setError(
-        error instanceof Error ? error : new Error('Error fetching scores'),
-      );
+    } catch (err) {
+      setError(err instanceof Error ? err : new Error('Error fetching scores'));
     } finally {
       setLoading(false);
     }
