@@ -2,40 +2,42 @@ import React, {useState, useEffect} from 'react';
 import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
 import AppLoading from 'expo-app-loading';
 import {
-  useFonts,
-  Mukta_400Regular,
-  Mukta_700Bold,
-} from '@expo-google-fonts/mukta';
-import {
   DonutChartComponent,
   ReflecticaScoreIncrease,
   LineChartWithInteraction,
   BarGraph,
   SelfEsteemBarComponent,
 } from '../components';
-import {useRoute} from '@react-navigation/native'; // Import useRoute to get the passed parameters
+// import {useRoute} from '@react-navigation/native';
 import {useRecentMentalHealthScores} from '../hooks';
+import {PostSessionScreenProps} from '../constants';
+import {barData, lineLabels} from '../data/barData';
 
-export default function PostSessionJournal() {
-  const route = useRoute();
+type SessionType = {
+  normalizedScores: {[key: string]: number | 'No Applicable'};
+  emotions: {label: string; score: number}[];
+  longSummary: string;
+  mentalHealthScore: number;
+};
+
+export default function PostSessionJournal({route}: PostSessionScreenProps) {
+  // const route = useRoute();
   const session = route.params?.session; // Get the session data from parameters
 
-  const [fontsLoaded] = useFonts({
-    Mukta_400Regular,
-    Mukta_700Bold,
-  });
-  const [dsmScores, setDsmScores] = useState({});
-  const [emotions, setEmotions] = useState([]);
-  const [longSummary, setLongSummary] = useState('');
-  const [lineData, setLineData] = useState([
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]); // Initialize lineData with null values
+  // const [fontsLoaded] = useFonts({
+  //   Mukta_400Regular,
+  //   Mukta_700Bold,
+  // });
+  const [dsmScores, setDsmScores] = useState<{
+    [key: string]: number | 'Not Applicable';
+  }>({});
+  const [emotions, setEmotions] = useState<
+    {label: string; percentage: number; opacity: number}[]
+  >([]);
+  const [longSummary, setLongSummary] = useState<string>('');
+  const [lineData, setLineData] = useState<(number | null)[]>(
+    Array(7).fill(null),
+  ); // Initialize lineData with null values
 
   const {mentalHealthScores} = useRecentMentalHealthScores(
     'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
@@ -72,7 +74,9 @@ export default function PostSessionJournal() {
 
   const mentalHealthScore = session.mentalHealthScore;
 
-  const calculateMentalHealthScore = (scores: any) => {
+  const calculateMentalHealthScore = (scores: {
+    [key: string]: number | 'Not Applicable';
+  }): number => {
     const weights = {
       'PHQ-9 Score': 3,
       'GAD-7 Score': 3,
@@ -84,12 +88,12 @@ export default function PostSessionJournal() {
       'SSRS Assessment': 1,
     };
 
-    let totalWeightedScore = 0;
-    let totalWeight = 0;
+    let totalWeightedScore: number = 0;
+    let totalWeight: number = 0;
 
     for (const key in scores) {
-      if (scores[key] !== 'Not Applicable' && !isNaN(scores[key])) {
-        totalWeightedScore += scores[key] * weights[key];
+      if (scores[key] !== 'Not Applicable' && !isNaN(scores[key] as number)) {
+        totalWeightedScore += (scores[key] as number) * weights[key];
         totalWeight += weights[key];
       }
     }
@@ -111,32 +115,32 @@ export default function PostSessionJournal() {
     return scores;
   };
 
-  const normalizeScores = scores => {
-    const ranges = {
-      'PHQ-9 Score': [0, 27],
-      'GAD-7 Score': [0, 21],
-      'CBT Behavioral Activation': [0, 7],
-      'Rosenberg Self Esteem': [10, 40],
-      'PSQI Score': [0, 21],
-      'SFQ Score': [0, 32],
-      'PSS Score': [0, 40],
-      'SSRS Assessment': [0, 5],
-    };
+  // const normalizeEmotions = (emotions: { label: string; score: number }[]) => {
+  //   const ranges = {
+  //     'PHQ-9 Score': [0, 27],
+  //     'GAD-7 Score': [0, 21],
+  //     'CBT Behavioral Activation': [0, 7],
+  //     'Rosenberg Self Esteem': [10, 40],
+  //     'PSQI Score': [0, 21],
+  //     'SFQ Score': [0, 32],
+  //     'PSS Score': [0, 40],
+  //     'SSRS Assessment': [0, 5],
+  //   };
 
-    const normalizedScores = {};
-    for (const key in scores) {
-      if (scores[key] === 'Not Applicable') {
-        normalizedScores[key] = 'Not Applicable';
-      } else {
-        const [min, max] = ranges[key];
-        normalizedScores[key] = ((scores[key] - min) / (max - min)) * 10;
-      }
-    }
+  //   const normalizedScores = {};
+  //   for (const key in scores) {
+  //     if (scores[key] === 'Not Applicable') {
+  //       normalizedScores[key] = 'Not Applicable';
+  //     } else {
+  //       const [min, max] = ranges[key];
+  //       normalizedScores[key] = ((scores[key] - min) / (max - min)) * 10;
+  //     }
+  //   }
 
-    return normalizedScores;
-  };
+  //   return normalizedScores;
+  // };
 
-  const normalizeEmotions = emotions => {
+  const normalizeEmotions = (emotions: {label: string; score: number}[]) => {
     const totalScore = emotions.reduce(
       (sum, emotion) => sum + emotion.score,
       0,
@@ -149,52 +153,8 @@ export default function PostSessionJournal() {
     }));
   };
 
-  const getColorWithOpacity = opacity => `rgba(82, 113, 255, ${opacity})`;
-
-  const barData = [
-    {
-      label: 'PHQ-9',
-      value: dsmScores['PHQ-9 Score'],
-      color: '#5271FF',
-      faded: dsmScores['PHQ-9 Score'] === 'Not Applicable',
-    },
-    {
-      label: 'GAD-7',
-      value: dsmScores['GAD-7 Score'],
-      color: '#5271FF',
-      faded: dsmScores['GAD-7 Score'] === 'Not Applicable',
-    },
-    {
-      label: 'CBT',
-      value: dsmScores['CBT Behavioral Activation'],
-      color: '#5271FF',
-      faded: dsmScores['CBT Behavioral Activation'] === 'Not Applicable',
-    },
-    {
-      label: 'PSQI',
-      value: dsmScores['PSQI Score'],
-      color: '#5271FF',
-      faded: dsmScores['PSQI Score'] === 'Not Applicable',
-    },
-    {
-      label: 'SFQ',
-      value: dsmScores['SFQ Score'],
-      color: '#5271FF',
-      faded: dsmScores['SFQ Score'] === 'Not Applicable',
-    },
-    {
-      label: 'PSS',
-      value: dsmScores['PSS Score'],
-      color: '#5271FF',
-      faded: dsmScores['PSS Score'] === 'Not Applicable',
-    },
-    {
-      label: 'SSRS',
-      value: dsmScores['SSRS Assessment'],
-      color: '#5271FF',
-      faded: dsmScores['SSRS Assessment'] === 'Not Applicable',
-    },
-  ];
+  const getColorWithOpacity = (opacity: number) =>
+    `rgba(82, 113, 255, ${opacity})`;
 
   const pieData = emotions.map(emotion => ({
     label: emotion.label,
@@ -202,10 +162,8 @@ export default function PostSessionJournal() {
     color: getColorWithOpacity(emotion.opacity),
   }));
 
-  const lineLabels = ['S.1', 'S.2', 'S.3', 'S.4', 'S.5', 'S.6', 'S.7'];
-
   const selfEsteemScore =
-    isNaN(dsmScores['Rosenberg Self Esteem']) ||
+    isNaN(dsmScores['Rosenberg Self Esteem'] as number) ||
     dsmScores['Rosenberg Self Esteem'] === 'Not Applicable'
       ? null
       : dsmScores['Rosenberg Self Esteem'];
@@ -292,21 +250,22 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontSize: 28, // Increase font size for the heading
-    fontWeight: 'bold',
+    fontWeight: '700',
     marginBottom: 8, // Adjust margin for spacing
     textAlign: 'center',
-    fontFamily: 'Mukta_700Bold',
+    fontFamily: 'Mukta',
   },
   subheading: {
     fontSize: 23, // Increase font size for the subheading
-    fontWeight: '500',
+    fontWeight: '400',
     marginBottom: 8, // Adjust margin for spacing
-    fontFamily: 'Mukta_400Regular',
+    fontFamily: 'Mukta',
   },
   score: {
     fontSize: 20, // Increase font size for the score
     marginBottom: 8, // Adjust margin for spacing
-    fontFamily: 'Mukta_400Regular',
+    fontWeight: '400',
+    fontFamily: 'Mukta',
   },
   section: {
     marginBottom: 2, // Adjust margin between sections
@@ -345,9 +304,9 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
     marginBottom: 8,
-    fontFamily: 'Mukta_700Bold',
+    fontWeight: '700',
+    fontFamily: 'Mukta',
   },
   fadedText: {
     opacity: 0.5, // Adjust the opacity value to your preference
@@ -371,7 +330,8 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingRight: 60,
     fontSize: 14,
-    fontFamily: 'Mukta_400Regular',
+    fontWeight: '400',
+    fontFamily: 'Mukta',
   },
   keyTopicsSection: {
     marginBottom: 24,
@@ -383,6 +343,7 @@ const styles = StyleSheet.create({
   keyTopics: {
     fontSize: 18,
     textAlign: 'center',
-    fontFamily: 'Mukta_700Bold',
+    fontWeight: '700',
+    fontFamily: 'Mukta',
   },
 });

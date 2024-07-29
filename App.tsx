@@ -124,7 +124,7 @@ function App(): React.JSX.Element {
                 options={{headerShown: false}}
               />
               <Stack.Screen
-                name="Post-Session"
+                name="PostSession"
                 component={PostSessionJournal}
                 options={{headerShown: false}}
               />

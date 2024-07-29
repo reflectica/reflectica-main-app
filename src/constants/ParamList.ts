@@ -10,6 +10,7 @@ export type RootStackParamList = {
   Profile: undefined;
   MainApp: {screen?: string} | undefined;
   InSession: undefined;
+  PostSession: undefined;
   Onboarding: undefined;
   Login: undefined;
   EmailLogin: undefined;
@@ -109,6 +110,14 @@ type SessionScreenNavigationProp = StackNavigationProp<
 
 export type SessionScreenProps = {
   navigation: SessionScreenNavigationProp;
+};
+
+type PostSessionProp = StackNavigationProp<RootStackParamList, 'PostSession'>;
+type PostSessionRouteProp = RouteProp<RootStackParamList, 'PostSession'>;
+
+export type PostSessionScreenProps = {
+  navigation: PostSessionProp;
+  route: PostSessionRouteProp;
 };
 
 type LoginScreenNavigationProp = StackNavigationProp<

@@ -16,6 +16,7 @@ export {type PhonenumberScreenProps} from './ParamList';
 export {type ProfileScreenProps} from './ParamList';
 export {type SessionScreenProps} from './ParamList';
 export {type SessionDetailScreenProps} from './ParamList';
+export {type PostSessionScreenProps} from './ParamList';
 export {type LoginScreenProps} from './ParamList';
 export {type EmailLoginScreenProps} from './ParamList';
 export {type SettingScreenProps} from './ParamList';
