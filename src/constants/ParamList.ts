@@ -25,7 +25,7 @@ export type RootStackParamList = {
 };
 
 export type VerificationScreenProps = {
-  navigation?: StackNavigationProp<RootStackParamList, 'Verification'>;
+  navigation: StackNavigationProp<RootStackParamList, 'Verification'>;
   route: RouteProp<RootStackParamList, 'Verification'>;
 };
 
@@ -48,6 +48,7 @@ export type NotificationScreenProps = {
 export type OnboardingScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Onboarding'>;
 };
+
 export type PhonenumberScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 };

@@ -12,7 +12,7 @@ import {
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {useNavigation} from '@react-navigation/native'; // Import useNavigation
 import {ButtonTemplate} from '../components';
-import {OnboardingScreenNavigationProp} from '../constants';
+import {OnboardingScreenProps} from '../constants';
 
 type ItemProps = {
   image: ImageSourcePropType;
@@ -40,9 +40,9 @@ const items: ItemProps[] = [
   },
 ];
 
-export default function OnboardingScreen() {
+export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
   const [activeSlide, setActiveSlide] = React.useState(0);
-  const navigation = useNavigation<OnboardingScreenNavigationProp>();
+  // const navigation = useNavigation<OnboardingScreenProps>();
 
   const renderItem = ({item}: {item: ItemProps}) => {
     return (

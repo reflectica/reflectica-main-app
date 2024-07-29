@@ -20,7 +20,7 @@ import {VerificationScreenProps} from '../../constants';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function VerificationScreen({route}: VerificationScreenProps) {
+export default function VerificationScreen({route, navigation}: VerificationScreenProps) {
   const dispatch = useDispatch();
   const [time, setTime] = useState(300);
   const [verificationCode, setVerificationCode] = useState([
