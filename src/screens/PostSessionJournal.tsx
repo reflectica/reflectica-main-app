@@ -100,7 +100,7 @@ export default function PostSessionJournal({route}: PostSessionScreenProps) {
     return 10 - totalWeightedScore / totalWeight;
   };
 
-  const parseScores = dsmScore => {
+  const parseScores = (dsmScore: string) => {
     const lines = dsmScore.split('\n');
     const scores = {};
 
