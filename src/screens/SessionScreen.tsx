@@ -1,8 +1,8 @@
+/* eslint-disable react-native/no-inline-styles */
 import React, {useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   StyleSheet,
-  Button,
   Text,
   View,
   Dimensions,
@@ -15,7 +15,8 @@ import {v4 as uuidv4} from 'uuid';
 import axios from 'axios';
 import Voice, {SpeechResultsEvent} from '@react-native-voice/voice';
 // import {selectUser} from '../features/auth/authSelectors.ts'; // import the selector
-import {ButtonTemplate} from '../components/index.ts';
+import {ButtonTemplate, AnimatedButton} from '../components/index.ts';
+import {SessionScreenProps} from '../constants/ParamList.ts';
 // import * as FileSystem from 'expo-file-system';
 // import {Audio} from 'expo-av';
 // import {UserProps} from '../constants';
@@ -23,8 +24,8 @@ import {ButtonTemplate} from '../components/index.ts';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionScreen() {
-  // const [inputText, setInputText] = useState<string>('');
+export default function SessionScreen({navigation}: SessionScreenProps) {
+  const [inputText, setInputText] = useState<string>('');
   const [listening, setListening] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   // const user: UserProps = useSelector(selectUser); // use the selector to get the current user
@@ -67,71 +68,83 @@ export default function SessionScreen() {
     }
   };
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     // Use the transcript as the prompt for the request
-  //     const promptToSubmit = transcript; // Assuming transcript holds the recorded text
+  const handleRecordingToggle = async (newRecordingState: any) => {
+    if (newRecordingState) {
+      await startRecording();
+    } else {
+      await stopRecording();
+    }
+  };
 
-  //     // Send the request and wait for the response
-  //     const response = await axios.post('http://localhost:3006/chat', {
-  //       prompt: promptToSubmit,
-  //       userId: 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
-  //       sessionId: sessionId,
-  //     });
+  const handleSubmit = async () => {
+    try {
+      const promptToSubmit = transcript;
 
-  //     // audio data in base64 format
-  //     const base64Audio = response.data.audio;
+      const response = await axios.post('http://localhost:3006/chat', {
+        prompt: promptToSubmit,
+        userId: 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+        sessionId: sessionId,
+      });
 
-  //     // Prepare the URI for the audio file
-  //     const uri = FileSystem.documentDirectory + 'audio.mp3';
+      const base64Audio = response.data.audio;
 
-  //     // Convert base64 to a file and save
-  //     await FileSystem.writeAsStringAsync(uri, base64Audio, {
-  //       encoding: FileSystem.EncodingType.Base64,
-  //     });
+      const uri = FileSystem.documentDirectory + 'audio.mp3';
 
-  //     // Playback the saved audio file
-  //     const {sound} = await Audio.Sound.createAsync({uri}, {shouldPlay: true});
-  //     await sound.playAsync();
+      await FileSystem.writeAsStringAsync(uri, base64Audio, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-  //     console.log('Audio playback started');
+      const {sound} = await Audio.Sound.createAsync({uri}, {shouldPlay: true});
+      await sound.playAsync();
 
-  //     setInputText(''); // If you're managing the input separately, clear it.
-  //     setTranscript(''); // Clear the transcript after the request is completed and audio played.
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
+      console.log('Audio playback started');
+
+      setInputText('');
+      setTranscript('');
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleEndSession = async (userId: string) => {
-    await axios
-      .post('http://localhost:3006/session/endSession', {
-        userId: userId,
-        sessionId: sessionId,
-      })
-      .then(_res => {
-        setSessionId(uuidv4());
-      })
-      .catch(error => console.log(error));
+    try {
+      await axios
+        .post('http://localhost:3006/session/endSession', {
+          userId: userId,
+          sessionId: sessionId,
+        })
+        .then(res => {
+          setSessionId(uuidv4());
+          navigation.navigate('PostSession', {session: res.data}); // Navigate to PostSessionJournal
+        })
+        .catch(error => console.log(error));
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.window}>
         <View style={styles.actionBox}>
-          <Text style={styles.listeningText}>
-            {listening ? 'Listening...' : 'Speaking...'}
+          <Text
+            style={{
+              color: 'rgba(255, 255, 255, 1)',
+              fontWeight: '700',
+              fontFamily: 'Montserrat',
+              fontSize: 11,
+              lineHeight: 16.5,
+            }}>
+            {isRecording ? 'Listening...' : 'Speaking...'}
           </Text>
         </View>
         <View style={styles.container}>
-          <Button
-            title={isRecording ? 'Stop Recording' : 'Start Recording'}
-            onPress={isRecording ? stopRecording : startRecording}
+          <AnimatedButton
+            onRecordingToggle={handleRecordingToggle}
+            onSubmit={handleSubmit}
           />
-          {/* STYLE doesn't exist for 'transcript' */}
-          <Text style={styles.transcript}>Transcript: {transcript}</Text>
         </View>
-        {/* <ButtonTemplate title='Send' action={handleSubmit} stylebtn={'purple'} styling={{alignSelf:'center'}} /> */}
+
         <ButtonTemplate
           title="End Session"
           action={() =>
@@ -196,18 +209,12 @@ const styles = StyleSheet.create({
     marginLeft: 20,
   },
   bottomContainer: {
-    // display: 'relative',
-    // top: 670,
     width: screenWidth,
     height: screenHeight,
     alignSelf: 'center',
   },
-  listeningText: {
-    color: 'rgba(255, 255, 255, 1)',
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-    fontSize: 11,
-    lineHeight: 16.5,
+  transcript: {
+    color: 'white',
+    marginTop: 20,
   },
-  transcript: {},
 });

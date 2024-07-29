@@ -8,17 +8,17 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {SessionDetailScreenProps, SessionDetailProp} from '../../constants';
-import {Error} from '../../components';
+// import {Error} from '../../components';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionDetail({route}: SessionDetailScreenProps) {
+const SessionDetail: React.FC<SessionDetailScreenProps> = ({route}) => {
   const {session, sessionNumber} = route.params;
   const [sessionDetails, setSessionDetails] =
     useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
 
   useEffect(() => {
     // Fetch session details using sessionId
@@ -40,9 +40,9 @@ export default function SessionDetail({route}: SessionDetailScreenProps) {
     );
   }
 
-  if (error) {
-    return <Error error={error} />;
-  }
+  // if (Error) {
+  //   return <Error error={error} />;
+  // }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -59,7 +59,7 @@ export default function SessionDetail({route}: SessionDetailScreenProps) {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -125,3 +125,5 @@ const styles = StyleSheet.create({
     lineHeight: 29.92,
   },
 });
+
+export default SessionDetail;

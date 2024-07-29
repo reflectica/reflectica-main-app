@@ -8,7 +8,7 @@ export type RootStackParamList = {
   Support: undefined;
   Setting: undefined;
   Profile: undefined;
-  MainApp: {screen?: string} | undefined;
+  MainApp: {screen: string};
   InSession: undefined;
   PostSession: {session: any};
   Onboarding: undefined;
@@ -17,10 +17,7 @@ export type RootStackParamList = {
   Signup: undefined;
   EmailSignup: undefined;
   PhoneNumber: undefined;
-  Verification: {
-    fullPhoneNumber: string;
-    confirmationResult: any;
-  };
+  Verification: {fullPhoneNumber: string; confirmationResult: any};
   Notification: undefined;
 };
 
@@ -87,6 +84,6 @@ export type EmailSignupScreenProps = {
 };
 
 export type SessionDetailScreenProps = {
-  navigation?: StackNavigationProp<RootStackParamList, 'SessionDetail'>;
+  navigation: StackNavigationProp<RootStackParamList, 'SessionDetail'>;
   route: RouteProp<RootStackParamList, 'SessionDetail'>;
 };

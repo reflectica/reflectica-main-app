@@ -12,6 +12,7 @@ import {
 import {useRecentMentalHealthScores} from '../hooks';
 import {PostSessionScreenProps} from '../constants';
 import {barData, lineLabels} from '../data/barData';
+
 type ScoreType = {
   [key: string]: number | 'Not Applicable';
 };
@@ -24,8 +25,8 @@ type SessionType = {
 
 export default function PostSessionJournal({route}: PostSessionScreenProps) {
   // const route = useRoute();
-  const session = route.params?.session; // Get the session data from parameters
-
+  // const session = route.params?.session; // Get the session data from parameters
+  const {session} = route.params;
   // const [fontsLoaded] = useFonts({
   //   Mukta_400Regular,
   //   Mukta_700Bold,
