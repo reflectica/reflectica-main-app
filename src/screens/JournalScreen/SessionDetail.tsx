@@ -13,11 +13,7 @@ import {Error} from '../../components';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionDetail({
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  navigation,
-  route,
-}: SessionDetailScreenProps) {
+export default function SessionDetail({route}: SessionDetailScreenProps) {
   const {session, sessionNumber} = route.params;
   const [sessionDetails, setSessionDetails] =
     useState<SessionDetailProp | null>(null);

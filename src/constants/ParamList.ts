@@ -24,158 +24,68 @@ export type RootStackParamList = {
   Notification: undefined;
 };
 
-type VerificationScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Verification'
->;
-
-type VerificationScreenRouteProp = RouteProp<
-  RootStackParamList,
-  'Verification'
->;
-
 export type VerificationScreenProps = {
-  navigation: VerificationScreenNavigationProp;
-  route: VerificationScreenRouteProp;
+  navigation?: StackNavigationProp<RootStackParamList, 'Verification'>;
+  route: RouteProp<RootStackParamList, 'Verification'>;
 };
-
-type JournalScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Journal'
->;
 
 export type JournalScreenProps = {
-  navigation: JournalScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Journal'>;
 };
-
-// Define types for other screens similarly
-type DashboardScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Dashboard'
->;
 
 export type DashboardScreenProps = {
-  navigation: DashboardScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Dashboard'>;
 };
-
-type SignupScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Signup'
->;
 
 export type SignupScreenProps = {
-  navigation: SignupScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Signup'>;
 };
-
-type NotificationScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Notification'
->;
 
 export type NotificationScreenProps = {
-  navigation: NotificationScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Notification'>;
 };
-
-export type OnboardingScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Onboarding'
->;
 
 export type OnboardingScreenProps = {
-  navigation: OnboardingScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Onboarding'>;
 };
-
-type PhonenumberScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'PhoneNumber'
->;
-
 export type PhonenumberScreenProps = {
-  navigation: PhonenumberScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'PhoneNumber'>;
 };
-
-type ProfileScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Profile'
->;
 
 export type ProfileScreenProps = {
-  navigation: ProfileScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Profile'>;
 };
-
-type SessionScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'InSession'
->;
 
 export type SessionScreenProps = {
-  navigation: SessionScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'InSession'>;
 };
-
-type PostSessionProp = StackNavigationProp<RootStackParamList, 'PostSession'>;
-type PostSessionRouteProp = RouteProp<RootStackParamList, 'PostSession'>;
 
 export type PostSessionScreenProps = {
-  navigation: PostSessionProp;
-  route: PostSessionRouteProp;
+  navigation: StackNavigationProp<RootStackParamList, 'PostSession'>;
+  route: RouteProp<RootStackParamList, 'PostSession'>;
 };
-
-type LoginScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Login'
->;
 
 export type LoginScreenProps = {
-  navigation: LoginScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Login'>;
 };
-
-type EmailLoginScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'EmailLogin'
->;
 
 export type EmailLoginScreenProps = {
-  navigation: EmailLoginScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'EmailLogin'>;
 };
-
-type SettingScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Setting'
->;
 
 export type SettingScreenProps = {
-  navigation: SettingScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Setting'>;
 };
-
-type SupportScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'Support'
->;
 
 export type SupportScreenProps = {
-  navigation: SupportScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'Support'>;
 };
-
-type EmailSignupScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'EmailSignup'
->;
 
 export type EmailSignupScreenProps = {
-  navigation: EmailSignupScreenNavigationProp;
+  navigation: StackNavigationProp<RootStackParamList, 'EmailSignup'>;
 };
 
-type SessionDetailScreenNavigationProp = StackNavigationProp<
-  RootStackParamList,
-  'SessionDetail'
->;
-
-type SessionDetailScreenRouteProp = RouteProp<
-  RootStackParamList,
-  'SessionDetail'
->;
-
 export type SessionDetailScreenProps = {
-  navigation: SessionDetailScreenNavigationProp;
-  route: SessionDetailScreenRouteProp;
+  navigation?: StackNavigationProp<RootStackParamList, 'SessionDetail'>;
+  route: RouteProp<RootStackParamList, 'SessionDetail'>;
 };
