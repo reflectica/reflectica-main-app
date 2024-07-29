@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, SafeAreaView, StyleSheet, ScrollView} from 'react-native';
-import AppLoading from 'expo-app-loading';
+// import AppLoading from 'expo-app-loading';
 import {
   DonutChartComponent,
   ReflecticaScoreIncrease,
@@ -12,7 +12,9 @@ import {
 import {useRecentMentalHealthScores} from '../hooks';
 import {PostSessionScreenProps} from '../constants';
 import {barData, lineLabels} from '../data/barData';
-
+type ScoreType = {
+  [key: string]: number | 'Not Applicable';
+};
 type SessionType = {
   normalizedScores: {[key: string]: number | 'No Applicable'};
   emotions: {label: string; score: number}[];
@@ -52,7 +54,7 @@ export default function PostSessionJournal({route}: PostSessionScreenProps) {
 
       if (session.emotions) {
         const filteredEmotions = session.emotions.filter(
-          emotion => emotion.score > 0.1,
+          (emotion: {label: string; score: number}) => emotion.score > 0.1,
         );
         const normalizedEmotions = normalizeEmotions(filteredEmotions);
         setEmotions(normalizedEmotions);
@@ -74,10 +76,8 @@ export default function PostSessionJournal({route}: PostSessionScreenProps) {
 
   const mentalHealthScore = session.mentalHealthScore;
 
-  const calculateMentalHealthScore = (scores: {
-    [key: string]: number | 'Not Applicable';
-  }): number => {
-    const weights = {
+  const calculateMentalHealthScore = (scores: ScoreType): number => {
+    const weights: {[key: string]: number} = {
       'PHQ-9 Score': 3,
       'GAD-7 Score': 3,
       'CBT Behavioral Activation': 2,
@@ -100,9 +100,9 @@ export default function PostSessionJournal({route}: PostSessionScreenProps) {
     return 10 - totalWeightedScore / totalWeight;
   };
 
-  const parseScores = (dsmScore: string) => {
+  const parseScores = (dsmScore: string): ScoreType => {
     const lines = dsmScore.split('\n');
-    const scores = {};
+    const scores: ScoreType = {};
 
     lines.forEach(line => {
       const [key, value] = line.split(': ');
