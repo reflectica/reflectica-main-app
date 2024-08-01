@@ -1,24 +1,31 @@
+/* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
-const BarGraph = ({ data }) => {
+interface BarGraphProps {
+  data: any;
+};
+
+const BarGraph = ({data}: BarGraphProps) => {
   return (
     <View style={styles.container}>
-      {data.map((item, index) => (
+      {data.map((item: any, index: number) => (
         <View key={index} style={styles.barContainer}>
           <View style={styles.barBackground}>
             <View
               style={[
                 styles.barFill,
-                { 
-                  height: `${item.value * 10}%`, 
-                  backgroundColor: item.color, 
-                  opacity: item.faded ? 0.3 : 1  // Adjust opacity for faded bars
-                }
+                {
+                  height: `${item.value * 10}%`,
+                  backgroundColor: item.color,
+                  opacity: item.faded ? 0.3 : 1, // Adjust opacity for faded bars
+                },
               ]}
             />
           </View>
-          <Text style={[styles.label, item.faded && { opacity: 0.3 }]}>{item.label}</Text>
+          <Text style={[styles.label, item.faded && {opacity: 0.3}]}>
+            {item.label}
+          </Text>
         </View>
       ))}
     </View>

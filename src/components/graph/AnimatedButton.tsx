@@ -7,7 +7,11 @@ function getRandomValue() {
   return Math.random() * 0.4 + 0.8; // Random value between 0.8 and 1.2
 }
 
-const AnimatedButton = ({ onRecordingToggle, onSubmit }) => {
+interface AnimatedButtonProps {
+  onRecordingToggle: any;
+  onSubmit: any;
+}
+const AnimatedButton = ({ onRecordingToggle, onSubmit }: AnimatedButtonProps) => {
   const [isRecording, setIsRecording] = useState(false);
 
   const rotate = useSharedValue(0);

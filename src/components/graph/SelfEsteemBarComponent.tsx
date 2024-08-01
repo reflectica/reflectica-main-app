@@ -1,10 +1,15 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import {View, Text, StyleSheet} from 'react-native';
 
-const SelfEsteemBarComponent = ({ score }) => {
-  const barFillStyle = score === null
-    ? [styles.barFill, styles.barFaded]
-    : [styles.barFill, { width: `${score * 10}%` }];
+interface SelfEsteemBarComponentProps {
+  score: any;
+}
+
+const SelfEsteemBarComponent = ({score}: SelfEsteemBarComponentProps) => {
+  const barFillStyle =
+    score === null
+      ? [styles.barFill, styles.barFaded]
+      : [styles.barFill, {width: `${score * 10}%`}];
 
   return (
     <View style={styles.container}>
