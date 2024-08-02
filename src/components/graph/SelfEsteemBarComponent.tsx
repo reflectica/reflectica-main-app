@@ -22,7 +22,7 @@ const SelfEsteemBarComponent = ({score}: SelfEsteemBarComponentProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'left',
+    alignItems: 'left', // this isn't allowed
     marginBottom: 16,
   },
   title: {
