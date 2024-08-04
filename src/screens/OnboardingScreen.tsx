@@ -10,7 +10,6 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {useNavigation} from '@react-navigation/native'; // Import useNavigation
 import {ButtonTemplate} from '../components';
 import {OnboardingScreenProps} from '../constants';
 
@@ -149,12 +148,12 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 15,
   },
-  createbtn: {
-    backgroundColor: '#5271FF',
-    width: '80%',
-    borderRadius: 10,
-    padding: 10,
-    alignItems: 'center',
-    marginTop: 20,
-  },
+  // createbtn: {
+  //   backgroundColor: '#5271FF',
+  //   width: '80%',
+  //   borderRadius: 10,
+  //   padding: 10,
+  //   alignItems: 'center',
+  //   marginTop: 20,
+  // },
 });

@@ -99,9 +99,56 @@ function MyTabs() {
   );
 }
 
+function AuthNavigator() {
+  return (
+    <Stack.Navigator>
+      {/* <Stack.Screen
+              name="Onboarding"
+              component={OnboardingScreen}
+              options={{headerShown: false}}
+            /> */}
+      <Stack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="EmailLogin"
+        component={EmailLoginScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Signup"
+        component={SignupScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="EmailSignup"
+        component={EmailSignupScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="PhoneNumber"
+        component={PhonenumberScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Verification"
+        component={VerificationScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen
+        name="Notification"
+        component={NotificationScreen}
+        options={{headerShown: false}}
+      />
+    </Stack.Navigator>
+  );
+}
 function App(): React.JSX.Element {
   const {isLoggedIn, newUser} = useAuth();
-
+  console.log('SessionDetail in app.tsx:', SessionDetail);
+  console.log('JournalScreen:', JournalScreen);
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -134,22 +181,22 @@ function App(): React.JSX.Element {
         ) : (
           <>
             {/* <Stack.Screen
-              name="In-Session"
+              name="InSession"
               component={SessionScreen}
               options={{headerShown: false}}
-            /> */}
-            {/* <Stack.Screen
+            />
+            <Stack.Screen
               name="MainApp"
               component={MyTabs}
               options={{headerShown: false}}
             /> */}
-
-            <Stack.Screen
+            <AuthNavigator />
+            {/* <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
               options={{headerShown: false}}
-            />
-            <Stack.Screen
+            /> */}
+            {/* <Stack.Screen
               name="Login"
               component={LoginScreen}
               options={{headerShown: false}}
@@ -183,7 +230,7 @@ function App(): React.JSX.Element {
               name="Notification"
               component={NotificationScreen}
               options={{headerShown: false}}
-            />
+            /> */}
           </>
         )}
       </Stack.Navigator>

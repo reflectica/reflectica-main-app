@@ -26,9 +26,9 @@ import Sound from 'react-native-sound';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SessionScreen({navigation}: SessionScreenProps) {
-  const [inputText, setInputText] = useState<string>('');
-  const [listening, setListening] = useState<boolean>(false);
+const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
+  // const [inputText, setInputText] = useState<string>('');
+  // const [listening, setListening] = useState<boolean>(false);
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   // const user: UserProps = useSelector(selectUser); // use the selector to get the current user
   const {currentUser} = useAuth();
@@ -118,7 +118,7 @@ export default function SessionScreen({navigation}: SessionScreenProps) {
           }
         });
       });
-      setInputText('');
+      // setInputText('');
       setTranscript('');
     } catch (error) {
       console.error(error);
@@ -175,7 +175,7 @@ export default function SessionScreen({navigation}: SessionScreenProps) {
       </View>
     </SafeAreaView>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -237,3 +237,5 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+export default SessionScreen;
