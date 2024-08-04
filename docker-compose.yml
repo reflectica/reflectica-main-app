@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  react-native-app:
+    build:
+      context: .
+    ports:
+      - "8081:8081" # Metro bundler
+    volumes:
+      - .:/app
+      - /app/node_modules

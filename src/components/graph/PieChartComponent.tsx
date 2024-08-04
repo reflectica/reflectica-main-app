@@ -4,9 +4,9 @@ import Svg, {G, Path} from 'react-native-svg';
 
 interface DonutChartComponentProps {
   data: any;
-  innerRadius: number;
-  outerRadius: number;
-  spacing: number;
+  innerRadius?: number;
+  outerRadius?: number;
+  spacing?: number;
 }
 
 const DonutChartComponent = ({
@@ -15,7 +15,7 @@ const DonutChartComponent = ({
   outerRadius = 100,
   spacing = 5,
 }: DonutChartComponentProps) => {
-  const createDonutChart = data => {
+  const createDonutChart = (data: any) => {
     const total = data.reduce(
       (sum: number, value: any) => sum + value.percentage,
       0,

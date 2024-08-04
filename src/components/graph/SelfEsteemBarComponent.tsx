@@ -1,5 +1,5 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
+import {View, StyleSheet, ViewStyle} from 'react-native';
 
 interface SelfEsteemBarComponentProps {
   score: any;
@@ -14,7 +14,7 @@ const SelfEsteemBarComponent = ({score}: SelfEsteemBarComponentProps) => {
   return (
     <View style={styles.container}>
       <View style={styles.barBackground}>
-        <View style={barFillStyle} />
+        <View style={barFillStyle as ViewStyle[]} />
       </View>
     </View>
   );
@@ -22,7 +22,8 @@ const SelfEsteemBarComponent = ({score}: SelfEsteemBarComponentProps) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'left', // this isn't allowed
+    // alignItems: 'left', //this isn't allowed
+    justifyContent: 'flex-start',
     marginBottom: 16,
   },
   title: {

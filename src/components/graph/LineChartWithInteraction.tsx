@@ -24,9 +24,9 @@ const LineChartWithInteraction = ({
   const graphHeight = 200;
   const graphWidth = screenWidth - 120; // Adjust width calculation for margins
   const margin = 20;
-  const [selectedPoint, setSelectedPoint] = React.useState(null);
+  const [selectedPoint, setSelectedPoint] = React.useState<any>(null);
 
-  const handleTouch = evt => {
+  const handleTouch = (evt: any) => {
     const touchX = evt.nativeEvent.locationX - margin;
     const index = Math.round(
       (touchX / (graphWidth - 2 * margin)) * (data.length - 1),
@@ -65,7 +65,7 @@ const LineChartWithInteraction = ({
   // Generate the path string for the line
   const linePath =
     points.length > 0
-      ? points.reduce((acc, p, index: number) => {
+      ? points.reduce((acc: any, p: any, index: number) => {
           return acc + `${index === 0 ? 'M' : 'L'}${p.x},${p.y} `;
         }, '')
       : '';

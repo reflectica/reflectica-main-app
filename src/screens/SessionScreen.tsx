@@ -18,6 +18,8 @@ import Voice, {SpeechResultsEvent} from '@react-native-voice/voice';
 import {ButtonTemplate, AnimatedButton} from '../components/index.ts';
 import {SessionScreenProps} from '../constants/ParamList.ts';
 // import * as FileSystem from 'expo-file-system';
+import RNFS from 'react-native-fs';
+import Sound from 'react-native-sound';
 // import {Audio} from 'expo-av';
 // import {UserProps} from '../constants';
 
@@ -88,17 +90,34 @@ export default function SessionScreen({navigation}: SessionScreenProps) {
 
       const base64Audio = response.data.audio;
 
-      const uri = FileSystem.documentDirectory + 'audio.mp3';
+      // const uri = FileSystem.documentDirectory + 'audio.mp3';
+      const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
 
-      await FileSystem.writeAsStringAsync(uri, base64Audio, {
-        encoding: FileSystem.EncodingType.Base64,
+      await RNFS.writeFile(filePath, base64Audio, 'base64');
+
+      // await FileSystem.writeAsStringAsync(uri, base64Audio, {
+      //   encoding: FileSystem.EncodingType.Base64,
+      // });
+
+      // const {sound} = await Audio.Sound.createAsync({uri}, {shouldPlay: true});
+      // await sound.playAsync();
+
+      // console.log('Audio playback started');
+      // Play the audio
+      const sound = new Sound(filePath, Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.error('Failed to load the sound', error);
+          return;
+        }
+
+        sound.play(success => {
+          if (success) {
+            console.log('Successfully played the audio');
+          } else {
+            console.error('Playback failed due to audio decoding errors');
+          }
+        });
       });
-
-      const {sound} = await Audio.Sound.createAsync({uri}, {shouldPlay: true});
-      await sound.playAsync();
-
-      console.log('Audio playback started');
-
       setInputText('');
       setTranscript('');
     } catch (error) {

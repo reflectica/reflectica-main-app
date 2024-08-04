@@ -30,7 +30,8 @@ const ReflecticaScoreIncrease = ({
                 height="20"
                 viewBox="0 0 20 20"
                 fill="none"
-                xmlns="http://www.w3.org/2000/svg">
+                // xmlns="http://www.w3.org/2000/svg"
+              >
                 <G clipPath="url(#clip0_3354_799)">
                   <Path
                     d="M4.24825 20C4.13454 19.5625 4.21458 19.0926 4.48181 18.7118L7.32947 14.6538L5.72294 12.4256C5.64501 12.3175 5.52556 12.2634 5.40611 12.2634C5.28665 12.2634 5.1672 12.3175 5.08923 12.4256L0.0744625 19.3809C-0.111827 19.6393 0.0728219 20 0.391338 20H4.24825Z"
@@ -94,9 +95,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#fff',
     textAlign: 'center',
-    fontFamily: 'Poppins_400Regular', // Use Poppins font
-    fontWeight: 500,
-    fontSize: '10px',
+    fontFamily: 'Poppins', // Use Poppins font
+    fontWeight: 400,
+    // fontSize: '10px',
     flex: 1, // Ensure the text takes the remaining space
     flexWrap: 'wrap', // Wrap text to fit within the container
   },
