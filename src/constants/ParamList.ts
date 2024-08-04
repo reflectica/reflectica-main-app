@@ -1,6 +1,7 @@
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 
+// Params types passed via route
 export type RootStackParamList = {
   Dashboard: undefined;
   Journal: undefined;

@@ -25,10 +25,11 @@ import {
 } from './src/screens';
 import {cloud, log, question, setting} from './src/assets/nav';
 import {useAuth} from './src/context/AuthContext';
+import {RootStackParamList} from './src/constants';
 
 const Tab = createBottomTabNavigator();
-const Stack = createStackNavigator();
-const JournalStack = createStackNavigator();
+const Stack = createStackNavigator<RootStackParamList>();
+const JournalStack = createStackNavigator<RootStackParamList>();
 
 function JournalStackNavigator() {
   return (
