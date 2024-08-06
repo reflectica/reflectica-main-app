@@ -10,6 +10,7 @@ import auth from '@react-native-firebase/auth';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
 import {onAuthStateChanged} from 'firebase/auth';
+import Config from 'react-native-config';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -24,7 +25,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   const recaptchaVerifier = useRef(null);
 
   GoogleSignin.configure({
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_CLIENT_ID,
+    webClientId: Config.GOOGLE_CLIENT_ID,
     // nonce: 'your_nonce',
   });
 
