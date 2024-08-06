@@ -10,8 +10,8 @@ import {
   ImageSourcePropType,
 } from 'react-native';
 import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {ButtonTemplate} from '../components';
-import {OnboardingScreenProps} from '../constants';
+import {ButtonTemplate} from '../../components';
+import {OnboardingScreenProps} from '../../constants';
 
 type ItemProps = {
   image: ImageSourcePropType;
@@ -21,18 +21,18 @@ type ItemProps = {
 
 const items: ItemProps[] = [
   {
-    image: require('../assets/onboarding/Onboarding1.jpg'),
+    image: require('../../assets/onboarding/Onboarding1.jpg'),
     title: 'Hyper-Realistic',
     description:
       'Conduct audio therapy sessions with a hyper-realistic human sounding AI.',
   },
   {
-    image: require('../assets/onboarding/Onboarding2.jpg'),
+    image: require('../../assets/onboarding/Onboarding2.jpg'),
     title: 'Artificial Intelligence',
     description: 'The most advanced non-clinical AI model for psychotherapy.',
   },
   {
-    image: require('../assets/onboarding/Onboarding3.jpg'),
+    image: require('../../assets/onboarding/Onboarding3.jpg'),
     title: 'Advanced Insights',
     description:
       'Get a map of your mental health over time with data analytics.',
@@ -42,11 +42,15 @@ const items: ItemProps[] = [
 export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
   const [activeSlide, setActiveSlide] = React.useState(0);
   // const navigation = useNavigation<OnboardingScreenProps>();
+  console.log('OnboardingScreen Loaded');
 
   const renderItem = ({item}: {item: ItemProps}) => {
     return (
-      <View style={styles.slide}>
-        <Image source={item.image} style={styles.images} />
+      // <View style={styles.slide}>
+      //   <Image source={item.image} style={styles.images} />
+      // </View>
+      <View>
+        <Image source={item.image} />
       </View>
     );
   };
@@ -69,28 +73,9 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
         onSnapToItem={index => setActiveSlide(index)}
       />
       <View>
-        <View style={{alignItems: 'center', marginBottom: '5%', width: '80%'}}>
-          <Text
-            style={{
-              fontFamily: 'Montserrat',
-              lineHeight: 36,
-              textAlign: 'center',
-              fontSize: 24,
-              fontWeight: '700',
-              color: '#5271FF',
-              marginBottom: 10,
-            }}>
-            {items[activeSlide].title}
-          </Text>
-          <Text
-            style={{
-              fontFamily: 'Montserrat',
-              lineHeight: 21,
-              textAlign: 'center',
-              fontSize: 14,
-              color: '#323755',
-              fontWeight: '400',
-            }}>
+        <View style={styles.pagination}>
+          <Text style={styles.title}>{items[activeSlide].title}</Text>
+          <Text style={styles.description}>
             {items[activeSlide].description}
           </Text>
         </View>
@@ -101,25 +86,10 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
         stylebtn="purple"
         action={() => {}}
       />
-      <View style={{flexDirection: 'row', marginTop: '5%'}}>
+      <View style={styles.btnContainer}>
+        <Text style={styles.login}>Already have an account?</Text>
         <Text
-          style={{
-            color: '#000000',
-            fontFamily: 'Montserrat',
-            lineHeight: 21,
-            fontSize: 14,
-            fontWeight: '400',
-          }}>
-          Already have an account?
-        </Text>
-        <Text
-          style={{
-            fontFamily: 'Montserrat',
-            color: '#5271FF',
-            lineHeight: 21,
-            fontSize: 14,
-            fontWeight: '400',
-          }}
+          style={styles.signin}
           onPress={() => navigation.navigate('Login')}>
           {' '}
           Sign In
@@ -148,6 +118,24 @@ const styles = StyleSheet.create({
     height: 400,
     borderRadius: 15,
   },
+  pagination: {alignItems: 'center', marginBottom: '5%', width: '80%'},
+  title: {
+    fontFamily: 'Montserrat',
+    lineHeight: 36,
+    textAlign: 'center',
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#5271FF',
+    marginBottom: 10,
+  },
+  description: {
+    fontFamily: 'Montserrat',
+    lineHeight: 21,
+    textAlign: 'center',
+    fontSize: 14,
+    color: '#323755',
+    fontWeight: '400',
+  },
   // createbtn: {
   //   backgroundColor: '#5271FF',
   //   width: '80%',
@@ -156,4 +144,19 @@ const styles = StyleSheet.create({
   //   alignItems: 'center',
   //   marginTop: 20,
   // },
+  btnContainer: {flexDirection: 'row', marginTop: '5%'},
+  login: {
+    color: '#000000',
+    fontFamily: 'Montserrat',
+    lineHeight: 21,
+    fontSize: 14,
+    fontWeight: '400',
+  },
+  signin: {
+    fontFamily: 'Montserrat',
+    color: '#5271FF',
+    lineHeight: 21,
+    fontSize: 14,
+    fontWeight: '400',
+  },
 });

@@ -15,6 +15,8 @@ const screenWidth = Dimensions.get('window').width;
 
 const SessionDetail: React.FC<SessionDetailScreenProps> = ({route}) => {
   const {session, sessionNumber} = route.params;
+  console.log('routes:', route.params);
+  
   const [sessionDetails, setSessionDetails] =
     useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);

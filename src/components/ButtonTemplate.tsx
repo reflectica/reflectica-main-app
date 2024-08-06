@@ -66,7 +66,3 @@ const clearBtn = StyleSheet.create({
     fontFamily: 'Montserrat',
   },
 });
-
-// ButtonTemplate.propTypes = {
-//   title: PropTypes.string.isRequired
-// }

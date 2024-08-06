@@ -7,22 +7,22 @@ import {createStackNavigator} from '@react-navigation/stack';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
   DashboardScreen,
-  JournalScreen,
-  SignupScreen,
-  NotificationScreen,
-  OnboardingScreen,
-  PhonenumberScreen,
-  ProfileScreen,
   SessionScreen,
-  VerificationScreen,
-  LoginScreen,
-  EmailLoginScreen,
   SettingScreen,
   SupportScreen,
-  EmailSignupScreen,
   PostSessionJournal,
-  SessionDetail,
 } from './src/screens';
+import {NotificationScreen, ProfileScreen} from './src/screens/Profile';
+import {
+  OnboardingScreen,
+  PhonenumberScreen,
+  LoginScreen,
+  EmailLoginScreen,
+  SignupScreen,
+  VerificationScreen,
+  EmailSignupScreen,
+} from './src/screens/Auth';
+import {SessionDetail, JournalScreen} from './src/screens/Journal';
 import {cloud, log, question, setting} from './src/assets/nav';
 import {useAuth} from './src/context/AuthContext';
 import {RootStackParamList} from './src/constants';
@@ -99,56 +99,9 @@ function MyTabs() {
   );
 }
 
-function AuthNavigator() {
-  return (
-    <Stack.Navigator>
-      {/* <Stack.Screen
-              name="Onboarding"
-              component={OnboardingScreen}
-              options={{headerShown: false}}
-            /> */}
-      <Stack.Screen
-        name="Login"
-        component={LoginScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="EmailLogin"
-        component={EmailLoginScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Signup"
-        component={SignupScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="EmailSignup"
-        component={EmailSignupScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="PhoneNumber"
-        component={PhonenumberScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Verification"
-        component={VerificationScreen}
-        options={{headerShown: false}}
-      />
-      <Stack.Screen
-        name="Notification"
-        component={NotificationScreen}
-        options={{headerShown: false}}
-      />
-    </Stack.Navigator>
-  );
-}
 function App(): React.JSX.Element {
   const {isLoggedIn, newUser} = useAuth();
-  console.log('SessionDetail in app.tsx:', SessionDetail);
-  console.log('JournalScreen:', JournalScreen);
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -180,7 +133,7 @@ function App(): React.JSX.Element {
           )
         ) : (
           <>
-            {/* <Stack.Screen
+            <Stack.Screen
               name="InSession"
               component={SessionScreen}
               options={{headerShown: false}}
@@ -189,14 +142,13 @@ function App(): React.JSX.Element {
               name="MainApp"
               component={MyTabs}
               options={{headerShown: false}}
-            /> */}
-            <AuthNavigator />
-            {/* <Stack.Screen
+            />
+            <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}
               options={{headerShown: false}}
-            /> */}
-            {/* <Stack.Screen
+            />
+            <Stack.Screen
               name="Login"
               component={LoginScreen}
               options={{headerShown: false}}
@@ -230,7 +182,7 @@ function App(): React.JSX.Element {
               name="Notification"
               component={NotificationScreen}
               options={{headerShown: false}}
-            /> */}
+            />
           </>
         )}
       </Stack.Navigator>

@@ -1238,7 +1238,7 @@ PODS:
     - RNFBApp
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.17.1):
+  - RNGestureHandler (2.18.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1283,7 +1283,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.32.0):
+  - RNScreens (3.34.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1612,10 +1612,10 @@ SPEC CHECKSUMS:
   RNFBApp: 793adb33298db7e67dc365dc1ec0dc8a55a7a044
   RNFBAuth: e923d3f87088009ac8505140599ec1e784d77bd0
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 5538c370587d7e757667b9283ca867dd7635f154
+  RNGestureHandler: fc0d83b45872ee937ecc9814012d9b48586b4d7a
   RNGoogleSignin: 08dc4ba7eac2096c7fecfe109f0950fa4683c803
   RNReanimated: f6b214732ff303cb815ac81b26bbfd2070b69f43
-  RNScreens: fd2722bcc59f36a629205af8cc7b48e4bc0d09f5
+  RNScreens: db442e7b8c7bc8befec2ce057927305ff8598cc8
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: cb24fb322de8c1ebf59904e7aca0447bb8dbed5a
   SocketRocket: abac6f5de4d4d62d24e11868d7a2f427e0ef940d
