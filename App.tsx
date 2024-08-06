@@ -23,7 +23,11 @@ import {
   EmailSignupScreen,
 } from './src/screens/Auth';
 import {SessionDetail, JournalScreen} from './src/screens/Journal';
-import {cloud, log, question, setting} from './src/assets/nav';
+// import {cloud, log, question, setting} from './src/assets/nav';
+import cloud from './src/assets/nav/cloud.png'
+import log from './src/assets/nav/log.png'
+import question from './src/assets/nav/question.png'
+import setting from './src/assets/nav/setting.png'
 import {useAuth} from './src/context/AuthContext';
 import {RootStackParamList} from './src/constants';
 

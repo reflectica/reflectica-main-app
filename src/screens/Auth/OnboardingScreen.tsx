@@ -12,6 +12,9 @@ import {
 import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {ButtonTemplate} from '../../components';
 import {OnboardingScreenProps} from '../../constants';
+import onboarding1 from '../../assets/onboarding/onboarding1.jpg';
+import onboarding2 from '../../assets/onboarding/onboarding2.jpg';
+import onboarding3 from '../../assets/onboarding/onboarding3.jpg';
 
 type ItemProps = {
   image: ImageSourcePropType;
@@ -21,18 +24,21 @@ type ItemProps = {
 
 const items: ItemProps[] = [
   {
-    image: require('../../assets/onboarding/Onboarding1.jpg'),
+    // image: require('../../assets/onboarding/Onboarding1.jpg'),
+    image: onboarding1,
     title: 'Hyper-Realistic',
     description:
       'Conduct audio therapy sessions with a hyper-realistic human sounding AI.',
   },
   {
-    image: require('../../assets/onboarding/Onboarding2.jpg'),
+    // image: require('../../assets/onboarding/Onboarding2.jpg'),
+    image: onboarding2,
     title: 'Artificial Intelligence',
     description: 'The most advanced non-clinical AI model for psychotherapy.',
   },
   {
-    image: require('../../assets/onboarding/Onboarding3.jpg'),
+    image: onboarding3,
+    // image: require('../../assets/onboarding/Onboarding3.jpg'),
     title: 'Advanced Insights',
     description:
       'Get a map of your mental health over time with data analytics.',
@@ -59,7 +65,7 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Carousel
+      {/* <Carousel
         data={items}
         renderItem={renderItem}
         sliderWidth={screenWidth}
@@ -71,7 +77,7 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
         loop={true}
         loopClonesPerSide={1}
         onSnapToItem={index => setActiveSlide(index)}
-      />
+      /> */}
       <View>
         <View style={styles.pagination}>
           <Text style={styles.title}>{items[activeSlide].title}</Text>

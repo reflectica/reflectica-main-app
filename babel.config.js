@@ -1,10 +1,5 @@
 module.exports = {
-  presets: [
-    'module:metro-react-native-babel-preset',
-    '@babel/preset-env', // Ensures compatibility with various environments
-    '@babel/preset-react', // Handles JSX transformations
-    '@babel/preset-typescript', // Supports TypeScript
-  ],
+  presets: ['module:metro-react-native-babel-preset','@babel/preset-typescript',],
   plugins: [
     ['@babel/plugin-transform-class-properties', {loose: true}],
     ['@babel/plugin-transform-private-methods', {loose: true}],
