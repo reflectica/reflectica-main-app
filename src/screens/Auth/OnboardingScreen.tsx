@@ -1,4 +1,3 @@
-/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
@@ -7,11 +6,12 @@ import {
   View,
   Dimensions,
   Image,
-  ImageSourcePropType,
+  ImageSourcePropType
 } from 'react-native';
-import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {ButtonTemplate} from '../../components';
-import {OnboardingScreenProps} from '../../constants';
+import Carousel from 'react-native-reanimated-carousel';
+// import Carousel, {Pagination} from 'react-native-snap-carousel';
+import {ButtonTemplate, Pagination} from '../../components';
+import { OnboardingScreenProps } from '../../constants';
 import onboarding1 from '../../assets/onboarding/onboarding1.jpg';
 import onboarding2 from '../../assets/onboarding/onboarding2.jpg';
 import onboarding3 from '../../assets/onboarding/onboarding3.jpg';
@@ -52,32 +52,31 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
 
   const renderItem = ({item}: {item: ItemProps}) => {
     return (
-      // <View style={styles.slide}>
-      //   <Image source={item.image} style={styles.images} />
-      // </View>
-      <View>
-        <Image source={item.image} />
+      <View style={styles.slide}>
+        <Image source={item.image} style={styles.images} />
       </View>
     );
   };
 
   const screenWidth = Dimensions.get('window').width;
+  const screenHeight = Dimensions.get('window').height;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <Carousel
+      <Carousel
         data={items}
         renderItem={renderItem}
-        sliderWidth={screenWidth}
-        itemWidth={275}
-        layout={'default'}
-        inactiveSlideScale={0.8}
-        inactiveSlideOpacity={0.6}
-        activeSlideAlignment={'center'}
+        width={screenWidth}
+        height={screenHeight}
+        // itemWidth={275}
+        // layout={'default'}
+        // inactiveSlideScale={0.8}
+        // inactiveSlideOpacity={0.6}
+        // activeSlideAlignment={'center'}
         loop={true}
-        loopClonesPerSide={1}
+        // loopClonesPerSide={1}
         onSnapToItem={index => setActiveSlide(index)}
-      /> */}
+      />
       <View>
         <View style={styles.pagination}>
           <Text style={styles.title}>{items[activeSlide].title}</Text>
@@ -85,7 +84,7 @@ export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
             {items[activeSlide].description}
           </Text>
         </View>
-        <Pagination dotsLength={items.length} activeDotIndex={activeSlide} />
+        <Pagination length={items.length} activeIndex={activeSlide} />
       </View>
       <ButtonTemplate
         title="Create an account"
