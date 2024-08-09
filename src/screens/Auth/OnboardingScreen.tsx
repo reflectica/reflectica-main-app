@@ -8,7 +8,6 @@ import {
   Image,
   ImageSourcePropType
 } from 'react-native';
-// import Carousel, {Pagination} from 'react-native-snap-carousel';
 import {ButtonTemplate, Pagination, CarouselComponent} from '../../components';
 import { OnboardingScreenProps } from '../../constants';
 import onboarding1 from '../../assets/onboarding/onboarding1.jpg';
