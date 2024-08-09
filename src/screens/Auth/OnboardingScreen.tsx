@@ -8,9 +8,8 @@ import {
   Image,
   ImageSourcePropType
 } from 'react-native';
-import Carousel from 'react-native-reanimated-carousel';
 // import Carousel, {Pagination} from 'react-native-snap-carousel';
-import {ButtonTemplate, Pagination} from '../../components';
+import {ButtonTemplate, Pagination, CarouselComponent} from '../../components';
 import { OnboardingScreenProps } from '../../constants';
 import onboarding1 from '../../assets/onboarding/onboarding1.jpg';
 import onboarding2 from '../../assets/onboarding/onboarding2.jpg';
@@ -24,57 +23,39 @@ type ItemProps = {
 
 const items: ItemProps[] = [
   {
-    // image: require('../../assets/onboarding/Onboarding1.jpg'),
     image: onboarding1,
     title: 'Hyper-Realistic',
     description:
       'Conduct audio therapy sessions with a hyper-realistic human sounding AI.',
   },
   {
-    // image: require('../../assets/onboarding/Onboarding2.jpg'),
     image: onboarding2,
     title: 'Artificial Intelligence',
     description: 'The most advanced non-clinical AI model for psychotherapy.',
   },
   {
     image: onboarding3,
-    // image: require('../../assets/onboarding/Onboarding3.jpg'),
     title: 'Advanced Insights',
     description:
       'Get a map of your mental health over time with data analytics.',
   },
 ];
 
+const screenWidth = Dimensions.get('window').width;
+const screenHeight = Dimensions.get('window').height;
+
 export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
   const [activeSlide, setActiveSlide] = React.useState(0);
-  // const navigation = useNavigation<OnboardingScreenProps>();
-  console.log('OnboardingScreen Loaded');
-
-  const renderItem = ({item}: {item: ItemProps}) => {
-    return (
-      <View style={styles.slide}>
-        <Image source={item.image} style={styles.images} />
-      </View>
-    );
-  };
-
-  const screenWidth = Dimensions.get('window').width;
-  const screenHeight = Dimensions.get('window').height;
 
   return (
     <SafeAreaView style={styles.container}>
-      <Carousel
-        data={items}
-        renderItem={renderItem}
-        width={screenWidth}
-        height={screenHeight}
-        // itemWidth={275}
-        // layout={'default'}
-        // inactiveSlideScale={0.8}
-        // inactiveSlideOpacity={0.6}
-        // activeSlideAlignment={'center'}
+      <CarouselComponent
+        items={items}
+        width={screenWidth * .8}
+        height={screenHeight * .5}
+        renderItemContainerStyle={styles.slide}
+        renderImageStyle={styles.images}
         loop={true}
-        // loopClonesPerSide={1}
         onSnapToItem={index => setActiveSlide(index)}
       />
       <View>
@@ -119,7 +100,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   images: {
-    width: '100%',
+    width: screenWidth * .85,
     height: 400,
     borderRadius: 15,
   },
