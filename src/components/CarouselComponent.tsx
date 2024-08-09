@@ -35,13 +35,7 @@ export default function CarouselComponent({items, width, height, loop, onSnapToI
                 parallaxScrollingScale: .75,
                 parallaxScrollingOffset: 110,
             }}
-            // itemWidth={275}
-            // layout={'default'}
-            // inactiveSlideScale={0.8}
-            // inactiveSlideOpacity={0.6}
-            // activeSlideAlignment={'center'}
-            loop={true}
-            // loopClonesPerSide={1}
+            loop={loop}
             onSnapToItem={onSnapToItem}
         />
     )
