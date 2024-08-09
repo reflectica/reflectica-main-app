@@ -5,7 +5,6 @@ import {
   Text,
   View,
   Dimensions,
-  Image,
   ImageSourcePropType
 } from 'react-native';
 import {ButtonTemplate, Pagination, CarouselComponent} from '../../components';
@@ -44,14 +43,14 @@ const screenWidth = Dimensions.get('window').width;
 const screenHeight = Dimensions.get('window').height;
 
 export default function OnboardingScreen({navigation}: OnboardingScreenProps) {
-  const [activeSlide, setActiveSlide] = React.useState(0);
+  const [activeSlide, setActiveSlide] = React.useState<number>(0);
 
   return (
     <SafeAreaView style={styles.container}>
       <CarouselComponent
         items={items}
-        width={screenWidth * .8}
-        height={screenHeight * .5}
+        width={screenWidth}
+        height={screenHeight * .65}
         renderItemContainerStyle={styles.slide}
         renderImageStyle={styles.images}
         loop={true}
@@ -121,14 +120,6 @@ const styles = StyleSheet.create({
     color: '#323755',
     fontWeight: '400',
   },
-  // createbtn: {
-  //   backgroundColor: '#5271FF',
-  //   width: '80%',
-  //   borderRadius: 10,
-  //   padding: 10,
-  //   alignItems: 'center',
-  //   marginTop: 20,
-  // },
   btnContainer: {flexDirection: 'row', marginTop: '5%'},
   login: {
     color: '#000000',

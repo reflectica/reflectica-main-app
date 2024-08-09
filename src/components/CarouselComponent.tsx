@@ -30,6 +30,11 @@ export default function CarouselComponent({items, width, height, loop, onSnapToI
             renderItem={renderItem}
             width={width}
             height={height}
+            mode="parallax"
+            modeConfig={{
+                parallaxScrollingScale: .75,
+                parallaxScrollingOffset: 110,
+            }}
             // itemWidth={275}
             // layout={'default'}
             // inactiveSlideScale={0.8}
