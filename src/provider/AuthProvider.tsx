@@ -146,42 +146,6 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     [],
   );
 
-  // const phoneNumberAuth = useCallback(async (phone: string) => {
-  //   // console.log("PHONEEE:", phone)
-
-  //   // if (!recaptchaVerifier.current) {
-  //   //     console.error("Recaptcha Verifier is not set.");
-  //   //     return null;
-  //   // }
-
-  //   try {
-  //     const confirmationResults = await auth().signInWithPhoneNumber(phone);
-  //     console.log('CONFIRMATION:', confirmationResults);
-  //     return confirmationResults;
-  //   } catch (error) {
-  //     console.error('Error phone auth:', error);
-  //     return null;
-  //   }
-  // }, []);
-
-  // const confirmPhoneAuthCode = useCallback(
-  //   async (
-  //     confirmationResults: FirebaseAuthTypes.ConfirmationResult,
-  //     code: string,
-  //   ) => {
-  //     if (!confirmationResults) {
-  //       return;
-  //     }
-
-  //     try {
-  //       await confirmationResults.confirm(code);
-  //     } catch (error) {
-  //       console.error('Invalid code:', error);
-  //     }
-  //   },
-  //   [],
-  // );
-
   const handleLogout = useCallback(async () => {
     setCurrentUser(null);
     setIsLoggedIn(false);
@@ -192,7 +156,6 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     // signInWithGoogle,
     // signupWithEmail,
     loginWithEmail,
-    // phoneNumberAuth,
     // confirmPhoneAuthCode,
     handleLogout,
     isLoggedIn,
@@ -203,13 +166,6 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider value={value}>
-      {/* <FirebaseRecaptchaVerifierModal
-        ref={recaptchaVerifier}
-        firebaseConfig={app.options}
-        attemptInvisibleVerification={true}
-        onVerify={token => console.log('CAPTCHA Token:', token)}
-        onError={error => console.log('reCAPTCHA Error:', error)}
-      /> */}
       {children}
     </AuthContext.Provider>
   );
