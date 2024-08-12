@@ -1,4 +1,5 @@
 import {useState, useEffect, useCallback} from 'react';
+import { useQuery } from 'react-query';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs} from 'firebase/firestore';
 import {SessionBoxesProp, SessionDetailProp} from '../constants';
