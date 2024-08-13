@@ -6,52 +6,41 @@ import {SessionBoxesProp, SessionDetailProp} from '../constants';
 
 export const useAllSummaryListener = (userId: string) => {
   const [sessionSummary, setSessionSummary] = useState<SessionDetailProp[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | string | null>(null);
 
-  const fetchSessions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-
+  const fetchSessions = async () => {
     if (!userId) {
-      setLoading(false);
       console.log('User ID is missing.');
-      return;
+      throw new Error('User ID is missing.');
     }
+    
+    const q = query(summaryCollection, where('uid', '==', userId)); // can add .orderBy here to sort by time
+    const querySnapshot = await getDocs(q);
+    const sessionDataArray: any = [];
 
-    try {
-      // can add .orderBy here to sort by time
-      const q = query(summaryCollection, where('uid', '==', userId));
-      const querySnapshot = await getDocs(q);
+    querySnapshot.forEach(doc => {
+      const sessionData = doc.data();
+      sessionDataArray.push(sessionData);
+    });
 
-      const sessionDataArray: any = [];
-
-      querySnapshot.forEach(doc => {
-        const sessionData = doc.data();
-        sessionDataArray.push(sessionData);
-      });
-
-      if (sessionDataArray.length > 0) {
-        console.log('Session summaries fetched:', sessionDataArray);
-        setSessionSummary(sessionDataArray);
-      } else {
-        console.log('No sessions found for the given UID.');
-        setSessionSummary([]);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err : new Error('Error fetching sessions'),
-      );
-    } finally {
-      setLoading(false);
+    if (sessionDataArray.length > 0) {
+      console.log('Session summaries fetched:', sessionDataArray);
+    } else {
+      console.log('No sessions found for the given UID.');
     }
-  }, [userId]);
+    return sessionDataArray
+  };
 
-  useEffect(() => {
-    fetchSessions();
-  }, [fetchSessions]);
+  // useEffect(() => {
+  //   fetchSessions();
+  // }, [fetchSessions]);
 
-  return {loading, error, sessionSummary};
+  const { data, error, isLoading } = useQuery(
+    ['sessionSummary', userId],
+    fetchSessions,
+    { enabled: !userId } // only run if userId exists
+  );
+
+  return {loading: isLoading, error, sessionSummary: data };
 };
 
 export const useRecentSummaryListener = (userId: string) => {
