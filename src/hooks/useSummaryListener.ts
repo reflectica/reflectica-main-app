@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState} from 'react';
 import { useQuery } from 'react-query';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs} from 'firebase/firestore';
@@ -12,7 +12,7 @@ export const useAllSummaryListener = (userId: string) => {
       console.log('User ID is missing.');
       throw new Error('User ID is missing.');
     }
-    
+
     const q = query(summaryCollection, where('uid', '==', userId)); // can add .orderBy here to sort by time
     const querySnapshot = await getDocs(q);
     const sessionDataArray: any = [];
@@ -30,17 +30,17 @@ export const useAllSummaryListener = (userId: string) => {
     return sessionDataArray
   };
 
-  // useEffect(() => {
-  //   fetchSessions();
-  // }, [fetchSessions]);
-
   const { data, error, isLoading } = useQuery(
     ['sessionSummary', userId],
-    fetchSessions,
-    { enabled: !userId } // only run if userId exists
+    fetchSessions, // this function will fetch the sessions 
+    { 
+      enabled: !userId, // only run if userId exists
+      staleTime: 1000 * 60 * 10, // consider data fresh for 10 minutes
+      cacheTime: 1000 * 60 * 60, // keep data in cache for 1 hour
+    } 
   );
 
-  return {loading: isLoading, error, sessionSummary: data };
+  return { loading: isLoading, error, sessionSummary: data };
 };
 
 export const useRecentSummaryListener = (userId: string) => {
@@ -48,59 +48,50 @@ export const useRecentSummaryListener = (userId: string) => {
     SessionBoxesProp[]
   >([]);
   const [recentFeeling, setRecentFeeling] = useState();
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | string | null>(null);
 
-  const fetchRecentSessions = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchRecentSessions = async () => {
 
     if (!userId) {
-      setLoading(false);
       console.log('User ID is missing.');
-      return;
+      throw new Error('User ID is missing.');
     }
 
-    try {
-      const q = query(summaryCollection, where('uid', '==', userId));
-      const querySnapshot = await getDocs(q);
-      const sessionDataArray: any = [];
+    const q = query(summaryCollection, where('uid', '==', userId));
+    const querySnapshot = await getDocs(q);
+    const sessionDataArray: any = [];
 
-      querySnapshot.forEach(doc => {
-        const sessionData = doc.data();
-        sessionDataArray.push(sessionData);
-      });
+    querySnapshot.forEach(doc => {
+      const sessionData = doc.data();
+      sessionDataArray.push(sessionData);
+    });
 
-      sessionDataArray.sort(
-        (a: any, b: any) =>
-          new Date(b.time).getTime() - new Date(a.time).getTime(),
-      );
-      const mostRecentSessions = sessionDataArray.slice(0, 3);
-      const mostRecentFeeling = sessionDataArray[0].moodPercentage;
+    sessionDataArray.sort(
+      (a: any, b: any) =>
+        new Date(b.time).getTime() - new Date(a.time).getTime(),
+    );
+    const mostRecentSessions = sessionDataArray.slice(0, 3);
+    const mostRecentFeeling = sessionDataArray[0].moodPercentage;
 
-      setRecentFeeling(mostRecentFeeling);
+    setRecentFeeling(mostRecentFeeling);
 
-      if (mostRecentSessions.length > 0) {
-        console.log('Recent session summaries fetched:', mostRecentSessions);
-        setRecentSessionSummary(mostRecentSessions);
-      } else {
-        console.log('No recent sessions found for the given UID.');
-        setRecentSessionSummary([]);
-      }
-    } catch (err) {
-      setError(
-        err instanceof Error
-          ? err
-          : new Error('Error fetching recent sessions'),
-      );
-    } finally {
-      setLoading(false);
+    if (mostRecentSessions.length > 0) {
+      console.log('Recent session summaries fetched:', mostRecentSessions);
+      // setRecentSessionSummary(mostRecentSessions);
+    } else {
+      console.log('No recent sessions found for the given UID.');
+      // setRecentSessionSummary([]);
     }
-  }, [userId]);
+  }
+    
+  const { data, error, isLoading } = useQuery(
+    ['reentSessions', userId],
+    fetchRecentSessions,
+    {
+      enabled: !userId, // only run if userId exists
+      staleTime: 1000 * 60 * 10, // consider data fresh for 10 minutes
+      cacheTime: 1000 * 60 * 60, // keep data in cache for 1 hour
+    }
+  );
 
-  useEffect(() => {
-    fetchRecentSessions();
-  }, [fetchRecentSessions]);
-
-  return {loading, error, recentSessionSummary, recentFeeling};
+  return {loading: isLoading, error, recentSessionSummary: data, recentFeeling};
 };
