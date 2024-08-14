@@ -1,57 +1,53 @@
-import {useState, useEffect, useCallback} from 'react';
+import {useState} from 'react';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs, orderBy, limit} from 'firebase/firestore';
+import { useQuery } from 'react-query';
 
 export const useRecentMentalHealthScores = (userId: string) => {
   const [mentalHealthScores, setMentalHealthScores] = useState<number[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
 
-  const fetchRecentScores = useCallback(async () => {
-    setLoading(true);
-    setError(null);
+  const fetchRecentScores = async () => {
 
     if (!userId) {
-      setLoading(false);
       console.log('User ID is missing.');
-      return;
+      throw new Error('User ID is missing.');
     }
 
-    try {
-      const q = query(
-        summaryCollection,
-        where('uid', '==', userId),
-        orderBy('time', 'desc'),
-        limit(7),
-      );
+    const q = query(
+      summaryCollection,
+      where('uid', '==', userId),
+      orderBy('time', 'desc'),
+      limit(7),
+    );
 
-      const querySnapshot = await getDocs(q);
-      const scoresArray: number[] = [];
+    const querySnapshot = await getDocs(q);
+    const scoresArray: number[] = [];
 
-      querySnapshot.forEach(doc => {
-        const sessionData = doc.data();
-        if (sessionData.mentalHealthScore) {
-          scoresArray.push(parseFloat(sessionData.mentalHealthScore));
-        }
-      });
-
-      if (scoresArray.length > 0) {
-        console.log('Mental health scores fetched:', scoresArray);
-        setMentalHealthScores(scoresArray.reverse()); // Reverse to get chronological order
-      } else {
-        console.log('No sessions found for the given UID.');
-        setMentalHealthScores([]);
+    querySnapshot.forEach(doc => {
+      const sessionData = doc.data();
+      if (sessionData.mentalHealthScore) {
+        scoresArray.push(parseFloat(sessionData.mentalHealthScore));
       }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Error fetching scores'));
-    } finally {
-      setLoading(false);
+    });
+
+    if (scoresArray.length > 0) {
+      console.log('Mental health scores fetched:', scoresArray);
+      setMentalHealthScores(scoresArray.reverse()); // Reverse to get chronological order
+    } else {
+      console.log('No sessions found for the given UID.');
+      setMentalHealthScores([]);
     }
-  }, [userId]);
+  };
 
-  useEffect(() => {
-    fetchRecentScores();
-  }, [fetchRecentScores]);
+  const { data, error, isLoading } = useQuery(
+    ['recentScores', userId],
+    fetchRecentScores,
+    {
+      enabled: !userId, // only run if userId exists
+      staleTime: 1000 * 60 * 10, // consider data fresh for 10 minutes
+      cacheTime: 1000 * 60 * 60, // keep data in cache for 1 hour
+    }
+  );
 
-  return {loading, error, mentalHealthScores};
+  return {loading: isLoading, error, mentalHealthScores: data};
 };

@@ -84,7 +84,7 @@ export const useRecentSummaryListener = (userId: string) => {
   }
     
   const { data, error, isLoading } = useQuery(
-    ['reentSessions', userId],
+    ['recentSessionSummary', userId],
     fetchRecentSessions,
     {
       enabled: !userId, // only run if userId exists
