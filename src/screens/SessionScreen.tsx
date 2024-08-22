@@ -1,52 +1,34 @@
-/* eslint-disable react-native/no-inline-styles */
-import React, {useState, useEffect} from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {
-  StyleSheet,
-  Text,
-  View,
-  Dimensions,
-  GestureResponderEvent,
-} from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import 'react-native-get-random-values';
-// import {useSelector} from 'react-redux';
-import {useAuth} from '../context/AuthContext.ts';
-import {v4 as uuidv4} from 'uuid';
+import { useAuth } from '../context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
-import Voice, {SpeechResultsEvent} from '@react-native-voice/voice';
-// import {selectUser} from '../features/auth/authSelectors.ts'; // import the selector
-import {ButtonTemplate, AnimatedButton} from '../components/index.ts';
-import {SessionScreenProps} from '../constants/ParamList.ts';
-// import * as FileSystem from 'expo-file-system';
+import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
+import { ButtonTemplate, AnimatedButton } from '../components';
+import { SessionScreenProps } from '../constants/ParamList';
 import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
-// import {Audio} from 'expo-av';
-// import {UserProps} from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
-  // const [inputText, setInputText] = useState<string>('');
-  // const [listening, setListening] = useState<boolean>(false);
+const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
-  // const user: UserProps = useSelector(selectUser); // use the selector to get the current user
-  const {currentUser} = useAuth();
+  const { currentUser } = useAuth();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
 
   useEffect(() => {
-    // Function to handle the voice recognition results
     const onSpeechResults = (e: SpeechResultsEvent) => {
       if (e.value) {
-        setTranscript(e.value.join(' ')); // Joining the array of strings into a single string
+        setTranscript(e.value.join(' '));
       }
     };
 
-    // Adding the event listener
     Voice.onSpeechResults = onSpeechResults;
 
-    // Cleanup function to remove the event listener
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
@@ -70,7 +52,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
     }
   };
 
-  const handleRecordingToggle = async (newRecordingState: any) => {
+  const handleRecordingToggle = async (newRecordingState: boolean) => {
     if (newRecordingState) {
       await startRecording();
     } else {
@@ -89,28 +71,25 @@ const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
       });
 
       const base64Audio = response.data.audio;
-
-      // const uri = FileSystem.documentDirectory + 'audio.mp3';
       const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
 
       await RNFS.writeFile(filePath, base64Audio, 'base64');
 
-      // await FileSystem.writeAsStringAsync(uri, base64Audio, {
-      //   encoding: FileSystem.EncodingType.Base64,
-      // });
+      const fileExists = await RNFS.exists(filePath);
+      if (!fileExists) {
+        console.error('Audio file does not exist');
+        return;
+      }
 
-      // const {sound} = await Audio.Sound.createAsync({uri}, {shouldPlay: true});
-      // await sound.playAsync();
+      Sound.setCategory('Playback');
 
-      // console.log('Audio playback started');
-      // Play the audio
-      const sound = new Sound(filePath, Sound.MAIN_BUNDLE, error => {
+      const sound = new Sound(filePath, '', (error) => {
         if (error) {
           console.error('Failed to load the sound', error);
           return;
         }
 
-        sound.play(success => {
+        sound.play((success) => {
           if (success) {
             console.log('Successfully played the audio');
           } else {
@@ -118,14 +97,16 @@ const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
           }
         });
       });
-      // setInputText('');
+
       setTranscript('');
     } catch (error) {
       console.error(error);
     }
   };
 
-  const handleEndSession = async (userId: string) => {
+  const handleEndSession = async () => {
+    const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
+
     try {
       await axios
         .post('http://localhost:3006/session/endSession', {
@@ -134,7 +115,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
         })
         .then(res => {
           setSessionId(uuidv4());
-          navigation.navigate('PostSession', {session: res.data}); // Navigate to PostSessionJournal
+          navigation.navigate('PostSession', { session: res.data });
         })
         .catch(error => console.log(error));
     } catch (error) {
@@ -163,14 +144,14 @@ const SessionScreen: React.FC<SessionScreenProps> = ({navigation}) => {
             onSubmit={handleSubmit}
           />
         </View>
-
+        <Text style={styles.transcript}>
+          {transcript}
+        </Text>
         <ButtonTemplate
           title="End Session"
-          action={() =>
-            handleEndSession('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1' || currentUser?.uid)
-          }
+          action={handleEndSession}
           stylebtn={'purple'}
-          styling={{alignSelf: 'center'}}
+          styling={{ alignSelf: 'center' }}
         />
       </View>
     </SafeAreaView>
@@ -235,6 +216,10 @@ const styles = StyleSheet.create({
   transcript: {
     color: 'white',
     marginTop: 20,
+    marginBottom: 20,
+    textAlign: 'center',
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

@@ -29,6 +29,8 @@ export type VerificationScreenProps = {
 
 export type JournalScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'Journal'>;
+  sessionId: string; // Ensure this matches the actual property
+  shortSummary: string; // Ensure this matches the actual property
 };
 
 export type DashboardScreenProps = {
