@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
-import React from 'react';
-import {Image} from 'react-native';
+import React, { useRef, useEffect, useCallback } from 'react';
+import {Image, AppState} from 'react-native';
 // import type {PropsWithChildren} from 'react';
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
@@ -104,12 +104,39 @@ function MyTabs() {
 }
 
 function App(): React.JSX.Element {
-  const {isLoggedIn, newUser} = useAuth();
+  const {isLoggedIn, newUser, handleLogout} = useAuth();
+  const inactivityTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+
+  const resetTimer = useCallback(() => {
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+      console.log("Timer reset");
+    }
+    inactivityTimer.current = setTimeout(() => {
+      console.log("Logging out due to inactivity");
+      handleLogout();
+    }, INACTIVITY_TIMEOUT);
+  }, [handleLogout]);
+
+  useEffect(() => {
+    resetTimer();
+
+    const subscription = AppState.addEventListener('change', resetTimer);
+    
+    return () => {
+      if (inactivityTimer.current) {
+        clearTimeout(inactivityTimer.current);
+      }
+      subscription.remove();
+    };
+  }, [resetTimer]);
 
   return (
     <NavigationContainer>
       <Stack.Navigator>
         {isLoggedIn ? (
+          // remove new user profile
           newUser ? (
             <Stack.Screen
               name="Profile"
@@ -147,11 +174,11 @@ function App(): React.JSX.Element {
               component={OnboardingScreen}
               options={{headerShown: false}}
             /> */}
-                  <Stack.Screen
-        name="Dashboard"
-        component={DashboardScreen}
-        options={{headerShown: false}}
-      />
+            <Stack.Screen
+              name="Dashboard"
+              component={DashboardScreen}
+              options={{headerShown: false}}
+            />
             <Stack.Screen
               name="Login"
               component={LoginScreen}
@@ -172,7 +199,7 @@ function App(): React.JSX.Element {
               component={EmailSignupScreen}
               options={{headerShown: false}}
             />
-            <Stack.Screen
+            {/* <Stack.Screen
               name="PhoneNumber"
               component={PhonenumberScreen}
               options={{headerShown: false}}
@@ -186,7 +213,7 @@ function App(): React.JSX.Element {
               name="Notification"
               component={NotificationScreen}
               options={{headerShown: false}}
-            />
+            /> */}
           </>
         )}
       </Stack.Navigator>
