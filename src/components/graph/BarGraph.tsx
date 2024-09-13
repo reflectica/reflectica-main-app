@@ -1,33 +1,39 @@
-/* eslint-disable react-native/no-inline-styles */
 import * as React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 
 interface BarGraphProps {
-  data: any;
-};
+  data: { label: string; value: number; color?: string; faded?: boolean }[];
+}
 
-const BarGraph = ({data}: BarGraphProps) => {
+const BarGraph = ({ data }: BarGraphProps) => {
+  // Log the data for debugging
+
   return (
     <View style={styles.container}>
-      {data.map((item: any, index: number) => (
-        <View key={index} style={styles.barContainer}>
-          <View style={styles.barBackground}>
-            <View
-              style={[
-                styles.barFill,
-                {
-                  height: `${item.value * 10}%`,
-                  backgroundColor: item.color,
-                  opacity: item.faded ? 0.3 : 1, // Adjust opacity for faded bars
-                },
-              ]}
-            />
+      {data.map((item, index) => {
+        // Ensure item.value is valid (not NaN or undefined)
+        const barHeight = !isNaN(item.value) && item.value >= 0 ? item.value * 10 : 0;
+
+        return (
+          <View key={index} style={styles.barContainer}>
+            <View style={styles.barBackground}>
+              <View
+                style={[
+                  styles.barFill,
+                  {
+                    height: `${barHeight}%`,
+                    backgroundColor: item.color || '#5271FF', // Default to blue if no color is provided
+                    opacity: item.faded ? 0.3 : 1, // Adjust opacity for faded bars
+                  },
+                ]}
+              />
+            </View>
+            <Text style={[styles.label, item.faded && { opacity: 0.3 }]}>
+              {item.label}
+            </Text>
           </View>
-          <Text style={[styles.label, item.faded && {opacity: 0.3}]}>
-            {item.label}
-          </Text>
-        </View>
-      ))}
+        );
+      })}
     </View>
   );
 };
@@ -37,15 +43,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    height: 250, // Adjusted height to reduce gap
-    paddingBottom: 20, // Added padding to balance the bar graph vertically
+    height: 250,
+    paddingBottom: 20,
   },
   barContainer: {
     alignItems: 'center',
   },
   barBackground: {
     width: 15,
-    height: 200, // Adjusted height of the bars
+    height: 200,
     backgroundColor: '#e0e0e0',
     borderRadius: 10,
     overflow: 'hidden',

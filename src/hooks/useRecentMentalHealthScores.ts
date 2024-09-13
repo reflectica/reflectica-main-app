@@ -55,3 +55,4 @@ export const useRecentMentalHealthScores = (userId: string) => {
 
   return {loading, error, mentalHealthScores};
 };
+

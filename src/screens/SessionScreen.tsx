@@ -10,15 +10,27 @@ import { ButtonTemplate, AnimatedButton } from '../components';
 import { SessionScreenProps } from '../constants/ParamList';
 import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
+import DropDownPicker from 'react-native-dropdown-picker'; 
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
+const languages = [
+  { label: 'English (US)', value: 'en-US' },
+  { label: 'Spanish (Spain)', value: 'es-ES' },
+  { label: 'Spanish (Mexico)', value: 'es-MX' },
+  { label: 'French (France)', value: 'fr-FR' },
+  { label: 'Chinese (Simplified)', value: 'zh-CN' },
+  { label: 'Russian', value: 'ru-RU' },
+];
 
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   const { currentUser } = useAuth();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('en-US'); // Default to English (US)
+  const [open, setOpen] = useState(false);
+  const [value, setValue] = useState('en-US')
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -37,11 +49,12 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const startRecording = async () => {
     try {
       setIsRecording(true);
-      await Voice.start('en-US');
+      await Voice.start(selectedLanguage); // Use the selected language
     } catch (e) {
       console.error(e);
     }
   };
+
 
   const stopRecording = async () => {
     try {
@@ -138,6 +151,18 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
             {isRecording ? 'Listening...' : 'Speaking...'}
           </Text>
         </View>
+        {/* Language Selection Dropdown */}
+        {/* Language Selection Dropdown */}
+        <DropDownPicker
+          open={open}
+          value={selectedLanguage}
+          items={languages}
+          setOpen={setOpen}
+          setValue={setSelectedLanguage}
+          placeholder="Select a language"
+        />
+
+
         <View style={styles.container}>
           <AnimatedButton
             onRecordingToggle={handleRecordingToggle}

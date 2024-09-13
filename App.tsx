@@ -115,7 +115,6 @@ function MyTabs() {
 
 function App(): React.JSX.Element {
   const { isLoggedIn, newUser } = useAuth();
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -148,22 +147,13 @@ function App(): React.JSX.Element {
         ) : (
           <>
             {/* <Stack.Screen
+              name="InSession"
+              component={SessionScreen}
+              options={{headerShown: false}}
+            /> */}
+            <Stack.Screen
               name="MainApp"
               component={MyTabs}
-<<<<<<< HEAD
-              options={{headerShown: false}}
-            /> */}
-            {/* <Stack.Screen
-              name="Onboarding"
-              component={OnboardingScreen}
-              options={{headerShown: false}}
-            /> */}
-                  <Stack.Screen
-        name="Dashboard"
-        component={DashboardScreen}
-        options={{headerShown: false}}
-      />
-=======
               options={{ headerShown: false }}
             />
             <Stack.Screen
@@ -171,7 +161,6 @@ function App(): React.JSX.Element {
               component={OnboardingScreen}
               options={{ headerShown: false }}
             />
->>>>>>> ba831bd (session journal fixes)
             <Stack.Screen
               name="Login"
               component={LoginScreen}

@@ -8,7 +8,7 @@ import {
 } from '../components';
 import { View, Text, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { useSessionAndSurroundingScores } from '../hooks';
+import { useRecentMentalHealthScores } from '../hooks';
 
 type SessionParams = {
   session: {
@@ -32,7 +32,7 @@ const PostSessionJournal: React.FC = () => {
   const [lineData, setLineData] = useState<number[]>([]);
   const [lineLabels, setLineLabels] = useState<string[]>([]);
 
-  const { mentalHealthScores } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+  const { mentalHealthScores } = useRecentMentalHealthScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
 
   useEffect(() => {
     if (session) {
@@ -60,13 +60,18 @@ const PostSessionJournal: React.FC = () => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);
     const sortedEmotions = emotions.sort((a, b) => b.score - a.score);
     return sortedEmotions.map((emotion, index) => ({
-      ...emotion,
+      ...emotion, 
       percentage: (emotion.score / totalScore) * 100,
       opacity: 1 - (index * 0.1),
     }));
   };
-
   const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
+
+  const pieData = emotions.map(emotion => ({
+    label: emotion.label,
+    percentage: Math.round(emotion.percentage || 0),
+    color: getColorWithOpacity(emotion.opacity || 1),
+  }));
 
   const barData = [
     { label: 'PHQ-9', value: dsmScores['PHQ-9 Score'], color: '#5271FF', faded: dsmScores['PHQ-9 Score'] === 'Not Applicable' },
@@ -78,11 +83,7 @@ const PostSessionJournal: React.FC = () => {
     { label: 'SSRS', value: dsmScores['SSRS Assessment'], color: '#5271FF', faded: dsmScores['SSRS Assessment'] === 'Not Applicable' },
   ];
 
-  const pieData = emotions.map(emotion => ({
-    label: emotion.label,
-    percentage: Math.round(emotion.percentage || 0),
-    color: getColorWithOpacity(emotion.opacity || 1),
-  }));
+ 
 
   const selfEsteemScore = isNaN(dsmScores['Rosenberg Self Esteem']) || dsmScores['Rosenberg Self Esteem'] === 'Not Applicable' ? null : dsmScores['Rosenberg Self Esteem'];
 
