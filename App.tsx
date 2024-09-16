@@ -55,59 +55,61 @@ function JournalStackNavigator() {
 function MyTabs() {
   return (
     <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarShowLabel: false,
-        // eslint-disable-next-line react/no-unstable-nested-components
-        tabBarIcon: ({ color }) => {
-          let iconSource: any;
-
-          if (route.name === 'Dashboard') {
-            iconSource = cloud;
-          } else if (route.name === 'Journal') {
-            iconSource = log;
-          } else if (route.name === 'Support') {
-            iconSource = question;
-          } else if (route.name === 'Setting') {
-            iconSource = setting;
-          }
-          return (
-            <Image
-              source={iconSource}
-              style={{ height: 30, width: 30 }}
-            // color={color}
-            />
-          );
-        },
-      })}>
-      <Stack.Screen
-        name="InSession"
-        component={SessionScreen}
-        options={{ headerShown: false }}
-      />
-      <Stack.Screen
-        name="PostSession"
-        component={PostSessionJournal}
-        options={{ headerShown: false }}
-      />
+    screenOptions={{
+      tabBarShowLabel: false,
+      tabBarStyle: {
+        backgroundColor: '#fff',
+        flexDirection: 'row',
+        justifyContent: 'center', // Centers the tabs
+        alignItems: 'center',
+        paddingHorizontal: 20,
+      },
+      tabBarItemStyle: {
+        // Remove flex: 1 to prevent tabs from stretching
+        alignItems: 'center',
+        justifyContent: 'center',
+      },
+    }}
+    >
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Image source={cloud} style={{ height: 30, width: 50 }} />
+          ),
+        }}
       />
       <Tab.Screen
         name="Journal"
         component={JournalStackNavigator}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Image source={log} style={{ height: 30, width: 30 }} />
+          ),
+        }}
       />
       <Tab.Screen
         name="Support"
         component={SupportScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Image source={question} style={{ height: 30, width: 30 }} />
+          ),
+        }}
       />
       <Tab.Screen
         name="Setting"
         component={SettingScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          tabBarIcon: ({ color }) => (
+            <Image source={setting} style={{ height: 30, width: 30 }} />
+          ),
+        }}
       />
     </Tab.Navigator>
   );

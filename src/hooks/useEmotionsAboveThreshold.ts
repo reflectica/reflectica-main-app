@@ -3,12 +3,12 @@ import { summaryCollection } from '../firebase/firebaseConfig'; // Adjust path a
 import { query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 interface Emotion {
-  label: string;
-  score: number;
-}
+    label: string;
+    score: number | null;
+  }
 
 interface SessionData {
-  emotions?: Emotion[]; // Emotions array in each session
+  emotions?: Emotion[] | 'unavailable'; // Emotions array or 'unavailable' string
   time: any; // Firestore Timestamp or other time representation
   sessionId: string; // Session ID or other unique identifier
 }
@@ -46,8 +46,8 @@ export const useEmotionsAboveThreshold = (userId: string, threshold: number = 0.
       last30SessionsSnapshot.forEach((doc) => {
         const sessionData = doc.data() as SessionData;
 
-        // Check if the session contains emotions
-        if (sessionData.emotions) {
+        // Check if the session contains emotions and emotions is an array
+        if (sessionData.emotions && Array.isArray(sessionData.emotions)) {
           // Filter emotions by score above the threshold
           const sessionEmotionsAboveThreshold = sessionData.emotions.filter(
             (emotion) => emotion.score > threshold
@@ -55,11 +55,13 @@ export const useEmotionsAboveThreshold = (userId: string, threshold: number = 0.
 
           // Add filtered emotions to the array
           filteredEmotions.push(...sessionEmotionsAboveThreshold);
+        } else {
+          // Emotions are unavailable or invalid
+          console.log(`Emotions unavailable for session ${sessionData.sessionId}`);
         }
       });
 
       // Log emotions fetched for debugging
-      console.log('Emotions above threshold:', filteredEmotions);
 
       // Set the state with the filtered emotions
       setEmotionsAboveThreshold(filteredEmotions);

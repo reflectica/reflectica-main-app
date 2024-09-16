@@ -37,10 +37,13 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   }, [mentalHealthScores]);
 
   useEffect(() => {
-    if (session?.emotions) {
-      const filteredEmotions = session.emotions.filter((emotion) => emotion.score > 0.10);
+    if (session.emotions && Array.isArray(session.emotions)) {
+      const filteredEmotions = session.emotions.filter(emotion => emotion.score > 0.10);
       const normalizedEmotions = normalizeEmotions(filteredEmotions);
       setEmotions(normalizedEmotions);
+    } else {
+      // Handle the case where emotions are 'unavailable'
+      setEmotions([]); // Or handle it differently if you prefer
     }
   }, [session]);
 
@@ -156,16 +159,20 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
           <View style={styles.pieChartContainer}>
             <Text style={styles.sectionTitle}>Emotional State Modeling</Text>
-            <View style={styles.pieChartWrapper}>
-              <DonutChartComponent data={pieData} />
-              <View style={styles.legendContainer}>
-                {pieData.map((item, index) => (
-                  <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
-                    {item.label} ({item.percentage}%)
-                  </Text>
-                ))}
+            {emotions.length > 0 ? (
+              <View style={styles.pieChartWrapper}>
+                <DonutChartComponent data={pieData} />
+                <View style={styles.legendContainer}>
+                  {pieData.map((item, index) => (
+                    <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
+                      {item.label} ({item.percentage}%)
+                    </Text>
+                  ))}
+                </View>
               </View>
-            </View>
+            ) : (
+              <Text>Emotions data is unavailable for this session.</Text>
+            )}
           </View>
 
           <View style={styles.keyTopicsSection}>

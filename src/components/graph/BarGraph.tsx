@@ -43,15 +43,15 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'flex-end',
-    height: 250,
+    height: 240,
     paddingBottom: 20,
   },
   barContainer: {
     alignItems: 'center',
   },
   barBackground: {
-    width: 15,
-    height: 200,
+    width: 18,
+    height: 190,
     backgroundColor: '#e0e0e0',
     borderRadius: 10,
     overflow: 'hidden',

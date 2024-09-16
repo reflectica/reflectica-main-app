@@ -15,12 +15,9 @@ import DropDownPicker from 'react-native-dropdown-picker';
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 const languages = [
-  { label: 'English (US)', value: 'en-US' },
-  { label: 'Spanish (Spain)', value: 'es-ES' },
-  { label: 'Spanish (Mexico)', value: 'es-MX' },
-  { label: 'French (France)', value: 'fr-FR' },
-  { label: 'Chinese (Simplified)', value: 'zh-CN' },
-  { label: 'Russian', value: 'ru-RU' },
+  { label: 'English', value: 'en-US' },
+  { label: 'Spanish', value: 'es-ES' },
+
 ];
 
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
@@ -119,12 +116,17 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   const handleEndSession = async () => {
     const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
-
+    
+    // Step 1: Get the selected language
+    // Replace this with how you actually retrieve the language in your app
+    const language = selectedLanguage; // Assuming 'language' is available in your component's scope
+  
     try {
       await axios
         .post('http://localhost:3006/session/endSession', {
           userId: userId,
           sessionId: sessionId,
+          language: language, // Step 2: Include 'language' in the request body
         })
         .then(res => {
           setSessionId(uuidv4());
@@ -135,6 +137,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
       console.error(error);
     }
   };
+  
 
   return (
     <SafeAreaView style={styles.container}>

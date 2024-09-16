@@ -41,10 +41,14 @@ const PostSessionJournal: React.FC = () => {
         setLongSummary(session.longSummary || '');
       }
 
-      if (session.emotions) {
+      // Check if emotions are available and are an array
+      if (session.emotions && Array.isArray(session.emotions)) {
         const filteredEmotions = session.emotions.filter(emotion => emotion.score > 0.10);
         const normalizedEmotions = normalizeEmotions(filteredEmotions);
         setEmotions(normalizedEmotions);
+      } else {
+        // Handle the case where emotions are 'unavailable'
+        setEmotions([]); // Or handle it differently if you prefer
       }
     }
   }, [session]);
@@ -60,7 +64,7 @@ const PostSessionJournal: React.FC = () => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);
     const sortedEmotions = emotions.sort((a, b) => b.score - a.score);
     return sortedEmotions.map((emotion, index) => ({
-      ...emotion, 
+      ...emotion,
       percentage: (emotion.score / totalScore) * 100,
       opacity: 1 - (index * 0.1),
     }));
@@ -83,7 +87,7 @@ const PostSessionJournal: React.FC = () => {
     { label: 'SSRS', value: dsmScores['SSRS Assessment'], color: '#5271FF', faded: dsmScores['SSRS Assessment'] === 'Not Applicable' },
   ];
 
- 
+
 
   const selfEsteemScore = isNaN(dsmScores['Rosenberg Self Esteem']) || dsmScores['Rosenberg Self Esteem'] === 'Not Applicable' ? null : dsmScores['Rosenberg Self Esteem'];
 
@@ -119,16 +123,20 @@ const PostSessionJournal: React.FC = () => {
 
           <View style={styles.pieChartContainer}>
             <Text style={styles.sectionTitle}>Emotional State Modeling</Text>
-            <View style={styles.pieChartWrapper}>
-              <DonutChartComponent data={pieData} />
-              <View style={styles.legendContainer}>
-                {pieData.map((item, index) => (
-                  <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
-                    {item.label} ({item.percentage}%)
-                  </Text>
-                ))}
+            {emotions.length > 0 ? (
+              <View style={styles.pieChartWrapper}>
+                <DonutChartComponent data={pieData} />
+                <View style={styles.legendContainer}>
+                  {pieData.map((item, index) => (
+                    <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
+                      {item.label} ({item.percentage}%)
+                    </Text>
+                  ))}
+                </View>
               </View>
-            </View>
+            ) : (
+              <Text>Emotions data is unavailable for this session.</Text>
+            )}
           </View>
           <View style={styles.keyTopicsSection}>
             <Text style={styles.sectionTitle}>Key Conversation Topics:</Text>
