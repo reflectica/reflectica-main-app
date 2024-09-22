@@ -1,33 +1,23 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import 'react-native-get-random-values';
+import { SafeAreaView, View, Text, Switch, StyleSheet, Dimensions } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
+import { SessionScreenProps } from '../constants/ParamList';
 import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
 import { ButtonTemplate, AnimatedButton } from '../components';
-import { SessionScreenProps } from '../constants/ParamList';
 import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
-import DropDownPicker from 'react-native-dropdown-picker'; 
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
-const languages = [
-  { label: 'English', value: 'en-US' },
-  { label: 'Spanish', value: 'es-ES' },
-
-];
 
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   const { currentUser } = useAuth();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
-  const [selectedLanguage, setSelectedLanguage] = useState<string>('en-US'); // Default to English (US)
-  const [open, setOpen] = useState(false);
-  const [value, setValue] = useState('en-US')
+  const [isSpanish, setIsSpanish] = useState<boolean>(false); // Toggle between English and Spanish
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -46,12 +36,12 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const startRecording = async () => {
     try {
       setIsRecording(true);
-      await Voice.start(selectedLanguage); // Use the selected language
+      const language = isSpanish ? 'es-ES' : 'en-US'; // Use Spanish if toggled, else English
+      await Voice.start(language);
     } catch (e) {
       console.error(e);
     }
   };
-
 
   const stopRecording = async () => {
     try {
@@ -73,7 +63,6 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const handleSubmit = async () => {
     try {
       const promptToSubmit = transcript;
-
       const response = await axios.post('http://localhost:3006/chat', {
         prompt: promptToSubmit,
         userId: 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
@@ -84,15 +73,14 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
       const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
 
       await RNFS.writeFile(filePath, base64Audio, 'base64');
-
       const fileExists = await RNFS.exists(filePath);
+
       if (!fileExists) {
         console.error('Audio file does not exist');
         return;
       }
 
       Sound.setCategory('Playback');
-
       const sound = new Sound(filePath, '', (error) => {
         if (error) {
           console.error('Failed to load the sound', error);
@@ -100,9 +88,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
         }
 
         sound.play((success) => {
-          if (success) {
-            console.log('Successfully played the audio');
-          } else {
+          if (!success) {
             console.error('Playback failed due to audio decoding errors');
           }
         });
@@ -116,61 +102,54 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   const handleEndSession = async () => {
     const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
-    
-    // Step 1: Get the selected language
-    // Replace this with how you actually retrieve the language in your app
-    const language = selectedLanguage; // Assuming 'language' is available in your component's scope
-  
+    const language = isSpanish ? 'es-ES' : 'en-US'; // Use the selected language
+
     try {
-      await axios
-        .post('http://localhost:3006/session/endSession', {
-          userId: userId,
-          sessionId: sessionId,
-          language: language, // Step 2: Include 'language' in the request body
-        })
-        .then(res => {
-          setSessionId(uuidv4());
-          navigation.navigate('PostSession', { session: res.data });
-        })
-        .catch(error => console.log(error));
+      await axios.post('http://localhost:3006/session/endSession', {
+        userId: userId,
+        sessionId: sessionId,
+        language: language,
+      })
+      .then(res => {
+        setSessionId(uuidv4());
+        navigation.navigate('PostSession', { session: res.data });
+      })
+      .catch(error => console.log(error));
     } catch (error) {
       console.error(error);
     }
   };
-  
+
+  const toggleLanguage = () => {
+    setIsSpanish((prevState) => !prevState);
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.window}>
-        <View style={styles.actionBox}>
-          <Text
-            style={{
-              color: 'rgba(255, 255, 255, 1)',
-              fontWeight: '700',
-              fontFamily: 'Montserrat',
-              fontSize: 11,
-              lineHeight: 16.5,
-            }}>
-            {isRecording ? 'Listening...' : 'Speaking...'}
-          </Text>
+        {/* Language Switch */}
+        <View style={styles.topRow}>
+          <View style={styles.actionBox}>
+            <Text style={styles.actionText}>
+              {isRecording ? 'Listening...' : 'Speaking...'}
+            </Text>
+          </View>
+
+          {/* Language Switcher */}
+          <View style={styles.switchContainer}>
+            <Text style={styles.languageText}>{isSpanish ? 'Spanish' : 'English'}</Text>
+            <Switch
+              value={isSpanish}
+              onValueChange={toggleLanguage}
+              trackColor={{ false: '#767577', true: '#5271FF' }}
+              thumbColor="#fff"
+            />
+          </View>
         </View>
-        {/* Language Selection Dropdown */}
-        {/* Language Selection Dropdown */}
-        <DropDownPicker
-          open={open}
-          value={selectedLanguage}
-          items={languages}
-          setOpen={setOpen}
-          setValue={setSelectedLanguage}
-          placeholder="Select a language"
-        />
 
-
+        {/* Rest of the layout */}
         <View style={styles.container}>
-          <AnimatedButton
-            onRecordingToggle={handleRecordingToggle}
-            onSubmit={handleSubmit}
-          />
+          <AnimatedButton onRecordingToggle={handleRecordingToggle} onSubmit={handleSubmit} />
         </View>
         <Text style={styles.transcript}>
           {transcript}
@@ -178,7 +157,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
         <ButtonTemplate
           title="End Session"
           action={handleEndSession}
-          stylebtn={'purple'}
+          stylebtn="purple"
           styling={{ alignSelf: 'center' }}
         />
       </View>
@@ -199,31 +178,15 @@ const styles = StyleSheet.create({
     width: screenWidth * 0.95,
     borderRadius: 30,
     alignSelf: 'center',
+    justifyContent: 'flex-start',
     padding: 20,
   },
-  notificationBoxContainer: {
-    backgroundColor: '#393948',
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 15,
-    width: screenWidth * 0.2,
-    height: screenHeight * 0.04,
-    justifyContent: 'center',
-  },
-  notificationBox: {
-    color: 'white',
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-    fontSize: 11,
-    lineHeight: 16.5,
-    textAlign: 'center',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 10,
-    paddingHorizontal: 10,
+  topRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    width: '100%',
   },
   actionBox: {
     backgroundColor: '#393948',
@@ -232,14 +195,23 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     paddingHorizontal: 20,
     paddingVertical: 15,
-    alignSelf: 'flex-start',
-    marginTop: 20,
-    marginLeft: 20,
   },
-  bottomContainer: {
-    width: screenWidth,
-    height: screenHeight,
-    alignSelf: 'center',
+  actionText: {
+    color: 'rgba(255, 255, 255, 1)',
+    fontWeight: '700',
+    fontFamily: 'Montserrat',
+    fontSize: 11,
+    lineHeight: 16.5,
+  },
+  switchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  languageText: {
+    color: '#FFFFFF', // White text
+    fontSize: 16,
+    fontWeight: '700',
+    marginRight: 10, // Space between text and switch
   },
   transcript: {
     color: 'white',

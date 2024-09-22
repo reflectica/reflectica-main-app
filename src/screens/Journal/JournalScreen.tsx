@@ -56,6 +56,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Montserrat',
     textAlign: 'center',
     marginVertical: 10,
+    paddingBottom: 15,
   },
   scrollContainer: {
     alignItems: 'center',
@@ -63,8 +64,9 @@ const styles = StyleSheet.create({
   },
   body: {
     backgroundColor: 'white',
-    width: '80%',
-    borderRadius: 10,
-    paddingTop: 10,
+    width: '90%',
+    height: 620,
+    borderRadius: 15,
+    paddingTop: 25,
   },
 });
