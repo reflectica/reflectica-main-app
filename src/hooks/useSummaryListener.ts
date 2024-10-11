@@ -1,8 +1,9 @@
 import {useState, useEffect, useCallback} from 'react';
 import { useQuery } from 'react-query';
 import {summaryCollection} from '../firebase/firebaseConfig';
-import {query, where, getDocs} from 'firebase/firestore';
+import {query, where, getDocs, orderBy} from 'firebase/firestore';
 import {SessionBoxesProp, SessionDetailProp} from '../constants';
+
 
 export const useAllSummaryListener = (userId: string) => {
   const [sessionSummary, setSessionSummary] = useState<SessionDetailProp[]>([]);
@@ -20,14 +21,14 @@ export const useAllSummaryListener = (userId: string) => {
     }
 
     try {
-      // can add .orderBy here to sort by time
-      const q = query(summaryCollection, where('uid', '==', userId));
+      // Add .orderBy to sort by time
+      const q = query(summaryCollection, where('uid', '==', userId), orderBy('time', 'asc')); // Ascending order by time
       const querySnapshot = await getDocs(q);
 
-      const sessionDataArray: any = [];
+      const sessionDataArray: SessionDetailProp[] = [];
 
-      querySnapshot.forEach(doc => {
-        const sessionData = doc.data();
+      querySnapshot.forEach((doc) => {
+        const sessionData = doc.data() as SessionDetailProp;
         sessionDataArray.push(sessionData);
       });
 
@@ -51,8 +52,9 @@ export const useAllSummaryListener = (userId: string) => {
     fetchSessions();
   }, [fetchSessions]);
 
-  return {loading, error, sessionSummary};
+  return { loading, error, sessionSummary };
 };
+
 
 export const useRecentSummaryListener = (userId: string) => {
   const [recentSessionSummary, setRecentSessionSummary] = useState<

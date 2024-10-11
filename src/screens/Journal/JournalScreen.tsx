@@ -1,60 +1,53 @@
 import React from 'react';
-import {SafeAreaView} from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import {
   StyleSheet,
   Text,
   View,
   Dimensions,
   TouchableOpacity,
+  ScrollView, // Import ScrollView
 } from 'react-native';
-import {SessionBoxes} from '../../components';
-import {useAllSummaryListener} from '../../hooks/useSummaryListener';
-import {JournalScreenProps} from '../../constants';
+import { SessionBoxes } from '../../components';
+import { useAllSummaryListener } from '../../hooks/useSummaryListener';
+import { JournalScreenProps } from '../../constants';
 
-const screenHeight = Dimensions.get('window').height;
-// const screenWidth = Dimensions.get('window').width;
-
-export default function JournalScreen({navigation}: JournalScreenProps) {
-  const {sessionSummary, loading, error} = useAllSummaryListener(
-    'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+export default function JournalScreen({ navigation }: JournalScreenProps) {
+  const { sessionSummary, loading, error } = useAllSummaryListener(
+    'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'
   );
-
-  // console.log('error', error)
-  console.log('sessionSummary', sessionSummary);
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* <MainTemplate title="Session Journals"/> */}
       <Text style={styles.title}>Session Journals</Text>
-      <View style={styles.body}>
-        {Array.isArray(sessionSummary) &&
-          sessionSummary.map((data, index) => (
-            <TouchableOpacity
-              // index={index}
-              onPress={() => {
-                console.log('LOGGING SESSION ID:', data.sessionID);
-                navigation.navigate('SessionDetail', {
-                  session: data,
-                  sessionNumber: index + 1,
-                });
-              }}>
-              <SessionBoxes id={index + 1} description={data.shortSummary} />
-            </TouchableOpacity>
-          ))}
-
-        {/* {error && <Text>Error: {error}</Text>}
-        // {loading && <Text>Loading: {loading}</Text>} */}
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.body}>
+          {Array.isArray(sessionSummary) &&
+            sessionSummary.map((data, index) => (
+              <TouchableOpacity
+                key={index} // Add key prop for performance
+                onPress={() => {
+                  console.log('LOGGING SESSION ID:', data.sessionId);
+                  navigation.navigate('SessionDetail', {
+                    session: data,
+                    sessionNumber: index + 1,
+                  });
+                }}
+              >
+                <SessionBoxes id={index + 1} description={data.shortSummary} />
+              </TouchableOpacity>
+            ))}
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     alignItems: 'center',
     backgroundColor: '#F5F7FA',
-    gap: 15,
-    flex: 1,
   },
   title: {
     fontSize: 25,
@@ -62,12 +55,18 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     fontFamily: 'Montserrat',
     textAlign: 'center',
+    marginVertical: 10,
+    paddingBottom: 15,
+  },
+  scrollContainer: {
+    alignItems: 'center',
+    paddingBottom: 20, // Add some padding to the bottom for better scrolling experience
   },
   body: {
     backgroundColor: 'white',
-    width: '80%',
-    height: screenHeight * 0.7,
-    borderRadius: 10,
-    paddingTop: 10,
+    width: '90%',
+    height: 620,
+    borderRadius: 15,
+    paddingTop: 25,
   },
 });

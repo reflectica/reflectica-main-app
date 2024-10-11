@@ -14,6 +14,11 @@
 		<string>6.0</string>
 		<key>CFBundleName</key>
 		<string>$(PRODUCT_NAME)</string>
+		<key>NSSpeechRecognitionUsageDescription</key>
+		<string>We need your permission to use speech recognition for transcribing your speech into
+			text.</string>
+		<key>NSMicrophoneUsageDescription</key>
+		<string>We need your permission to use the microphone to record audio.</string>
 		<key>CFBundlePackageType</key>
 		<string>APPL</string>
 		<key>CFBundleShortVersionString</key>

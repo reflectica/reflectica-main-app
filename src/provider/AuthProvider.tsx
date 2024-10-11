@@ -10,7 +10,7 @@ import auth from '@react-native-firebase/auth';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
 import {onAuthStateChanged} from 'firebase/auth';
-import Config from 'react-native-config';
+import Config from "react-native-config";
 
 interface AuthProviderProps {
   children: ReactNode;
