@@ -1,5 +1,5 @@
 /* eslint-disable react-native/no-inline-styles */
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   View,
@@ -15,6 +15,7 @@ import {
 import {ButtonTemplate} from '../../components';
 import {useAuth} from '../../context/AuthContext';
 import {EmailLoginScreenProps} from '../../constants';
+import { isBiometricSupported, saveCredentials, authenticateWithBiometrics } from '../../components/BiometricAuth'; // Import functions
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -25,8 +26,18 @@ export default function EmailLoginScreen({navigation}: EmailLoginScreenProps) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [loading, setLoading] = useState<boolean>(false);
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [biometricAvailable, setBiometricAvailable] = useState<boolean>(false);
 
   const {loginWithEmail} = useAuth();
+
+  // Check if biometric authentication is available on component mount
+  useEffect(() => {
+    (async () => {
+      const supported = await isBiometricSupported();
+      console.log("Is supported:", supported)
+      setBiometricAvailable(supported);
+    })();
+  }, []);
 
   const handleLongPress = () => setPasswordVisible(prevState => !prevState);
 

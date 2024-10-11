@@ -147,11 +147,11 @@ function App(): React.JSX.Element {
               component={OnboardingScreen}
               options={{headerShown: false}}
             /> */}
-                  <Stack.Screen
+                  {/* <Stack.Screen
         name="Dashboard"
         component={DashboardScreen}
         options={{headerShown: false}}
-      />
+      /> */}
             <Stack.Screen
               name="Login"
               component={LoginScreen}

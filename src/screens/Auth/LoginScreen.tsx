@@ -16,6 +16,7 @@ import {ButtonTemplate} from '../../components';
 // import { useNavigation } from '@react-navigation/native';
 import {useAuth} from '../../context/AuthContext';
 import {LoginScreenProps} from '../../constants';
+// import { isBiometricSupported, saveCredentials, authenticateWithBiometrics } from '../../components/BiometricAuth'; // Import functions
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -24,7 +25,18 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
   // const navigation = useNavigation();
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState();
+  const [biometricAvailable, setBiometricAvailable] = useState<boolean>(false);
+
   const {signInWithGoogle} = useAuth();
+
+  // Check if biometric authentication is available on component mount
+  // useEffect(() => {
+  //   (async () => {
+  //     const supported = await isBiometricSupported();
+  //     console.log("Is supported:", supported)
+  //     setBiometricAvailable(supported);
+  //   })();
+  // }, []);
 
   const handleGoogleSignIn = () => {
     setLoading(true);
