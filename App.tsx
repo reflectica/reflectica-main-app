@@ -11,6 +11,7 @@ import {
   SettingScreen,
   SupportScreen,
   PostSessionJournal,
+  ClinicalSupport
 } from './src/screens';
 import { NotificationScreen, ProfileScreen } from './src/screens/Profile';
 import {
