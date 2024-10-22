@@ -55,21 +55,21 @@ function JournalStackNavigator() {
 function MyTabs() {
   return (
     <Tab.Navigator
-    screenOptions={{
-      tabBarShowLabel: false,
-      tabBarStyle: {
-        backgroundColor: '#fff',
-        flexDirection: 'row',
-        justifyContent: 'center', // Centers the tabs
-        alignItems: 'center',
-        paddingHorizontal: 20,
-      },
-      tabBarItemStyle: {
-        // Remove flex: 1 to prevent tabs from stretching
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-    }}
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          flexDirection: 'row',
+          justifyContent: 'center', // Centers the tabs
+          alignItems: 'center',
+          paddingHorizontal: 20,
+        },
+        tabBarItemStyle: {
+          // Remove flex: 1 to prevent tabs from stretching
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }}
     >
       <Tab.Screen
         name="Dashboard"
@@ -139,6 +139,7 @@ function App(): React.JSX.Element {
                 component={SessionScreen}
                 options={{ headerShown: false }}
               />
+
               <Stack.Screen
                 name="PostSession"
                 component={PostSessionJournal}
@@ -149,15 +150,21 @@ function App(): React.JSX.Element {
         ) : (
           <>
             <Stack.Screen
-              name="InSession"
-              component={SessionScreen}
-              options={{headerShown: false}}
-            /> 
-            <Stack.Screen
               name="MainApp"
               component={MyTabs}
               options={{ headerShown: false }}
             />
+            <Stack.Screen
+              name="InSession"
+              component={SessionScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="PostSession"
+              component={PostSessionJournal}
+              options={{ headerShown: false }}
+            />
+
             <Stack.Screen
               name="Onboarding"
               component={OnboardingScreen}

@@ -1,6 +1,7 @@
+// useSessionAndSurroundingScores.ts
 import { useState, useEffect, useCallback } from 'react';
 import { summaryCollection } from '../firebase/firebaseConfig';
-import { query, where, getDocs, orderBy, limit, Timestamp } from 'firebase/firestore';
+import { query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 
 type SessionData = {
   sessionId: string;
@@ -25,10 +26,11 @@ type AllSessionData = {
 };
 
 export const useSessionAndSurroundingScores = (userId: string, sessionId: string) => {
+  // State for surrounding 7 sessions
   const [mentalHealthScores, setMentalHealthScores] = useState<(number | null)[]>([]);
+  
+  // States for the last 30 sessions
   const [last30DaysScores, setLast30DaysScores] = useState<(number | null)[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<Error | null>(null);
   const [cbtScores, setCbtScores] = useState<(number | null)[]>([]);
   const [gad7Scores, setGad7Scores] = useState<(number | null)[]>([]);
   const [phq9Scores, setPhq9Scores] = useState<(number | null)[]>([]);
@@ -38,8 +40,9 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
   const [sfqScores, setSfqScores] = useState<(number | null)[]>([]);
   const [ssrsScores, setSsrsScores] = useState<(number | null)[]>([]);
 
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<Error | null>(null);
 
-  
   const fetchScores = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -82,7 +85,7 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
 
       console.log('Current session index:', currentSessionIndex);
 
-      // Get the previous 6 sessions and include the current session
+      // Get the previous 6 sessions and include the current session (total 7)
       const startIndex = Math.max(0, currentSessionIndex - 6);
       const endIndex = currentSessionIndex + 1; // Include the current session
 
@@ -101,16 +104,16 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
             return score;
           } else {
             console.warn('Invalid mentalHealthScore for sessionId:', session.sessionId);
-            return NaN; // Return NaN for invalid scores, still included in the array
+            return null; // Return null for invalid scores
           }
         } else {
           console.warn('Missing mentalHealthScore for sessionId:', session.sessionId);
-          return NaN; // Return NaN for missing scores, still included in the array
+          return null; // Return null for missing scores
         }
       });
 
-      console.log('Final scores array:', scoresArray);
-      setMentalHealthScores(scoresArray); // Include NaN values
+      console.log('Final scores array (Surrounding 7):', scoresArray);
+      setMentalHealthScores(scoresArray); // Set only surrounding 7 sessions
     } catch (err) {
       console.error('Error fetching scores:', err);
       setError(err instanceof Error ? err : new Error('Error fetching scores'));
@@ -130,7 +133,7 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     }
 
     try {
-      console.log('Fetching sessions for user:', userId);
+      console.log('Fetching last 30 sessions for user:', userId);
 
       // Fetch the last 30 sessions for the user
       const last30SessionsQuery = query(
@@ -158,9 +161,9 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
         // Extract mental health score
         if (allSessionData.mentalHealthScore) {
           const score = parseFloat(allSessionData.mentalHealthScore);
-          mentalHealthArray.push(!isNaN(score) ? score : NaN);
+          mentalHealthArray.push(!isNaN(score) ? score : null);
         } else {
-          mentalHealthArray.push(NaN);
+          mentalHealthArray.push(null);
         }
 
         // Extract normalized scores
@@ -177,34 +180,34 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
           } = allSessionData.normalizedScores;
 
           cbtArray.push(
-            typeof cbtScore === 'string' ? NaN : cbtScore ?? NaN
+            typeof cbtScore === 'string' ? null : cbtScore ?? null
           );
           gad7Array.push(
-            typeof gad7Score === 'string' ? NaN : gad7Score ?? NaN
+            typeof gad7Score === 'string' ? null : gad7Score ?? null
           );
           phq9Array.push(
-            typeof phq9Score === 'string' ? NaN : phq9Score ?? NaN
+            typeof phq9Score === 'string' ? null : phq9Score ?? null
           );
           psqiArray.push(
-            typeof psqiScore === 'string' ? NaN : psqiScore ?? NaN
+            typeof psqiScore === 'string' ? null : psqiScore ?? null
           );
           pssArray.push(
-            typeof pssScore === 'string' ? NaN : pssScore ?? NaN
+            typeof pssScore === 'string' ? null : pssScore ?? null
           );
           rosenbergArray.push(
-            typeof rosenbergScore === 'string' ? NaN : rosenbergScore ?? NaN
+            typeof rosenbergScore === 'string' ? null : rosenbergScore ?? null
           );
           sfqArray.push(
-            typeof sfqScore === 'string' ? NaN : sfqScore ?? NaN
+            typeof sfqScore === 'string' ? null : sfqScore ?? null
           );
           ssrsArray.push(
-            typeof ssrsScore === 'string' ? NaN : ssrsScore ?? NaN
+            typeof ssrsScore === 'string' ? null : ssrsScore ?? null
           );
         }
       });
 
       // Reverse the arrays to be in chronological order
-      setMentalHealthScores(mentalHealthArray.reverse());
+      setLast30DaysScores(mentalHealthArray.reverse());
       setCbtScores(cbtArray.reverse());
       setGad7Scores(gad7Array.reverse());
       setPhq9Scores(phq9Array.reverse());
@@ -215,23 +218,23 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
       setSsrsScores(ssrsArray.reverse());
 
     } catch (err) {
-      console.error('Error fetching scores:', err);
-      setError(err instanceof Error ? err : new Error('Error fetching scores'));
+      console.error('Error fetching last 30 sessions:', err);
+      setError(err instanceof Error ? err : new Error('Error fetching last 30 sessions'));
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
-
   useEffect(() => {
     fetchScores();
-    fetchAllScores(); // Fetch scores from the last 30 days
+    fetchAllScores(); // Fetch scores from the last 30 sessions
   }, [fetchScores, fetchAllScores]);
 
   return {
     loading,
     error,
-    mentalHealthScores,
+    mentalHealthScores, // Surrounding 7 sessions
+    last30DaysScores, // Last 30 sessions
     cbtScores,
     gad7Scores,
     phq9Scores,
@@ -242,4 +245,3 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     ssrsScores,
   };
 };
-

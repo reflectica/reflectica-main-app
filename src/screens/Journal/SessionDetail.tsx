@@ -1,3 +1,4 @@
+// SessionDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
@@ -19,10 +20,15 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const [sessionDetails, setSessionDetails] = useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { mentalHealthScores } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+  const {
+    mentalHealthScores,
+    loading: hookLoading,
+    error: hookError,
+  } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+
   const [lineLabels, setLineLabels] = useState<string[]>([]);
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);
-  console.log(session.sessionId)
+
   useEffect(() => {
     setTimeout(() => {
       setSessionDetails(session);
@@ -30,9 +36,11 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
     }, 1000);
   }, [session]);
 
+  // Update line labels based on mentalHealthScores
   useEffect(() => {
     if (mentalHealthScores.length > 0) {
-      setLineLabels(mentalHealthScores.map((_, index) => `S.${index + 1}`));
+      const newLineLabels = mentalHealthScores.map((_, index) => `S.${index + 1}`);
+      setLineLabels(newLineLabels);
     }
   }, [mentalHealthScores]);
 
@@ -61,10 +69,20 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
   const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
 
-  if (loading) {
+  // Handle loading states from both component and hook
+  if (loading || hookLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
+  // Handle errors from the hook
+  if (hookError) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Failed to load session scores.</Text>
       </SafeAreaView>
     );
   }
@@ -141,7 +159,11 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Score Over Time</Text>
-            <LineChartWithInteraction data={mentalHealthScores} labels={lineLabels} />
+            {mentalHealthScores.length > 0 ? (
+              <LineChartWithInteraction data={mentalHealthScores} labels={lineLabels} />
+            ) : (
+              <Text>No score data available.</Text>
+            )}
           </View>
 
           <View style={styles.section}>

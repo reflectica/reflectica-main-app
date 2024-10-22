@@ -4,9 +4,8 @@ import {
   StyleSheet,
   Text,
   View,
-  Dimensions,
   TouchableOpacity,
-  ScrollView, // Import ScrollView
+  ScrollView,
 } from 'react-native';
 import { SessionBoxes } from '../../components';
 import { useAllSummaryListener } from '../../hooks/useSummaryListener';
@@ -20,8 +19,8 @@ export default function JournalScreen({ navigation }: JournalScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Session Journals</Text>
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.body}>
+      <View style={styles.body}>
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
           {Array.isArray(sessionSummary) &&
             sessionSummary.map((data, index) => (
               <TouchableOpacity
@@ -37,17 +36,18 @@ export default function JournalScreen({ navigation }: JournalScreenProps) {
                 <SessionBoxes id={index + 1} description={data.shortSummary} />
               </TouchableOpacity>
             ))}
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1, // Ensures the SafeAreaView takes up the full screen
     alignItems: 'center',
     backgroundColor: '#F5F7FA',
+    padding: 10, // Optional: Adds padding to prevent content from touching the edges
   },
   title: {
     fontSize: 25,
@@ -58,15 +58,15 @@ const styles = StyleSheet.create({
     marginVertical: 10,
     paddingBottom: 15,
   },
-  scrollContainer: {
-    alignItems: 'center',
-    paddingBottom: 20, // Add some padding to the bottom for better scrolling experience
-  },
   body: {
     backgroundColor: 'white',
     width: '90%',
-    height: 620,
+    flex: 1, // Allows the body to expand and fill available space
     borderRadius: 15,
     paddingTop: 25,
+    paddingHorizontal: 15, // Optional: Adds horizontal padding for better layout
+  },
+  scrollContainer: {
+    paddingBottom: 20, // Adds padding to the bottom for better scrolling experience
   },
 });

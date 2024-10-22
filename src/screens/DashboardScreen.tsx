@@ -27,11 +27,8 @@ const sanitizeData = (data: (number | null)[]): number[] => {
   return data.filter((value): value is number => value !== null && !isNaN(value));
 };
 
-
-
 // Function to get color with opacity
 const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
-
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { currentUser } = useAuth();
 
@@ -130,7 +127,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Dashboard</Text>
 
-        {/* Top Section: Current Score and Line Chart */}
+        {/* Top Section: Current Score and Line Chart 
         <View style={styles.topSection}>
           <View style={styles.scoreContainer}>
             <Text style={styles.boldText}>Current Score</Text>
@@ -142,12 +139,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
               }
             </Text>
           </View>
+          
           <View style={styles.lineChartContainer}>
             <Text style={styles.boldText}>Overall Mental Health</Text>
             <FadedGraph data={sanitizedMentalHealthScores} />
           </View>
         </View>
-
+*/}
         {/* Start Session Button */}
         <View style={styles.sessionButtonWrapper}>
           <TouchableOpacity style={styles.sessionButton} onPress={handleStartSessionPress}>
