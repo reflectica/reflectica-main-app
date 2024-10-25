@@ -21,9 +21,10 @@ const LineChartWithInteraction = ({
   labels,
 }: LineChartWithInteractionProps) => {
   const maxValue = 10;
+  const margin = 30; // Increased margin from 20 to 30 to provide extra whitespace
   const graphHeight = 200;
-  const graphWidth = screenWidth - 120; // Adjust width calculation for margins
-  const margin = 20;
+  const graphWidth = screenWidth - 100; // Adjusted to create space horizontally
+  
   const [selectedPoint, setSelectedPoint] = React.useState<number | null>(null);
 
   const handleTouch = (evt: any) => {
@@ -56,16 +57,16 @@ const LineChartWithInteraction = ({
 
   // Generate points array with only valid data points
   const points = data
-    .map((value: number | null, index: number) => {
-      if (value !== null && !isNaN(value)) {
-        const x =
-          (index / (data.length - 1)) * (graphWidth - 2 * margin) + margin;
-        const y = ((maxValue - value) / maxValue) * graphHeight + margin;
-        return { x, y, value };
-      }
-      return null;
-    })
-    .filter((point) => point !== null) as { x: number; y: number; value: number }[];
+  .map((value: number | null, index: number) => {
+    if (value !== null && !isNaN(value)) {
+      const x =
+        (index / (data.length - 1)) * (graphWidth - 2 * margin) + margin;
+      const y = ((maxValue - value) / maxValue) * graphHeight + margin;
+      return { x, y, value };
+    }
+    return null;
+  })
+  .filter((point) => point !== null) as { x: number; y: number; value: number }[];
 
   // Generate the path string for the line
   const linePath =

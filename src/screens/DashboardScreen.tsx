@@ -58,7 +58,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
 
   // Fetch emotions with scores above 0.1 from the last 30 sessions
   const { emotionsAboveThreshold } = useEmotionsAboveThreshold('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
-  const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== 'unavailable');
+  const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== null);
   const normalizeEmotions = (emotions: { label: string, score: number }[]) => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);
     return emotions.map(emotion => ({
@@ -98,8 +98,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     if (!emotionMap[emotion.label]) {
       emotionMap[emotion.label] = [];
     }
-    emotionMap[emotion.label].push(emotion.score);
+    if (emotion.score !== null) {
+      emotionMap[emotion.label].push(emotion.score);
+    }
   });
+  
 
   Object.keys(emotionMap).forEach((label) => {
     const scores = emotionMap[label];

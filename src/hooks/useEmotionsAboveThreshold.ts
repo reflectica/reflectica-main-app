@@ -50,7 +50,7 @@ export const useEmotionsAboveThreshold = (userId: string, threshold: number = 0.
         if (sessionData.emotions && Array.isArray(sessionData.emotions)) {
           // Filter emotions by score above the threshold
           const sessionEmotionsAboveThreshold = sessionData.emotions.filter(
-            (emotion) => emotion.score > threshold
+            (emotion) => emotion.score !== null && emotion.score > threshold
           );
 
           // Add filtered emotions to the array

@@ -46,7 +46,7 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
   useEffect(() => {
     if (session.emotions && Array.isArray(session.emotions)) {
-      const filteredEmotions = session.emotions.filter(emotion => emotion.score > 0.10);
+      const filteredEmotions = session.emotions.filter((emotion: { score: number; }) => emotion.score > 0.10);
       const normalizedEmotions = normalizeEmotions(filteredEmotions);
       setEmotions(normalizedEmotions);
     } else {
@@ -98,47 +98,62 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const barData = [
     {
       label: 'PHQ-9',
-      value: sessionDetails.normalizedScores?.['PHQ-9 Score'],
+      value: typeof sessionDetails.normalizedScores?.['PHQ-9 Score'] === 'number' 
+        ? sessionDetails.normalizedScores['PHQ-9 Score']
+        : 0,  // Provide a fallback value like 0 if not applicable or undefined
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PHQ-9 Score'] === 'Not Applicable',
     },
     {
       label: 'GAD-7',
-      value: sessionDetails.normalizedScores?.['GAD-7 Score'],
+      value: typeof sessionDetails.normalizedScores?.['GAD-7 Score'] === 'number'
+        ? sessionDetails.normalizedScores['GAD-7 Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['GAD-7 Score'] === 'Not Applicable',
     },
     {
       label: 'CBT',
-      value: sessionDetails.normalizedScores?.['CBT Behavioral Activation'],
+      value: typeof sessionDetails.normalizedScores?.['CBT Behavioral Activation'] === 'number'
+        ? sessionDetails.normalizedScores['CBT Behavioral Activation']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['CBT Behavioral Activation'] === 'Not Applicable',
     },
     {
       label: 'PSQI',
-      value: sessionDetails.normalizedScores?.['PSQI Score'],
+      value: typeof sessionDetails.normalizedScores?.['PSQI Score'] === 'number'
+        ? sessionDetails.normalizedScores['PSQI Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PSQI Score'] === 'Not Applicable',
     },
     {
       label: 'SFQ',
-      value: sessionDetails.normalizedScores?.['SFQ Score'],
+      value: typeof sessionDetails.normalizedScores?.['SFQ Score'] === 'number'
+        ? sessionDetails.normalizedScores['SFQ Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['SFQ Score'] === 'Not Applicable',
     },
     {
       label: 'PSS',
-      value: sessionDetails.normalizedScores?.['PSS Score'],
+      value: typeof sessionDetails.normalizedScores?.['PSS Score'] === 'number'
+        ? sessionDetails.normalizedScores['PSS Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PSS Score'] === 'Not Applicable',
     },
     {
       label: 'SSRS',
-      value: sessionDetails.normalizedScores?.['SSRS Assessment'],
+      value: typeof sessionDetails.normalizedScores?.['SSRS Assessment'] === 'number'
+        ? sessionDetails.normalizedScores['SSRS Assessment']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['SSRS Assessment'] === 'Not Applicable',
     },
   ];
+  
 
   const pieData = emotions.map((emotion) => ({
     label: emotion.label,
