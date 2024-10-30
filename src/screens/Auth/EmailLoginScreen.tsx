@@ -31,13 +31,13 @@ export default function EmailLoginScreen({navigation}: EmailLoginScreenProps) {
   const {loginWithEmail} = useAuth();
 
   // Check if biometric authentication is available on component mount
-  useEffect(() => {
-    (async () => {
-      const supported = await isBiometricSupported();
-      console.log("Is supported:", supported)
-      setBiometricAvailable(supported);
-    })();
-  }, []);
+  // useEffect(() => {
+  //   (async () => {
+  //     const supported = await isBiometricSupported();
+  //     console.log("Is supported:", supported)
+  //     setBiometricAvailable(supported);
+  //   })();
+  // }, []);
 
   const handleLongPress = () => setPasswordVisible(prevState => !prevState);
 

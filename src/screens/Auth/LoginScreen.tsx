@@ -71,7 +71,7 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
       <ButtonTemplate
         title="Use enterprise login"
         stylebtn="purple"
-        action={() => navigation.navigate('EmailSignup')}
+        action={() => navigation.navigate('EmailLogin')}
       />
       <ButtonTemplate
         title="Use phone number"

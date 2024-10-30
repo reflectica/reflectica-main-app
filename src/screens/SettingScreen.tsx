@@ -8,11 +8,14 @@ import {
   Image,
 } from 'react-native';
 import {SettingScreenProps} from '../constants';
+import {useAuth} from '../context/AuthContext';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 export default function SettingScreen({navigation}: SettingScreenProps) {
+  const {handleLogout} = useAuth();
+
   const options = [
     {
       icon: require('../assets/settings/profile.png'),
@@ -53,7 +56,7 @@ export default function SettingScreen({navigation}: SettingScreenProps) {
     {
       icon: require('../assets/settings/logout.png'),
       title: 'Logout from Account',
-      action: '',
+      action: handleLogout,
     },
   ];
 
@@ -61,7 +64,7 @@ export default function SettingScreen({navigation}: SettingScreenProps) {
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Settings</Text>
       {options.map((option, index) => (
-        <TouchableOpacity key={index} style={styles.btnContainer}>
+        <TouchableOpacity key={index} style={styles.btnContainer} onPress={option?.action}>
           <Image source={option.icon} style={styles.icon} />
           <Text style={styles.btnText}>{option.title}</Text>
         </TouchableOpacity>
