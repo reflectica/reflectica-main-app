@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, Switch, StyleSheet, Dimensions } from 'react-native';
+import { SafeAreaView, View, Text, Switch, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 import axios from 'axios';
@@ -8,6 +8,9 @@ import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
 import { ButtonTemplate, AnimatedButton } from '../components';
 import RNFS from 'react-native-fs';
 import Sound from 'react-native-sound';
+import { updateDoc, doc } from 'firebase/firestore';
+import { userCollection } from '../firebase/firebaseConfig';
+import { useDiagnosticStatus } from '../hooks/useDiagnosticStatus'; // Import the custom hook
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -18,6 +21,10 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
   const [isSpanish, setIsSpanish] = useState<boolean>(false); // Toggle between English and Spanish
+  const [isREBT, setIsREBT] = useState<boolean>(true); // Toggle between CBT and REBT, REBT is default
+
+  // Use the custom hook to check diagnostic status
+  const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -63,10 +70,16 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const handleSubmit = async () => {
     try {
       const promptToSubmit = transcript;
+      const therapyMode = isREBT ? 'REBT' : 'CBT'; // Determine therapy mode
+      const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'; // Replace with dynamic user ID if available
+      const diagnosticMode = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
+
       const response = await axios.post('http://localhost:3006/chat', {
         prompt: promptToSubmit,
-        userId: 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+        userId: userId,
         sessionId: sessionId,
+        therapyMode: therapyMode, // Send therapy mode
+        sessionType: diagnosticMode, // Send session type
       });
 
       const base64Audio = response.data.audio;
@@ -103,18 +116,27 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const handleEndSession = async () => {
     const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
     const language = isSpanish ? 'es-ES' : 'en-US'; // Use the selected language
+    const therapyMode = isREBT ? 'REBT' : 'CBT'; // Use the selected therapy mode
+    const sessionType = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
 
     try {
       await axios.post('http://localhost:3006/session/endSession', {
         userId: userId,
         sessionId: sessionId,
         language: language,
+        sessionType: sessionType, // Send session type
       })
-      .then(res => {
-        setSessionId(uuidv4());
-        navigation.navigate('PostSession', { session: res.data });
-      })
-      .catch(error => console.log(error));
+        .then(async res => {
+          if (isDiagnostic) {
+            // Mark diagnostic as completed in Firebase
+            const userDocRef = doc(userCollection, userId);
+            await updateDoc(userDocRef, { hasCompletedDiagnostic: true });
+            setIsDiagnostic(false);
+          }
+          setSessionId(uuidv4());
+          navigation.navigate('PostSession', { session: res.data });
+        })
+        .catch(error => console.log(error));
     } catch (error) {
       console.error(error);
     }
@@ -124,36 +146,85 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
     setIsSpanish((prevState) => !prevState);
   };
 
+  const toggleTherapyMode = () => {
+    setIsREBT((prevState) => !prevState);
+  };
+
+  // Render loading or error states if necessary
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.window}>
+          <ActivityIndicator size="large" color="#5271FF" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  if (error) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.window}>
+          <Text style={styles.errorText}>Error: {error.message}</Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.window}>
-        {/* Language Switch */}
+        {/* Top Row: Back Button and Switches */}
         <View style={styles.topRow}>
-          <View style={styles.actionBox}>
-            <Text style={styles.actionText}>
-              {isRecording ? 'Listening...' : 'Speaking...'}
-            </Text>
-          </View>
+          {/* Back Button */}
+          <TouchableOpacity
+            style={styles.backButton}
+            onPress={() => navigation.goBack()}
+          >
+            <Text style={styles.backButtonText}>Back</Text>
+          </TouchableOpacity>
 
-          {/* Language Switcher */}
-          <View style={styles.switchContainer}>
-            <Text style={styles.languageText}>{isSpanish ? 'Spanish' : 'English'}</Text>
-            <Switch
-              value={isSpanish}
-              onValueChange={toggleLanguage}
-              trackColor={{ false: '#767577', true: '#5271FF' }}
-              thumbColor="#fff"
-            />
+          {/* Switches Container */}
+          <View style={styles.switchesContainer}>
+            {/* Language Switcher */}
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabelText}>{isSpanish ? 'Spanish' : 'English'}</Text>
+              <Switch
+                value={isSpanish}
+                onValueChange={toggleLanguage}
+                trackColor={{ false: '#767577', true: '#5271FF' }}
+                thumbColor="#fff"
+                accessibilityLabel="Toggle Language"
+                accessibilityHint="Switch between English and Spanish"
+              />
+            </View>
+
+            {/* Therapy Mode Switcher */}
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabelText}>{isREBT ? 'REBT' : 'CBT'}</Text>
+              <Switch
+                value={isREBT}
+                onValueChange={toggleTherapyMode}
+                trackColor={{ false: '#767577', true: '#5271FF' }}
+                thumbColor="#fff"
+                accessibilityLabel="Toggle Therapy Mode"
+                accessibilityHint="Switch between CBT and REBT therapy modes"
+              />
+            </View>
           </View>
         </View>
 
         {/* Rest of the layout */}
-        <View style={styles.container}>
+        <View style={styles.sessionContent}>
           <AnimatedButton onRecordingToggle={handleRecordingToggle} onSubmit={handleSubmit} />
         </View>
+
+        {/* Transcript Display */}
         <Text style={styles.transcript}>
           {transcript}
         </Text>
+
+        {/* End Session Button */}
         <ButtonTemplate
           title="End Session"
           action={handleEndSession}
@@ -168,9 +239,8 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    paddingHorizontal: 10,
-    gap: 20,
+    // Ensure the SafeAreaView takes up the full screen
+    backgroundColor: '#f0f0f0',
   },
   window: {
     backgroundColor: '#08071A',
@@ -185,33 +255,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 0, // Remove horizontal padding to align switches properly
     width: '100%',
   },
-  actionBox: {
-    backgroundColor: '#393948',
-    borderColor: 'white',
-    borderWidth: 1,
-    borderRadius: 15,
-    paddingHorizontal: 20,
-    paddingVertical: 15,
+  backButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 15,
+    backgroundColor: 'transparent', // Transparent background
   },
-  actionText: {
-    color: 'rgba(255, 255, 255, 1)',
-    fontWeight: '700',
-    fontFamily: 'Montserrat',
-    fontSize: 11,
-    lineHeight: 16.5,
+  backButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  switchesContainer: {
+    flexDirection: 'column',
+    alignItems: 'flex-end',
   },
   switchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 10, // Space between switches
   },
-  languageText: {
+  switchLabelText: {
     color: '#FFFFFF', // White text
     fontSize: 16,
     fontWeight: '700',
     marginRight: 10, // Space between text and switch
+  },
+  sessionContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  loadingText: {
+    color: '#5271FF',
+    fontSize: 18,
+    marginTop: 10,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 18,
+    marginTop: 10,
   },
   transcript: {
     color: 'white',

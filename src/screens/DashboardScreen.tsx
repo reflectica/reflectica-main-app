@@ -27,11 +27,8 @@ const sanitizeData = (data: (number | null)[]): number[] => {
   return data.filter((value): value is number => value !== null && !isNaN(value));
 };
 
-
-
 // Function to get color with opacity
 const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
-
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { currentUser } = useAuth();
 
@@ -61,7 +58,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
 
   // Fetch emotions with scores above 0.1 from the last 30 sessions
   const { emotionsAboveThreshold } = useEmotionsAboveThreshold('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
-  const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== 'unavailable');
+  const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== null);
   const normalizeEmotions = (emotions: { label: string, score: number }[]) => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);
     return emotions.map(emotion => ({
@@ -101,8 +98,11 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     if (!emotionMap[emotion.label]) {
       emotionMap[emotion.label] = [];
     }
-    emotionMap[emotion.label].push(emotion.score);
+    if (emotion.score !== null) {
+      emotionMap[emotion.label].push(emotion.score);
+    }
   });
+  
 
   Object.keys(emotionMap).forEach((label) => {
     const scores = emotionMap[label];
@@ -130,7 +130,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Dashboard</Text>
 
-        {/* Top Section: Current Score and Line Chart */}
+        {/* Top Section: Current Score and Line Chart 
         <View style={styles.topSection}>
           <View style={styles.scoreContainer}>
             <Text style={styles.boldText}>Current Score</Text>
@@ -142,12 +142,13 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
               }
             </Text>
           </View>
+          
           <View style={styles.lineChartContainer}>
             <Text style={styles.boldText}>Overall Mental Health</Text>
             <FadedGraph data={sanitizedMentalHealthScores} />
           </View>
         </View>
-
+*/}
         {/* Start Session Button */}
         <View style={styles.sessionButtonWrapper}>
           <TouchableOpacity style={styles.sessionButton} onPress={handleStartSessionPress}>

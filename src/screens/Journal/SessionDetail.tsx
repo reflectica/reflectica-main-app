@@ -1,3 +1,4 @@
+// SessionDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
@@ -19,10 +20,15 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const [sessionDetails, setSessionDetails] = useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const { mentalHealthScores } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+  const {
+    mentalHealthScores,
+    loading: hookLoading,
+    error: hookError,
+  } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+
   const [lineLabels, setLineLabels] = useState<string[]>([]);
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);
-  console.log(session.sessionId)
+
   useEffect(() => {
     setTimeout(() => {
       setSessionDetails(session);
@@ -30,15 +36,17 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
     }, 1000);
   }, [session]);
 
+  // Update line labels based on mentalHealthScores
   useEffect(() => {
     if (mentalHealthScores.length > 0) {
-      setLineLabels(mentalHealthScores.map((_, index) => `S.${index + 1}`));
+      const newLineLabels = mentalHealthScores.map((_, index) => `S.${index + 1}`);
+      setLineLabels(newLineLabels);
     }
   }, [mentalHealthScores]);
 
   useEffect(() => {
     if (session.emotions && Array.isArray(session.emotions)) {
-      const filteredEmotions = session.emotions.filter(emotion => emotion.score > 0.10);
+      const filteredEmotions = session.emotions.filter((emotion: { score: number; }) => emotion.score > 0.10);
       const normalizedEmotions = normalizeEmotions(filteredEmotions);
       setEmotions(normalizedEmotions);
     } else {
@@ -61,10 +69,20 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
   const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
 
-  if (loading) {
+  // Handle loading states from both component and hook
+  if (loading || hookLoading) {
     return (
       <SafeAreaView style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
+      </SafeAreaView>
+    );
+  }
+
+  // Handle errors from the hook
+  if (hookError) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.errorText}>Failed to load session scores.</Text>
       </SafeAreaView>
     );
   }
@@ -80,47 +98,62 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const barData = [
     {
       label: 'PHQ-9',
-      value: sessionDetails.normalizedScores?.['PHQ-9 Score'],
+      value: typeof sessionDetails.normalizedScores?.['PHQ-9 Score'] === 'number' 
+        ? sessionDetails.normalizedScores['PHQ-9 Score']
+        : 0,  // Provide a fallback value like 0 if not applicable or undefined
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PHQ-9 Score'] === 'Not Applicable',
     },
     {
       label: 'GAD-7',
-      value: sessionDetails.normalizedScores?.['GAD-7 Score'],
+      value: typeof sessionDetails.normalizedScores?.['GAD-7 Score'] === 'number'
+        ? sessionDetails.normalizedScores['GAD-7 Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['GAD-7 Score'] === 'Not Applicable',
     },
     {
       label: 'CBT',
-      value: sessionDetails.normalizedScores?.['CBT Behavioral Activation'],
+      value: typeof sessionDetails.normalizedScores?.['CBT Behavioral Activation'] === 'number'
+        ? sessionDetails.normalizedScores['CBT Behavioral Activation']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['CBT Behavioral Activation'] === 'Not Applicable',
     },
     {
       label: 'PSQI',
-      value: sessionDetails.normalizedScores?.['PSQI Score'],
+      value: typeof sessionDetails.normalizedScores?.['PSQI Score'] === 'number'
+        ? sessionDetails.normalizedScores['PSQI Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PSQI Score'] === 'Not Applicable',
     },
     {
       label: 'SFQ',
-      value: sessionDetails.normalizedScores?.['SFQ Score'],
+      value: typeof sessionDetails.normalizedScores?.['SFQ Score'] === 'number'
+        ? sessionDetails.normalizedScores['SFQ Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['SFQ Score'] === 'Not Applicable',
     },
     {
       label: 'PSS',
-      value: sessionDetails.normalizedScores?.['PSS Score'],
+      value: typeof sessionDetails.normalizedScores?.['PSS Score'] === 'number'
+        ? sessionDetails.normalizedScores['PSS Score']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['PSS Score'] === 'Not Applicable',
     },
     {
       label: 'SSRS',
-      value: sessionDetails.normalizedScores?.['SSRS Assessment'],
+      value: typeof sessionDetails.normalizedScores?.['SSRS Assessment'] === 'number'
+        ? sessionDetails.normalizedScores['SSRS Assessment']
+        : 0,
       color: '#5271FF',
       faded: sessionDetails.normalizedScores?.['SSRS Assessment'] === 'Not Applicable',
     },
   ];
+  
 
   const pieData = emotions.map((emotion) => ({
     label: emotion.label,
@@ -141,7 +174,11 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Score Over Time</Text>
-            <LineChartWithInteraction data={mentalHealthScores} labels={lineLabels} />
+            {mentalHealthScores.length > 0 ? (
+              <LineChartWithInteraction data={mentalHealthScores} labels={lineLabels} />
+            ) : (
+              <Text>No score data available.</Text>
+            )}
           </View>
 
           <View style={styles.section}>
