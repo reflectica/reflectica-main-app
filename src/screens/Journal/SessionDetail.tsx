@@ -24,7 +24,7 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
     mentalHealthScores,
     loading: hookLoading,
     error: hookError,
-  } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+  } = useSessionAndSurroundingScores('gADXwFiz2WfZaMgWLrffyr7Ookw2', session.sessionId);
 
   const [lineLabels, setLineLabels] = useState<string[]>([]);
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);

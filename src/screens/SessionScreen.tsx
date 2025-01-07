@@ -24,7 +24,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [isREBT, setIsREBT] = useState<boolean>(true); // Toggle between CBT and REBT, REBT is default
 
   // Use the custom hook to check diagnostic status
-  const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+  const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2');
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -71,7 +71,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
     try {
       const promptToSubmit = transcript;
       const therapyMode = isREBT ? 'REBT' : 'CBT'; // Determine therapy mode
-      const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'; // Replace with dynamic user ID if available
+      const userId = currentUser?.uid ?? 'gADXwFiz2WfZaMgWLrffyr7Ookw2'; // Replace with dynamic user ID if available
       const diagnosticMode = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
 
       const response = await axios.post('http://localhost:3006/chat', {
@@ -114,7 +114,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   };
 
   const handleEndSession = async () => {
-    const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
+    const userId = currentUser?.uid ?? 'gADXwFiz2WfZaMgWLrffyr7Ookw2';
     const language = isSpanish ? 'es-ES' : 'en-US'; // Use the selected language
     const therapyMode = isREBT ? 'REBT' : 'CBT'; // Use the selected therapy mode
     const sessionType = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type

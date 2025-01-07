@@ -82,7 +82,7 @@ function MyTabs() {
         }}
       />
       <Tab.Screen
-        name="Journal"
+        name="JournalTab"
         component={JournalStackNavigator}
         options={{
           headerShown: false,

@@ -12,10 +12,8 @@ import { useAllSummaryListener } from '../../hooks/useSummaryListener';
 import { JournalScreenProps } from '../../constants';
 
 export default function JournalScreen({ navigation }: JournalScreenProps) {
-  const { sessionSummary, loading, error } = useAllSummaryListener(
-    'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'
-  );
-
+  const { sessionSummary, loading, error } = useAllSummaryListener('gADXwFiz2WfZaMgWLrffyr7Ookw2');
+  console.log(sessionSummary)
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Session Journals</Text>

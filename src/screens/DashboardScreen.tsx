@@ -45,9 +45,9 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     rosenbergScores,
     sfqScores,
     ssrsScores,
-  } = useSessionAndSurroundingScores(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', ''); // No sessionId needed here
+  } = useSessionAndSurroundingScores(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2', ''); // No sessionId needed here
   const { sessionSummary, loading: sessionsLoading, error: sessionsError } = useAllSummaryListener(
-    currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'
+    currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2'
   );
 
   // Get the 3 most recent sessions
@@ -57,7 +57,7 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const totalSessions = Array.isArray(sessionSummary) ? sessionSummary.length : 0;
 
   // Fetch emotions with scores above 0.1 from the last 30 sessions
-  const { emotionsAboveThreshold } = useEmotionsAboveThreshold('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+  const { emotionsAboveThreshold } = useEmotionsAboveThreshold('gADXwFiz2WfZaMgWLrffyr7Ookw2');
   const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== null);
   const normalizeEmotions = (emotions: { label: string, score: number }[]) => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);

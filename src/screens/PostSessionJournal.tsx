@@ -32,7 +32,7 @@ const PostSessionJournal: React.FC = () => {
   const [lineData, setLineData] = useState<number[]>([]);
   const [lineLabels, setLineLabels] = useState<string[]>([]);
 
-  const { mentalHealthScores } = useRecentMentalHealthScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+  const { mentalHealthScores } = useRecentMentalHealthScores('gADXwFiz2WfZaMgWLrffyr7Ookw2');
 
   useEffect(() => {
     if (session) {
