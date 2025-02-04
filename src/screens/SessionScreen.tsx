@@ -67,6 +67,18 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
     }
   };
 
+  const downloadBase64AndStore = async (base64String: string) => {
+    try {
+      const localPath = `${RNFS.DocumentDirectoryPath}/chat.wav`;
+      await RNFS.writeFile(localPath, base64String, 'base64');
+      console.log('Successfully saved WAV file at:', localPath);
+      return localPath;
+    } catch (error) {
+      console.error('Error writing WAV file:', error);
+      throw error;
+    }
+  };
+  
   const handleSubmit = async () => {
     try {
       const promptToSubmit = transcript;
@@ -82,36 +94,37 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
         sessionType: diagnosticMode, // Send session type
       });
 
-      const base64Audio = response.data.audio;
-      const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
 
-      await RNFS.writeFile(filePath, base64Audio, 'base64');
-      const fileExists = await RNFS.exists(filePath);
+      
+    const base64Data = response.data.audio; // If your backend returns Base64 directly
 
-      if (!fileExists) {
-        console.error('Audio file does not exist');
-        return;
-      }
+    // Log the first 100 characters of the Base64 data for debugging
+    console.log('Base64 Audio Data (first 100 chars):', base64Data.substring(0, 100));
 
+    if (base64Data && typeof base64Data === 'string') {
+      const localPath = await downloadBase64AndStore(base64Data);
+      // Play the file from localPath using react-native-sound
       Sound.setCategory('Playback');
-      const sound = new Sound(filePath, '', (error) => {
+      const sound = new Sound(localPath, '', (error) => {
         if (error) {
-          console.error('Failed to load the sound', error);
+          console.error('Failed to load sound', error);
           return;
         }
-
         sound.play((success) => {
-          if (!success) {
-            console.error('Playback failed due to audio decoding errors');
+          if (success) {
+            console.log('Successfully played the sound');
+          } else {
+            console.error('Playback failed');
           }
         });
       });
-
-      setTranscript('');
-    } catch (error) {
-      console.error(error);
     }
-  };
+
+    setTranscript('');
+  } catch (error) {
+    console.error(error);
+  }
+};
 
   const handleEndSession = async () => {
     const userId = currentUser?.uid ?? 'gADXwFiz2WfZaMgWLrffyr7Ookw2';

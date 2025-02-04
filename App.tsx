@@ -23,6 +23,7 @@ import {
   EmailSignupScreen,
 } from './src/screens/Auth';
 import { SessionDetail, JournalScreen } from './src/screens/Journal';
+import { UpdateProfile, NotificationsSetting, PasswordSetting} from './src/screens/Settings';
 // import {cloud, log, question, setting} from './src/assets/nav';
 import cloud from './src/assets/nav/cloud.png'
 import log from './src/assets/nav/log.png'
@@ -34,6 +35,35 @@ import { RootStackParamList } from './src/constants';
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator<RootStackParamList>();
 const JournalStack = createStackNavigator<RootStackParamList>();
+const SettingsStack = createStackNavigator();
+
+function SettingNavigator() {
+  return (
+    <SettingsStack.Navigator>
+      <SettingsStack.Screen
+        name="Setting"
+        component={SettingScreen}
+        options={{ headerShown: false }}
+      />
+      <SettingsStack.Screen
+        name="ProfileSetting"
+        component={UpdateProfile}
+        options={{ headerShown: false }}
+      />
+      <SettingsStack.Screen
+        name="NotificationsSetting"
+        component={NotificationsSetting}
+        options={{ headerShown: false }}
+      />
+        <SettingsStack.Screen
+        name="PasswordSetting"
+        component={PasswordSetting}
+        options={{ headerShown: false }}
+      />
+      {/* Add other settings screens here */}
+    </SettingsStack.Navigator>
+  );
+}
 
 function JournalStackNavigator() {
   return (
@@ -55,21 +85,21 @@ function JournalStackNavigator() {
 function MyTabs() {
   return (
     <Tab.Navigator
-    screenOptions={{
-      tabBarShowLabel: false,
-      tabBarStyle: {
-        backgroundColor: '#fff',
-        flexDirection: 'row',
-        justifyContent: 'center', // Centers the tabs
-        alignItems: 'center',
-        paddingHorizontal: 20,
-      },
-      tabBarItemStyle: {
-        // Remove flex: 1 to prevent tabs from stretching
-        alignItems: 'center',
-        justifyContent: 'center',
-      },
-    }}
+      screenOptions={{
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          flexDirection: 'row',
+          justifyContent: 'center', // Centers the tabs
+          alignItems: 'center',
+          paddingHorizontal: 20,
+        },
+        tabBarItemStyle: {
+          // Remove flex: 1 to prevent tabs from stretching
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+      }}
     >
       <Tab.Screen
         name="Dashboard"
@@ -102,8 +132,8 @@ function MyTabs() {
         }}
       />
       <Tab.Screen
-        name="Setting"
-        component={SettingScreen}
+        name="Menu"
+        component={SettingNavigator}
         options={{
           headerShown: false,
           tabBarIcon: ({ color }) => (

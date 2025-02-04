@@ -8,6 +8,9 @@ export type RootStackParamList = {
   SessionDetail: {session: any; sessionNumber: number};
   Support: undefined;
   Setting: undefined;
+  ProfileSetting: undefined;
+  NotificationsSetting: undefined;
+  PasswordSetting: undefined;
   Profile: undefined;
   MainApp: {screen: string};
   InSession: undefined;

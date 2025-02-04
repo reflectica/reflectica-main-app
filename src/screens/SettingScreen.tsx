@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {SafeAreaView} from 'react-native-safe-area-context';
 import {
   StyleSheet,
@@ -6,57 +6,64 @@ import {
   Dimensions,
   TouchableOpacity,
   Image,
+  Alert
 } from 'react-native';
 import {SettingScreenProps} from '../constants';
 import {useAuth} from '../context/AuthContext';
+import LogoutBanner from '../components/LogoutBanner';
+import DeleteAccountBanner from '../components/DeleteAccountBanner';
+import { deleteUser } from '@react-native-firebase/auth';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-export default function SettingScreen({navigation}: SettingScreenProps) {
-  const {handleLogout} = useAuth();
+export default function SettingScreen({ navigation }: SettingScreenProps) {
+  const { currentUser, handleLogout } = useAuth();
+  const [isBannerVisible, setIsBannerVisible] = useState<boolean>(false);
+  const [isLogoutBannerVisible, setIsLogoutBannerVisible] = useState<boolean>(false);
+
+  const handleDeleteAccount = async () => {
+    if (currentUser) {
+      try {
+        await deleteUser(currentUser);
+        Alert.alert('Success', 'Account deleted successfully.');
+        handleLogout();
+      } catch (error) {
+        Alert.alert('Error', 'There was an issue deleting the account.');
+      }
+    }
+  };
 
   const options = [
     {
       icon: require('../assets/settings/profile.png'),
       title: 'Profile information',
-      action: '',
+      action: () => navigation.navigate('ProfileSetting'),
     },
     {
       icon: require('../assets/settings/password.png'),
       title: 'Password & Security',
-      action: '',
-    },
-    {
-      icon: require('../assets/settings/billing.png'),
-      title: 'Billing information',
-      action: '',
+      action: () => navigation.navigate('PasswordSetting'),
     },
     {
       icon: require('../assets/settings/notification.png'),
       title: 'Notifications',
-      action: '',
-      // navigation.navigate(''),
+      action: () => navigation.navigate('NotificationsSetting'),
     },
     {
       icon: require('../assets/settings/privacy.png'),
       title: 'Privacy Management',
-      action: '',
-    },
-    {
-      icon: require('../assets/settings/provider.png'),
-      title: 'Provider integration',
-      action: '',
+      action: () => {},
     },
     {
       icon: require('../assets/settings/account.png'),
       title: 'Account Deletion',
-      action: '',
+      action: () => setIsBannerVisible(true),
     },
     {
       icon: require('../assets/settings/logout.png'),
       title: 'Logout from Account',
-      action: handleLogout,
+      action: () => setIsLogoutBannerVisible(true),
     },
   ];
 
@@ -69,8 +76,16 @@ export default function SettingScreen({navigation}: SettingScreenProps) {
           <Text style={styles.btnText}>{option.title}</Text>
         </TouchableOpacity>
       ))}
-
-      {/* <MenuBar /> */}
+      <DeleteAccountBanner
+        visible={isBannerVisible}
+        onCancel={() => setIsBannerVisible(false)}
+        onDelete={handleDeleteAccount}
+      />
+      <LogoutBanner
+        visible={isLogoutBannerVisible}
+        onCancel={() => setIsLogoutBannerVisible(false)}
+        onLogout={handleLogout}
+      />      
     </SafeAreaView>
   );
 }
@@ -108,3 +123,9 @@ const styles = StyleSheet.create({
     lineHeight: 20,
   },
 });
+
+
+
+
+
+

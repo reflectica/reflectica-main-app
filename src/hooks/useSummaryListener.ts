@@ -33,7 +33,7 @@ export const useAllSummaryListener = (userId: string) => {
       });
 
       if (sessionDataArray.length > 0) {
-        console.log('Session summaries fetched:', sessionDataArray);
+         
         setSessionSummary(sessionDataArray);
       } else {
         console.log('No sessions found for the given UID.');
