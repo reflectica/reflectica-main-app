@@ -56,9 +56,9 @@ const UpdateProfile: React.FC = () => {
         Alert.alert('Invalid Email', 'Please enter a valid email address.');
         return;
       }
-  
+
       let valueToSave = editValue;
-  
+
       if (editField === 'phoneNumber') {
         const formattedPhoneNumber = formatPhoneNumber(editValue);
         if (!formattedPhoneNumber) {
@@ -67,10 +67,10 @@ const UpdateProfile: React.FC = () => {
         }
         valueToSave = formattedPhoneNumber;
       }
-  
+
       const userDocRef = doc(db, 'users', currentUser.uid);
       const updatedData = { [editField]: valueToSave };
-  
+
       await updateDoc(userDocRef, updatedData);
       setUserInfo({ ...userInfo, ...updatedData });
       setModalVisible(false);
@@ -93,25 +93,53 @@ const UpdateProfile: React.FC = () => {
           source={{ uri: userInfo?.profilePic || 'https://via.placeholder.com/150' }}
           style={styles.profileImage}
         />
-        <Text style={styles.profileName}>{userInfo?.name || 'N/A'}</Text>
+        <TouchableOpacity style={styles.editIconContainer} onPress={() => handleEdit('profilePic', userInfo?.profilePic || '')}>
+          <Image source={require('../../assets/Group13.png')} style={styles.editIcon} />
+        </TouchableOpacity>
       </View>
-      <View style={styles.infoContainer}>
+      <View style={styles.infoSection}>
+        <Text style={styles.label}>Full Name:</Text>
+        <View style={styles.infoContainer}>
+          <View style={styles.rectangleView}>
+            <Text style={styles.value}>{userInfo?.name || 'N/A'}</Text>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('name', userInfo?.name || '')}>
+            <Image source={require('../../assets/Group13.png')} style={styles.editIcon} />
+          </TouchableOpacity>
+        </View>
+      </View>
+      <View style={styles.infoSection}>
         <Text style={styles.label}>Birthday:</Text>
-        <Text style={styles.value}>{userInfo?.birthday || 'N/A'}</Text>
+        <View style={styles.infoContainer}>
+          <View style={styles.rectangleView}>
+            <Text style={styles.value}>{userInfo?.birthday || 'N/A'}</Text>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('birthday', userInfo?.birthday || '')}>
+            <Image source={require('../../assets/Group13.png')} style={styles.editIcon} />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.infoContainer}>
+      <View style={styles.infoSection}>
         <Text style={styles.label}>Email:</Text>
-         <Text style={styles.value} numberOfLines={1} ellipsizeMode="tail">{currentUser?.email || 'N/A'}</Text>
-        <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('email', currentUser?.email || '')}>
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
+        <View style={styles.infoContainer}>
+          <View style={styles.rectangleView}>
+            <Text style={styles.value} numberOfLines={1} ellipsizeMode="tail">{currentUser?.email || 'N/A'}</Text>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('email', currentUser?.email || '')}>
+            <Image source={require('../../assets/Group13.png')} style={styles.editIcon} />
+          </TouchableOpacity>
+        </View>
       </View>
-      <View style={styles.infoContainer}>
+      <View style={styles.infoSection}>
         <Text style={styles.label}>Phone Number:</Text>
-        <Text style={styles.value}>{userInfo?.phoneNumber || 'N/A'}</Text>
-        <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('phoneNumber', userInfo?.phoneNumber || '')}>
-          <Text style={styles.editButtonText}>Edit</Text>
-        </TouchableOpacity>
+        <View style={styles.infoContainer}>
+          <View style={styles.rectangleView}>
+            <Text style={styles.value}>{userInfo?.phoneNumber || 'N/A'}</Text>
+          </View>
+          <TouchableOpacity style={styles.editButton} onPress={() => handleEdit('phoneNumber', userInfo?.phoneNumber || '')}>
+            <Image source={require('../../assets/Group13.png')} style={styles.editIcon} />
+          </TouchableOpacity>
+        </View>
       </View>
 
       <Modal
@@ -143,9 +171,15 @@ const styles = StyleSheet.create({
     padding: 20,
     backgroundColor: '#F5F7FA',
   },
+  title: {
+    fontWeight: '700',
+    fontSize: 25,
+    alignSelf: 'center',
+  },
   profileContainer: {
     alignItems: 'center',
     marginBottom: 30,
+    position: 'relative',
   },
   profileImage: {
     width: 80,
@@ -153,43 +187,54 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     marginBottom: 10,
   },
+  editIconContainer: {
+    position: 'absolute',
+    right: 0,
+    bottom: 0,
+  },
+  editIcon: {
+    width: 24, // Reduced size
+    height: 24, // Reduced size
+  },
   profileName: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#333',
   },
-  infoContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    marginTop: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
+  infoSection: {
+    marginBottom: 20,
   },
   label: {
     fontWeight: '700',
     fontSize: 16,
     color: '#333',
-    paddingRight: 10,
-    width: screenWidth * 0.3,
+    marginBottom: 5,
+    alignSelf: 'center',
+    width: '70%',
+  },
+  infoContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative', // Added to position the edit button
+  },
+  rectangleView: {
+    borderRadius: 15,
+    backgroundColor: "#fff",
+    width: '70%',
+    height: 45,
+    justifyContent: 'center',
+    paddingHorizontal: 10,
+    alignSelf: 'center',
   },
   value: {
     fontSize: 14,
     color: '#333',
-    flex: 1,
-    flexDirection: 'row'
   },
   editButton: {
-    backgroundColor: '#5271FF',
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-  editButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    position: 'absolute', // Position absolute to overlap
+    right: 75, // Adjust to overlap the right side of the text bar
+    top: 12, // Adjust to vertically center the icon
   },
   modalContainer: {
     flex: 1,
@@ -225,11 +270,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     paddingHorizontal: 10,
     marginBottom: 15,
-  },
-  title: {
-    fontWeight: '700',
-    fontSize: 25,
-    alignSelf: 'center',
   },
 });
 

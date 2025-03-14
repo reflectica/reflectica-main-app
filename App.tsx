@@ -23,7 +23,7 @@ import {
   EmailSignupScreen,
 } from './src/screens/Auth';
 import { SessionDetail, JournalScreen } from './src/screens/Journal';
-import { UpdateProfile, NotificationsSetting, PasswordSetting} from './src/screens/Settings';
+import { UpdateProfile, NotificationsSetting, PasswordSetting, PrivacySetting} from './src/screens/Settings';
 // import {cloud, log, question, setting} from './src/assets/nav';
 import cloud from './src/assets/nav/cloud.png'
 import log from './src/assets/nav/log.png'
@@ -55,9 +55,14 @@ function SettingNavigator() {
         component={NotificationsSetting}
         options={{ headerShown: false }}
       />
-        <SettingsStack.Screen
+      <SettingsStack.Screen
         name="PasswordSetting"
         component={PasswordSetting}
+        options={{ headerShown: false }}
+      />
+      <SettingsStack.Screen
+        name="PrivacySetting"
+        component={PrivacySetting}
         options={{ headerShown: false }}
       />
       {/* Add other settings screens here */}

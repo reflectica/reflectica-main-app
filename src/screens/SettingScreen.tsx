@@ -53,7 +53,7 @@ export default function SettingScreen({ navigation }: SettingScreenProps) {
     {
       icon: require('../assets/settings/privacy.png'),
       title: 'Privacy Management',
-      action: () => {},
+      action: () => navigation.navigate('PrivacySetting'),
     },
     {
       icon: require('../assets/settings/account.png'),

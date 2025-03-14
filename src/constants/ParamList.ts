@@ -11,6 +11,7 @@ export type RootStackParamList = {
   ProfileSetting: undefined;
   NotificationsSetting: undefined;
   PasswordSetting: undefined;
+  PrivacySetting: undefined;
   Profile: undefined;
   MainApp: {screen: string};
   InSession: undefined;

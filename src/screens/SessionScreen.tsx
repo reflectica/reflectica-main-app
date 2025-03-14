@@ -233,9 +233,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
         </View>
 
         {/* Transcript Display */}
-        <Text style={styles.transcript}>
-          {transcript}
-        </Text>
+
 
         {/* End Session Button */}
         <ButtonTemplate
