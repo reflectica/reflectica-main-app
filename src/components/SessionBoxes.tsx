@@ -17,7 +17,10 @@ export default function SessionBoxes({id, description}: SessionBoxesProps) {
           source={require('../assets/dashboard/check.png')}
         />
       </View>
-      <Text style={sessionStyles.titleDescription}>
+      <Text 
+        ellipsizeMode='tail'
+        numberOfLines={1}
+        style={sessionStyles.titleDescription}>
         {' '}
         Session #{id} | {description}
       </Text>
@@ -64,5 +67,6 @@ const sessionStyles = StyleSheet.create({
     lineHeight: 23.27,
     alignItems: 'center',
     flexShrink: 1,
+
   },
 });
