@@ -10,6 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import {getAuth, onAuthStateChanged} from 'firebase/auth';
+import { useNavigation } from '@react-navigation/native';
 // import { useDispatch, useSelector } from 'react-redux';
 // import { loginUser } from "../features/auth/authSlices";
 import {ButtonTemplate} from '../../components';
@@ -22,7 +23,6 @@ const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 export default function LoginScreen({navigation}: LoginScreenProps) {
-  // const navigation = useNavigation();
   const [loading, setLoading] = useState<boolean>(false);
   const [user, setUser] = useState();
   const [biometricAvailable, setBiometricAvailable] = useState<boolean>(false);
@@ -51,6 +51,9 @@ export default function LoginScreen({navigation}: LoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
       <Image
         resizeMode="contain"
         style={styles.reflecticaLogo}
@@ -135,6 +138,17 @@ const styles = StyleSheet.create({
     height: screenHeight * 0.4,
     position: 'relative',
     marginBottom: -50,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50, // adjust based on your status bar or safe area
+    left: 15,
+    padding: 15,
+    zIndex: 1,
+  },
+  backText: {
+    fontSize: 16,
+    color: 'black',
   },
   // signupOptionsContainer: {
   //   paddingTop:'5%',

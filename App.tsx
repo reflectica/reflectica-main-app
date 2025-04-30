@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { Image } from 'react-native';
+import { Image, View } from 'react-native';
 // import type {PropsWithChildren} from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -111,8 +111,21 @@ function MyTabs() {
         component={DashboardScreen}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Image source={cloud} style={{ height: 30, width: 50 }} />
+          tabBarIcon: ({ focused, color }) => (
+            <View style={{ alignItems: 'center' }}>
+              <Image source={cloud} style={{ height: 30, width: 50 }} />
+              {focused && (
+                <View
+                  style={{
+                    marginTop: 2,
+                    height: 3,
+                    width: 40,
+                    backgroundColor: '#5271FF',
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />
@@ -121,8 +134,21 @@ function MyTabs() {
         component={JournalStackNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Image source={log} style={{ height: 30, width: 30 }} />
+          tabBarIcon: ({ focused, color }) => (
+            <View style={{ alignItems: 'center' }}>
+              <Image source={log} style={{ height: 30, width: 30, tintColor: color }} />
+              {focused && (
+                <View
+                  style={{
+                    marginTop: 2,
+                    height: 3,
+                    width: 30,
+                    backgroundColor: '#5271FF',
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />
@@ -131,8 +157,21 @@ function MyTabs() {
         component={SupportScreen}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Image source={question} style={{ height: 30, width: 30 }} />
+          tabBarIcon: ({ focused, color }) => (
+            <View style={{ alignItems: 'center' }}>
+              <Image source={question} style={{ height: 30, width: 30, tintColor: color }} />
+              {focused && (
+                <View
+                  style={{
+                    marginTop: 2,
+                    height: 3,
+                    width: 30,
+                    backgroundColor: '#5271FF',
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />
@@ -141,8 +180,21 @@ function MyTabs() {
         component={SettingNavigator}
         options={{
           headerShown: false,
-          tabBarIcon: ({ color }) => (
-            <Image source={setting} style={{ height: 30, width: 30 }} />
+          tabBarIcon: ({ focused, color }) => (
+            <View style={{ alignItems: 'center' }}>
+              <Image source={setting} style={{ height: 30, width: 30, tintColor: color }} />
+              {focused && (
+                <View
+                  style={{
+                    marginTop: 2,
+                    height: 3,
+                    width: 30,
+                    backgroundColor: '#5271FF',
+                    borderRadius: 1.5,
+                  }}
+                />
+              )}
+            </View>
           ),
         }}
       />

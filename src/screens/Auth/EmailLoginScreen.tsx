@@ -11,6 +11,7 @@ import {
   Pressable,
   Image,
   Platform,
+  TouchableOpacity
 } from 'react-native';
 import {ButtonTemplate} from '../../components';
 import {useAuth} from '../../context/AuthContext';
@@ -54,6 +55,9 @@ export default function EmailLoginScreen({navigation}: EmailLoginScreenProps) {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
       <KeyboardAvoidingView
         style={{gap: 25}}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -135,7 +139,7 @@ export default function EmailLoginScreen({navigation}: EmailLoginScreenProps) {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
-    gap: screenHeight * 0.03,
+    gap: screenHeight * 0.05,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -191,5 +195,16 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     fontSize: 16,
     lineHeight: 24,
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50, // adjust based on your status bar or safe area
+    left: 15,
+    padding: 15,
+    zIndex: 1,
+  },
+  backText: {
+    fontSize: 16,
+    color: 'black',
   },
 });

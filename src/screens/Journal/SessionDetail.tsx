@@ -1,7 +1,7 @@
 // SessionDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { StyleSheet, Text, View, Dimensions, ActivityIndicator, ScrollView } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
 import { SessionDetailScreenProps, SessionDetailProp } from '../../constants';
 import {
   DonutChartComponent,
@@ -11,11 +11,13 @@ import {
   SelfEsteemBarComponent,
 } from '../../components';
 import { useSessionAndSurroundingScores } from '../../hooks';
+import { useNavigation } from '@react-navigation/native';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
+  const navigation = useNavigation();
   const { session, sessionNumber } = route.params;
   const [sessionDetails, setSessionDetails] = useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -166,6 +168,9 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.heading}>Session Summary</Text>
         <View style={styles.contentWrapper}>
@@ -315,6 +320,13 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
     marginTop: 20,
+  },
+  backButton: {
+    marginLeft: 20,
+  },
+  backText: {
+    fontSize: 16,
+    color: 'black',
   },
 });
 

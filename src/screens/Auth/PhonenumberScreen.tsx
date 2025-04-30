@@ -8,6 +8,7 @@ import {
   TextInput,
   Alert,
   Text,
+  TouchableOpacity
 } from 'react-native';
 // import {useDispatch} from 'react-redux';
 import {ButtonTemplate} from '../../components/index';
@@ -76,12 +77,10 @@ export default function PhonenumberScreen({
   };
 
   return (
-    <SafeAreaView
-      style={{
-        alignItems: 'center',
-        gap: 20,
-        flex: 1,
-      }}>
+    <SafeAreaView style={styles.container}>
+      <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+        <Text style={styles.backText}>Back</Text>
+      </TouchableOpacity>
       <View style={{alignItems: 'center', width: screenWidth * 0.6}}>
         <Text
           style={{
@@ -140,6 +139,12 @@ export default function PhonenumberScreen({
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    gap: screenHeight * 0.04,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -172,5 +177,16 @@ const styles = StyleSheet.create({
     fontWeight: '400',
     lineHeight: 21,
     color: 'rgba(0, 0, 0, 1)',
+  },
+  backButton: {
+    position: 'absolute',
+    top: 50, // adjust based on your status bar or safe area
+    left: 15,
+    padding: 15,
+    zIndex: 1,
+  },
+  backText: {
+    fontSize: 16,
+    color: 'black',
   },
 });
