@@ -2,7 +2,12 @@
   "compilerOptions": {
     "paths": {
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
-    }
+    },
+    "lib": ["dom", "es2017"],
   },
-  "extends": "@react-native/typescript-config/tsconfig.json"
+  "extends": "@react-native/typescript-config/tsconfig.json",
+  "include": [
+    "global.d.ts",
+    "src/**/*"
+  ]
 }

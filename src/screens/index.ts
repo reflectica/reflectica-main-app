@@ -7,3 +7,4 @@ export {default as DashboardScreen} from './DashboardScreen';
 export {default as SessionScreen} from './SessionScreen';
 export {default as SettingScreen} from './SettingScreen';
 export {default as PostSessionJournal} from './PostSessionJournal';
+export {default as SessionScreenTest} from './SessionScreenTest';

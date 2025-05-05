@@ -83,6 +83,7 @@
     "metro-react-native-babel-preset": "^0.77.0",
     "prettier": "2.8.8",
     "react-native-audio-toolkit": "^1.0.6",
+    "react-native-webrtc": "^124.0.5",
     "react-test-renderer": "18.2.0",
     "tsc-watch": "^6.2.0",
     "typescript": "^5.5.3"

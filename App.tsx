@@ -11,6 +11,7 @@ import {
   SettingScreen,
   SupportScreen,
   PostSessionJournal,
+  SessionScreenTest
 } from './src/screens';
 import { NotificationScreen, ProfileScreen } from './src/screens/Profile';
 import {
@@ -223,7 +224,7 @@ function App(): React.JSX.Element {
               />
               <Stack.Screen
                 name="InSession"
-                component={SessionScreen}
+                component={SessionScreenTest}
                 options={{ headerShown: false }}
               />
               <Stack.Screen
