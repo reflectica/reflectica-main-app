@@ -1,7 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, Button, StyleSheet, Alert } from 'react-native';
-import axios from 'axios';
+import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
+import React, { useEffect, useRef, useState } from 'react';
+
+import axios from 'axios';
 
 const SessionScreenTest: React.FC = () => {
   const [status, setStatus] = useState<string>('Ready to connect');
@@ -41,23 +42,23 @@ const SessionScreenTest: React.FC = () => {
       setStatus('Requesting ephemeral token...');
       const EPHEMERAL_KEY = await getEphemeralToken();
       console.log('Ephemeral token:', EPHEMERAL_KEY);
-      
+
       // Create a new RTCPeerConnection
       const pc = new RTCPeerConnection();
       setPeerConnection(pc);
 
       // Set up remote audio handling using the ontrack event.
       // This will be triggered when a remote track is received.
-      pc.ontrack = (event) => {
+      pc.addEventListener('track', (event) => {
         console.log('Received remote track');
         // Assuming the first stream is the remote audio stream.
         remoteStream.current = event.streams[0];
-      };
+      });
 
       // Get local audio (microphone) track.
       const stream = await mediaDevices.getUserMedia({ audio: true, video: false });
       localStream.current = stream;
-      
+
       // Add local audio track to the peer connection.
       stream.getAudioTracks().forEach(track => {
         pc.addTrack(track, stream);
