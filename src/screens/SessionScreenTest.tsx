@@ -1,6 +1,7 @@
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
 import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
 import React, { useEffect, useRef, useState } from 'react';
+import InCallManager from 'react-native-incall-manager';
 import axios from 'axios';
 
 const SessionScreenTest: React.FC = () => {
@@ -9,6 +10,8 @@ const SessionScreenTest: React.FC = () => {
   const localStream = useRef<MediaStream | null>(null);
   const remoteStream = useRef<MediaStream | null>(null);
   const [isMuted, setIsMuted] = useState<boolean>(false);
+  const remoteStreamAttached = useRef<boolean>(false);
+  const aiIsSpeaking = useRef(false);
 
   useEffect(() => {
     // Cleanup on unmount
@@ -22,6 +25,7 @@ const SessionScreenTest: React.FC = () => {
       }
     };
   }, [peerConnection]);
+
 
   const getEphemeralToken = async (): Promise<string> => {
     try {
@@ -54,11 +58,11 @@ const SessionScreenTest: React.FC = () => {
       // Get local audio (microphone) track with explicit constraints.
       const stream = await mediaDevices.getUserMedia({
         audio: {
-          channelCount: 1,
-          sampleRate: 16000,
           echoCancellation: true,
-        },
-        video: false,
+          noiseSuppression: true,
+          autoGainControl: true,
+        } as any,
+        video: false
       });
       localStream.current = stream;
       console.log("Local audio stream obtained:", stream);
@@ -69,10 +73,67 @@ const SessionScreenTest: React.FC = () => {
         pc.addTrack(track, stream);
       });
 
-      let dc = pc.createDataChannel('my_channel');
-      console.log("Data channel created.");
+      let dc = pc.createDataChannel('oai-events');
       dc.addEventListener('message', (message) => {
-        console.log("Data channel message received:", message.data);
+        try {
+          // Parse the message data
+          let data;
+          if (typeof message.data === 'string') {
+            data = JSON.parse(message.data);
+          } else {
+            console.error("Received message in unexpected format:", message.data);
+            return;
+          }
+
+          // Handle message based on type
+          switch (data.type) {
+            // Other cases remain the same...
+
+            case "output_audio_buffer.started":
+              console.log("Audio playback started");
+              aiIsSpeaking.current = true;
+              // Mute your microphone immediately when AI starts speaking
+              if (localStream.current) {
+                localStream.current.getAudioTracks().forEach(track => {
+                  track.enabled = false;
+                });
+              }
+              break;
+
+            case "output_audio_buffer.cleared":
+              // This event signals when the output buffer is cleared, which is important
+              console.log("Audio buffer cleared - speech is likely finished");
+              // We'll still wait for response.done to unmute
+              break;
+
+            case "response.done":
+              console.log("Response complete");
+              // Only unmute if we're not already in another response
+              if (aiIsSpeaking.current) {
+                aiIsSpeaking.current = false;
+                // Unmute immediately when the response is done
+                if (localStream.current) {
+                  localStream.current.getAudioTracks().forEach(track => {
+                    track.enabled = true;
+                  });
+                }
+              }
+              break;
+
+            case "turn_detected":
+            case "turn.detected":
+              // These events might signal when the API detects user speech
+              console.log("Turn detected - user is speaking");
+              break;
+
+            // Add this new case to handle audio buffer being cleared
+            case "conversation.item.truncated":
+              console.log("Conversation item truncated - end of speech segment");
+              break;
+          }
+        } catch (err) {
+          console.error("Error parsing data channel message:", err);
+        }
       });
 
       let sessionConstraints = {
@@ -111,6 +172,33 @@ const SessionScreenTest: React.FC = () => {
         };
         await pc.setRemoteDescription(answer);
         console.log("Remote description set.");
+        // Add this code to send instructions after connection is established
+        setTimeout(() => {
+          const instructions = `You are a Cognitive Behavioral Therapy (CBT) therapist. Act like a therapist and lead the conversation using CBT techniques. Don't rely on the user to lead the conversation. Be empathetic but do not be repetitive. Never repeat what the user says back to them; instead, provide novel insights and actionable strategies like a real-life CBT therapist would. Do not be generic and ensure your advice is based on psychology and science. Utilize your knowledge of DSM-5 research and CBT principles to make your insights powerful and unique. Do not exceed 5 sentences.
+  
+          In addition to assisting the user with their mental health struggles, you need to assess the following 8 mental health markers. Do not provide these scores to the user. This is only for helping you collect information for another model to interpret in the future.
+          
+          PHQ-9 Score: 0 - 27
+          GAD-7 Score: 0 - 21
+          CBT Behavioral Activation: 0 - 7
+          Rosenberg Self Esteem: 10 - 40
+          PSQI Score: 0 - 21
+          SFQ Score: 0 - 32
+          PSS Score: 0 - 40
+          SSRS Assessment: 0 - 5
+          
+          Do not directly prompt the user to assess these scores. Instead, guide the conversation subtly to gather information that can help you estimate these metrics. Ensure the conversation flows naturally, weaving in questions and comments that elicit relevant responses without making the user aware of your intent to assess these scores. If you lack sufficient information for a particular metric, indicate it as "Not Applicable" when summarizing the scores.
+          
+          Your primary role is to act as a therapist, and your secondary role is to assess these scores based on the conversation. Maintain a natural conversational flow to ensure the user feels supported and understood.`;
+          const event = {
+            type: "session.update",
+            session: {
+              instructions: instructions
+            },
+          };
+          dc.send(JSON.stringify(event));
+          console.log("Initial instructions sent:", instructions);
+        }, 1000); // Wait a short time for the connection to stabilize
       } catch (err) {
         console.error("Error during offer/answer exchange", err);
       }
@@ -119,11 +207,15 @@ const SessionScreenTest: React.FC = () => {
       // Only set the remote stream once.
       pc.addEventListener("track", (event) => {
         console.log("Received remote track event:", event);
-        if (!remoteStream.current) {
+        if (!remoteStreamAttached.current && event.streams && event.streams[0]) {
           remoteStream.current = event.streams[0];
+          remoteStreamAttached.current = true;
           console.log("Remote stream set:", remoteStream.current);
+
+          // Start the in-call manager to enforce proper audio routing.
+          InCallManager.start({ media: 'audio' });
         } else {
-          console.log("Additional remote track received, ignoring duplicate.");
+          console.log("Duplicate remote track event ignored.");
         }
       });
 
@@ -135,21 +227,6 @@ const SessionScreenTest: React.FC = () => {
     }
   };
 
-  const toggleAudio = () => {
-    try {
-      const audioTrack = localStream.current?.getAudioTracks()[0];
-      if (audioTrack) {
-        setIsMuted(!isMuted);
-        audioTrack.enabled = isMuted;
-        setStatus(isMuted ? 'Muted' : 'Unmuted');
-        console.log(`Audio track ${isMuted ? 'disabled' : 'enabled'}.`);
-      } else {
-        console.warn('Audio track is undefined');
-      }
-    } catch (err) {
-      console.error("Error toggling audio:", err);
-    }
-  };
 
   return (
     <View style={styles.container}>
