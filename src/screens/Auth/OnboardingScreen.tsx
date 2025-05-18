@@ -9,9 +9,9 @@ import {
 } from 'react-native';
 import {ButtonTemplate, Pagination, CarouselComponent} from '../../components';
 import { OnboardingScreenProps } from '../../constants';
-import onboarding1 from '../../assets/onboarding/onboarding1.jpg';
-import onboarding2 from '../../assets/onboarding/onboarding2.jpg';
-import onboarding3 from '../../assets/onboarding/onboarding3.jpg';
+import onboarding1 from '../../assets/onboarding/Onboarding1.jpg';
+import onboarding2 from '../../assets/onboarding/Onboarding2.jpg';
+import onboarding3 from '../../assets/onboarding/Onboarding3.jpg';
 
 type ItemProps = {
   image: ImageSourcePropType;

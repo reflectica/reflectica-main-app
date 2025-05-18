@@ -14,7 +14,7 @@ export default function SessionBoxes({id, description}: SessionBoxesProps) {
       <View style={sessionStyles.checkmarkContainer}>
         <Image
           style={sessionStyles.checkIcon}
-          source={require('../assets/dashboard/check.png')}
+          source={require('../assets/dashboard/write.png')}
         />
       </View>
       <Text 
