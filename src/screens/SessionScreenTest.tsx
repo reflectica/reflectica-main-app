@@ -1,17 +1,26 @@
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '../context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
 import React, { useEffect, useRef, useState } from 'react';
+import { SessionScreenProps } from '../constants/ParamList';
+import { ButtonTemplate } from '../components';
 import InCallManager from 'react-native-incall-manager';
 import axios from 'axios';
 
-const SessionScreenTest: React.FC = () => {
+const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [status, setStatus] = useState<string>('Ready to connect');
   const [peerConnection, setPeerConnection] = useState<RTCPeerConnection | null>(null);
   const localStream = useRef<MediaStream | null>(null);
   const remoteStream = useRef<MediaStream | null>(null);
-  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [sessionId, setSessionId] = useState<string>(uuidv4());
+  const { currentUser } = useAuth();
   const remoteStreamAttached = useRef<boolean>(false);
   const aiIsSpeaking = useRef(false);
+  const language = 'en-US'
+  const therapyMode = 'CBT'; // Determine therapy mode
+  const userId = currentUser?.uid ?? 'gADXwFiz2WfZaMgWLrffyr7Ookw2'; // Replace with dynamic user ID if available
+  const sessionType = 'therapy'
 
   useEffect(() => {
     // Cleanup on unmount
@@ -26,6 +35,44 @@ const SessionScreenTest: React.FC = () => {
     };
   }, [peerConnection]);
 
+  // Helper function to post a transcript to local server
+  const postTranscript = async (
+    userId: string,
+    sessionId: string,
+    role: 'user' | 'assistant',
+    message: string
+  ) => {
+    try {
+      await axios.post('http://localhost:3006/audio/transcript', {
+        userId,
+        sessionId,
+        role,
+        message,
+      });
+      console.log(`[${role}] transcript posted:`, message);
+    } catch (error) {
+      console.error('Error posting transcript:', error);
+    }
+  };
+  const handleEndSession = async () => {
+
+    try {
+      await axios.post('http://localhost:3006/session/endSession', {
+        userId: userId,
+        sessionId: sessionId,
+        language: language,
+        sessionType: sessionType, // Send session type
+      })
+        .then(async res => {
+
+          setSessionId(uuidv4());
+          navigation.navigate('PostSession', { session: res.data });
+        })
+        .catch(error => console.log(error));
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getEphemeralToken = async (): Promise<string> => {
     try {
@@ -36,7 +83,7 @@ const SessionScreenTest: React.FC = () => {
       });
       const data = response.data;
       const EPHEMERAL_KEY = data.client_secret.value;
-      console.log("Ephemeral token received:", EPHEMERAL_KEY);
+      
       return EPHEMERAL_KEY;
     } catch (error) {
       console.error('Token fetch error:', error);
@@ -48,7 +95,6 @@ const SessionScreenTest: React.FC = () => {
     try {
       setStatus('Requesting ephemeral token...');
       const EPHEMERAL_KEY = await getEphemeralToken();
-      console.log('Ephemeral token:', EPHEMERAL_KEY);
 
       // Create a new RTCPeerConnection
       const pc = new RTCPeerConnection();
@@ -74,16 +120,19 @@ const SessionScreenTest: React.FC = () => {
       });
 
       let dc = pc.createDataChannel('oai-events');
+      dc.addEventListener('open', () => {
+        dc.send(JSON.stringify({
+          type: 'session.update',
+          session: {
+            input_audio_transcription: { model: 'whisper-1' }  // final + delta events
+          }
+        }));
+      });
       dc.addEventListener('message', (message) => {
         try {
           // Parse the message data
-          let data;
-          if (typeof message.data === 'string') {
-            data = JSON.parse(message.data);
-          } else {
-            console.error("Received message in unexpected format:", message.data);
-            return;
-          }
+          const data = typeof message.data === 'string' ? JSON.parse(message.data) : null;
+          if (!data) return;
 
           // Handle message based on type
           switch (data.type) {
@@ -105,13 +154,39 @@ const SessionScreenTest: React.FC = () => {
               console.log("Audio buffer cleared - speech is likely finished");
               // We'll still wait for response.done to unmute
               break;
-
-            case "response.done":
+            case "conversation.item.input_audio_transcription.completed":
+              
+              postTranscript(userId, sessionId, 'user', data.transcript);
+              // This is typically the event you'll use to store or process final user utterances
+              break;
+            case "response.done": {
               console.log("Response complete");
-              // Only unmute if we're not already in another response
+
+              // The full response object is under data.response
+              const outputs = data.response?.output;
+              if (Array.isArray(outputs)) {
+                outputs.forEach(item => {
+                  // Each item may have a content array
+                  if (Array.isArray(item.content)) {
+                    // Each content element can have type="audio" or type="text"
+                    item.content.forEach((contentPart: { type: string; transcript: any; text: any; }) => {
+                      if (contentPart.type === "audio" && contentPart.transcript) {
+                        // Print the transcript of the audio content
+                        
+                        postTranscript(userId, sessionId, 'assistant', contentPart.transcript);
+                      } else if (contentPart.type === "text" && contentPart.text) {
+                        // Print plain text content
+                        console.log("AI text response:", contentPart.text);
+                      }
+                    });
+                  }
+                });
+              }
+
+              // Unmute logic (only if currently speaking, etc.)
               if (aiIsSpeaking.current) {
                 aiIsSpeaking.current = false;
-                // Unmute immediately when the response is done
+                // Unmute the mic if needed
                 if (localStream.current) {
                   localStream.current.getAudioTracks().forEach(track => {
                     track.enabled = true;
@@ -119,6 +194,7 @@ const SessionScreenTest: React.FC = () => {
                 }
               }
               break;
+            }
 
             case "turn_detected":
             case "turn.detected":
@@ -128,8 +204,9 @@ const SessionScreenTest: React.FC = () => {
 
             // Add this new case to handle audio buffer being cleared
             case "conversation.item.truncated":
-              console.log("Conversation item truncated - end of speech segment");
+
               break;
+
           }
         } catch (err) {
           console.error("Error parsing data channel message:", err);
@@ -197,7 +274,6 @@ const SessionScreenTest: React.FC = () => {
             },
           };
           dc.send(JSON.stringify(event));
-          console.log("Initial instructions sent:", instructions);
         }, 1000); // Wait a short time for the connection to stabilize
       } catch (err) {
         console.error("Error during offer/answer exchange", err);
@@ -236,6 +312,12 @@ const SessionScreenTest: React.FC = () => {
         <Button title="Start Session" onPress={init} />
         {/* <Button title={isMuted ? 'Unmute' : 'Mute'} onPress={toggleAudio} /> */}
       </View>
+      <ButtonTemplate
+        title="End Session"
+        action={handleEndSession}
+        stylebtn="purple"
+        styling={{ alignSelf: 'center' }}
+      />
     </View>
   );
 };
