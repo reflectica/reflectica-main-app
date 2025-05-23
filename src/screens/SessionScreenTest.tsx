@@ -3,7 +3,6 @@ import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrt
 import React, { useEffect, useRef, useState } from 'react';
 
 import { ButtonTemplate } from '../components';
-import InCallManager from 'react-native-incall-manager';
 import { SessionScreenProps } from '../constants/ParamList';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -56,6 +55,21 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
     }
   };
   const handleEndSession = async () => {
+    if (peerConnection) {
+      peerConnection.close();
+      setPeerConnection(null);
+      console.log("Peer connection closed.");
+    }
+    if (localStream.current) {
+      localStream.current.getTracks().forEach(track => track.stop());
+      localStream.current = null;
+      console.log("Local stream stopped.");
+    }
+    if (remoteStream.current) {
+      remoteStream.current.getTracks().forEach(track => track.stop());
+      remoteStream.current = null;
+      console.log("Remote stream stopped.");
+    }
 
     try {
       await axios.post('http://localhost:3006/session/endSession', {
@@ -294,9 +308,6 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
           remoteStream.current = event.streams[0];
           remoteStreamAttached.current = true;
           console.log("Remote stream set:", remoteStream.current);
-
-          // Start the in-call manager to enforce proper audio routing.
-          InCallManager.start({ media: 'audio' });
         } else {
           console.log("Duplicate remote track event ignored.");
         }
