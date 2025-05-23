@@ -332,6 +332,25 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
       });
 
       setStatus("Peer connection created, audio tracks set up.");
+
+      // Ask AI to start conversation
+      const event = {
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [
+            {
+              type: "input_text",
+              text: "Hi!",
+            }
+          ]
+        },
+      };
+
+      // WebRTC data channel and WebSocket both have .send()
+      dc.send(JSON.stringify(event));
+
     } catch (error: any) {
       console.error("Error initializing session:", error);
       Alert.alert("Error", error.message);
