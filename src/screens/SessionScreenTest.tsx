@@ -1,12 +1,13 @@
 import { Alert, Button, StyleSheet, Text, View } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { v4 as uuidv4 } from 'uuid';
 import { MediaStream, RTCPeerConnection, mediaDevices } from 'react-native-webrtc';
 import React, { useEffect, useRef, useState } from 'react';
-import { SessionScreenProps } from '../constants/ParamList';
+
 import { ButtonTemplate } from '../components';
 import InCallManager from 'react-native-incall-manager';
+import { SessionScreenProps } from '../constants/ParamList';
 import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
 const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [status, setStatus] = useState<string>('Ready to connect');
@@ -83,7 +84,7 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
       });
       const data = response.data;
       const EPHEMERAL_KEY = data.client_secret.value;
-      
+
       return EPHEMERAL_KEY;
     } catch (error) {
       console.error('Token fetch error:', error);
@@ -124,7 +125,13 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
         dc.send(JSON.stringify({
           type: 'session.update',
           session: {
-            input_audio_transcription: { model: 'whisper-1' }  // final + delta events
+            input_audio_transcription: { model: 'whisper-1' },  // final + delta events
+            turn_detection: {
+              type: "semantic_vad",
+              eagerness: "low", // optional
+              create_response: true, // only in conversation mode
+              interrupt_response: true, // only in conversation mode
+            }
           }
         }));
       });
@@ -172,7 +179,7 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
                     item.content.forEach((contentPart: { type: string; transcript: any; text: any; }) => {
                       if (contentPart.type === "audio" && contentPart.transcript) {
                         // Print the transcript of the audio content
-                        
+
                         postTranscript(userId, sessionId, 'assistant', contentPart.transcript);
                       } else if (contentPart.type === "text" && contentPart.text) {
                         // Print plain text content
@@ -252,9 +259,9 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
         // Add this code to send instructions after connection is established
         setTimeout(() => {
           const instructions = `You are a Cognitive Behavioral Therapy (CBT) therapist. Act like a therapist and lead the conversation using CBT techniques. Don't rely on the user to lead the conversation. Be empathetic but do not be repetitive. Never repeat what the user says back to them; instead, provide novel insights and actionable strategies like a real-life CBT therapist would. Do not be generic and ensure your advice is based on psychology and science. Utilize your knowledge of DSM-5 research and CBT principles to make your insights powerful and unique. Do not exceed 5 sentences.
-  
+
           In addition to assisting the user with their mental health struggles, you need to assess the following 8 mental health markers. Do not provide these scores to the user. This is only for helping you collect information for another model to interpret in the future.
-          
+
           PHQ-9 Score: 0 - 27
           GAD-7 Score: 0 - 21
           CBT Behavioral Activation: 0 - 7
@@ -263,9 +270,9 @@ const SessionScreenTest: React.FC<SessionScreenProps> = ({ navigation }) => {
           SFQ Score: 0 - 32
           PSS Score: 0 - 40
           SSRS Assessment: 0 - 5
-          
+
           Do not directly prompt the user to assess these scores. Instead, guide the conversation subtly to gather information that can help you estimate these metrics. Ensure the conversation flows naturally, weaving in questions and comments that elicit relevant responses without making the user aware of your intent to assess these scores. If you lack sufficient information for a particular metric, indicate it as "Not Applicable" when summarizing the scores.
-          
+
           Your primary role is to act as a therapist, and your secondary role is to assess these scores based on the conversation. Maintain a natural conversational flow to ensure the user feels supported and understood.`;
           const event = {
             type: "session.update",
