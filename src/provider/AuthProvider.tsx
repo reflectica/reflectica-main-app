@@ -1,18 +1,19 @@
-import React, {useRef, useState, useCallback, ReactNode, useEffect} from 'react';
-import {Alert} from 'react-native';
-import {userCollection} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
-import {addDoc} from 'firebase/firestore';
 import {
   GoogleSignin,
   statusCodes,
 } from '@react-native-google-signin/google-signin';
-import auth from '@react-native-firebase/auth';
-import {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import React, {ReactNode, useCallback, useEffect, useRef, useState} from 'react';
+import { enableBiometrics, isBiometricsEnabled, loginWithBiometrics } from '../utils/biometrics';
+
+import {Alert} from 'react-native';
 import {AuthContext} from '../context/AuthContext';
-import {onAuthStateChanged} from 'firebase/auth';
 import Config from "react-native-config";
 import EncryptedStorage from 'react-native-encrypted-storage';
-import { isBiometricsEnabled, loginWithBiometrics, enableBiometrics } from '../utils/biometrics'; 
+import {FirebaseAuthTypes} from '@react-native-firebase/auth';
+import {addDoc} from 'firebase/firestore';
+import auth from '@react-native-firebase/auth';
+import {onAuthStateChanged} from 'firebase/auth';
+import {userCollection} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -53,7 +54,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
 
       return unsubscribe; // Unsubscribe on component unmount
     }
-  
+
     initializeAuth();
   }, []);
 
@@ -72,12 +73,12 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
         console.log('WELCOME BACK:', user);
 
         // Check if it's the first login
-        const isFirstLogin = await EncryptedStorage.getItem('firstLogin');
-        if (!isFirstLogin) {
-          Alert.alert('Would you like to enable biometrics for future logins?');
-          await EncryptedStorage.setItem('firstLogin', 'false');
-          await enableBiometrics(); // Enable biometrics for future logins
-        }
+        // const isFirstLogin = await EncryptedStorage.getItem('firstLogin');
+        // if (!isFirstLogin) {
+        //   Alert.alert('Would you like to enable biometrics for future logins?');
+        //   await EncryptedStorage.setItem('firstLogin', 'false');
+        //   await enableBiometrics(); // Enable biometrics for future logins
+        // }
 
       } catch (error) {
         const typedError = error as {code: string; message: string};
