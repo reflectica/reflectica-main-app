@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from 'react';
-import { SafeAreaView, View, Text, Switch, StyleSheet, Dimensions, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { useAuth } from '../context/AuthContext';
-import { v4 as uuidv4 } from 'uuid';
-import axios from 'axios';
-import { SessionScreenProps } from '../constants/ParamList';
-import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
-import { ButtonTemplate, AnimatedButton } from '../components';
+import { ActivityIndicator, Dimensions, SafeAreaView, StyleSheet, Switch, Text, TouchableOpacity, View } from 'react-native';
+// import Voice, { SpeechResultsEvent } from '@react-native-voice/voice';
+import { AnimatedButton, ButtonTemplate } from '../components';
+import React, { useEffect, useState } from 'react';
+import { doc, updateDoc } from 'firebase/firestore';
+
 import RNFS from 'react-native-fs';
+import { SessionScreenProps } from '../constants/ParamList';
 import Sound from 'react-native-sound';
-import { updateDoc, doc } from 'firebase/firestore';
-import { userCollection } from '../firebase/firebaseConfig';
+import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
 import { useDiagnosticStatus } from '../hooks/useDiagnosticStatus'; // Import the custom hook
+import { userCollection } from '../firebase/firebaseConfig';
+import { v4 as uuidv4 } from 'uuid';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -18,7 +19,7 @@ const screenWidth = Dimensions.get('window').width;
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
   const { currentUser } = useAuth();
-  const [isRecording, setIsRecording] = useState<boolean>(false);
+  // const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
   const [isSpanish, setIsSpanish] = useState<boolean>(false); // Toggle between English and Spanish
   const [isREBT, setIsREBT] = useState<boolean>(true); // Toggle between CBT and REBT, REBT is default
@@ -26,46 +27,46 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   // Use the custom hook to check diagnostic status
   const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2');
 
-  useEffect(() => {
-    const onSpeechResults = (e: SpeechResultsEvent) => {
-      if (e.value) {
-        setTranscript(e.value.join(' '));
-      }
-    };
+  // useEffect(() => {
+  //   const onSpeechResults = (e: SpeechResultsEvent) => {
+  //     if (e.value) {
+  //       setTranscript(e.value.join(' '));
+  //     }
+  //   };
 
-    Voice.onSpeechResults = onSpeechResults;
+  //   Voice.onSpeechResults = onSpeechResults;
 
-    return () => {
-      Voice.destroy().then(Voice.removeAllListeners);
-    };
-  }, []);
+  //   return () => {
+  //     Voice.destroy().then(Voice.removeAllListeners);
+  //   };
+  // }, []);
 
-  const startRecording = async () => {
-    try {
-      setIsRecording(true);
-      const language = isSpanish ? 'es-ES' : 'en-US'; // Use Spanish if toggled, else English
-      await Voice.start(language);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const startRecording = async () => {
+  //   try {
+  //     setIsRecording(true);
+  //     const language = isSpanish ? 'es-ES' : 'en-US'; // Use Spanish if toggled, else English
+  //     await Voice.start(language);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
-  const stopRecording = async () => {
-    try {
-      await Voice.stop();
-      setIsRecording(false);
-    } catch (e) {
-      console.error(e);
-    }
-  };
+  // const stopRecording = async () => {
+  //   try {
+  //     await Voice.stop();
+  //     setIsRecording(false);
+  //   } catch (e) {
+  //     console.error(e);
+  //   }
+  // };
 
-  const handleRecordingToggle = async (newRecordingState: boolean) => {
-    if (newRecordingState) {
-      await startRecording();
-    } else {
-      await stopRecording();
-    }
-  };
+  // const handleRecordingToggle = async (newRecordingState: boolean) => {
+  //   if (newRecordingState) {
+  //     await startRecording();
+  //   } else {
+  //     await stopRecording();
+  //   }
+  // };
 
   const downloadBase64AndStore = async (base64String: string) => {
     try {
@@ -78,7 +79,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
       throw error;
     }
   };
-  
+
   const handleSubmit = async () => {
     try {
       const promptToSubmit = transcript;
@@ -95,7 +96,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
       });
 
 
-      
+
     const base64Data = response.data.audio; // If your backend returns Base64 directly
 
     // Log the first 100 characters of the Base64 data for debugging
@@ -228,9 +229,9 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
         </View>
 
         {/* Rest of the layout */}
-        <View style={styles.sessionContent}>
+        {/* <View style={styles.sessionContent}>
           <AnimatedButton onRecordingToggle={handleRecordingToggle} onSubmit={handleSubmit} />
-        </View>
+        </View> */}
 
         {/* Transcript Display */}
 
