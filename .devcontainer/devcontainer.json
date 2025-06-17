@@ -3,10 +3,13 @@
   "forwardPorts": [3000, 8000],
   "portsAttributes": {
     "3000": {
-      "label": "Backend"
+      "label": "Backend",
+      "onAutoForward": "notify"
     },
     "8000": {
-      "label": "Frontend"
+      "label": "Frontend",
+      "onAutoForward": "notify"
     }
-  }
+  },
+  "postStartCommand": "cd /workspaces/second-repo && npm install && npm start &"
 }
