@@ -1,0 +1,15 @@
+{
+  "postCreateCommand": "git clone https://github.com/reflectica/reflectica-main-server.git /workspaces/reflectica-main-server",
+  "forwardPorts": [3000, 8000],
+  "portsAttributes": {
+    "3000": {
+      "label": "Backend",
+      "onAutoForward": "notify"
+    },
+    "8000": {
+      "label": "Frontend",
+      "onAutoForward": "notify"
+    }
+  },
+  "postStartCommand": "cd /workspaces/reflectica-main-server && npm install && npm start &"
+}
