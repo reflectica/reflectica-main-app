@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView, View, Text, StyleSheet, Dimensions, ActivityIndicator, TouchableOpacity, Image, Modal, TextInput, Button, Alert } from 'react-native';
 import { useAuth } from '../../context/AuthContext';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc } from '@react-native-firebase/firestore';
 import { db } from '../../firebase/firebaseConfig';
 
 const screenHeight = Dimensions.get('window').height;

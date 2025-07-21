@@ -6,9 +6,10 @@ import {
   BarGraph,
   SelfEsteemBarComponent,
 } from '../components';
-import { View, Text, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { useRecentMentalHealthScores } from '../hooks';
+import { Alert, Modal, TouchableOpacity, FlatList, View, Text, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
+import { useRoute, RouteProp, useNavigation } from '@react-navigation/native';
+import { useAuth } from '../context/AuthContext';
+import { useAppData } from '../hooks/useAppData';
 
 type SessionParams = {
   session: {
@@ -23,8 +24,13 @@ type SessionParams = {
 type PostSessionJournalRouteProp = RouteProp<Record<string, SessionParams>, string>;
 
 const PostSessionJournal: React.FC = () => {
+  const { currentUser } = useAuth();
+  const navigation = useNavigation();
   const route = useRoute<PostSessionJournalRouteProp>();
   const session = route.params?.session;
+  // Add these state variables
+  const [showCalendar, setShowCalendar] = useState(false);
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
 
   const [dsmScores, setDsmScores] = useState<Record<string, any>>({});
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);
@@ -32,7 +38,72 @@ const PostSessionJournal: React.FC = () => {
   const [lineData, setLineData] = useState<number[]>([]);
   const [lineLabels, setLineLabels] = useState<string[]>([]);
 
-  const { mentalHealthScores } = useRecentMentalHealthScores('gADXwFiz2WfZaMgWLrffyr7Ookw2');
+  // CONDITIONAL hook usage - only fetch if we don't have session data
+  const shouldFetchData = !session; // Only fetch if no session data from navigation
+  const { 
+    last30DaysScores: mentalHealthScores = [] 
+  } = useAppData(shouldFetchData ? (currentUser?.uid || '') : '');
+
+    // Generate time slots for the next 7 days
+  const generateTimeSlots = () => {
+    const slots = [];
+    const today = new Date();
+    
+    for (let day = 0; day < 7; day++) {
+      const currentDate = new Date(today);
+      currentDate.setDate(today.getDate() + day);
+      
+      for (let hour = 9; hour <= 17; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const timeSlot = new Date(currentDate);
+          timeSlot.setHours(hour, minute, 0, 0);
+          
+          const slotString = timeSlot.toLocaleString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            hour: 'numeric',
+            minute: '2-digit',
+            hour12: true
+          });
+          
+          slots.push({
+            id: timeSlot.toISOString(),
+            display: slotString,
+            date: timeSlot
+          });
+        }
+      }
+    }
+    return slots;
+  };
+
+  const timeSlots = generateTimeSlots();
+
+  const toggleTimeSlot = (slotId: string) => {
+    setSelectedTimeSlots(prev => 
+      prev.includes(slotId) 
+        ? prev.filter(id => id !== slotId)
+        : [...prev, slotId]
+    );
+  };
+
+  const handleScheduleSubmit = () => {
+    if (selectedTimeSlots.length < 5) {
+      Alert.alert('Selection Required', 'Please select at least 5 time slots.');
+      return;
+    }
+    
+    // Here you would typically save the selected slots to your backend
+    console.log('Selected time slots:', selectedTimeSlots);
+    Alert.alert('Success', 'Your availability has been submitted!');
+    setShowCalendar(false);
+    setSelectedTimeSlots([]);
+  };
+
+  const handleReturnToDashboard = () => {
+    navigation.navigate('Dashboard' as never);
+  };
 
   useEffect(() => {
     if (session) {
@@ -55,8 +126,9 @@ const PostSessionJournal: React.FC = () => {
 
   useEffect(() => {
     if (mentalHealthScores.length > 0) {
-      setLineData(mentalHealthScores);
-      setLineLabels(mentalHealthScores.map((_, index) => `S.${index + 1}`));
+      const filteredScores = mentalHealthScores.filter((score): score is number => score !== null);
+      setLineData(filteredScores);
+      setLineLabels(filteredScores.map((_, index) => `S.${index + 1}`));
     }
   }, [mentalHealthScores]);
 
@@ -86,8 +158,6 @@ const PostSessionJournal: React.FC = () => {
     { label: 'PSS', value: dsmScores['PSS Score'], color: '#5271FF', faded: dsmScores['PSS Score'] === 'Not Applicable' },
     { label: 'SSRS', value: dsmScores['SSRS Assessment'], color: '#5271FF', faded: dsmScores['SSRS Assessment'] === 'Not Applicable' },
   ];
-
-
 
   const selfEsteemScore = isNaN(dsmScores['Rosenberg Self Esteem']) || dsmScores['Rosenberg Self Esteem'] === 'Not Applicable' ? null : dsmScores['Rosenberg Self Esteem'];
 
@@ -142,8 +212,92 @@ const PostSessionJournal: React.FC = () => {
             <Text style={styles.sectionTitle}>Key Conversation Topics:</Text>
             <Text>{longSummary}</Text>
           </View>
+
+          {/* Next Steps Action Card */}
+          <View style={styles.actionCard}>
+            <Text style={styles.actionCardTitle}>Next Steps</Text>
+            <Text style={styles.actionCardSubtitle}>Continue your mental health journey</Text>
+            
+            <TouchableOpacity 
+              style={styles.actionButton}
+              onPress={() => setShowCalendar(true)}
+            >
+              <Text style={styles.actionButtonText}>Schedule Tele-Health Meeting</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[styles.actionButton, styles.secondaryButton]}
+              onPress={handleReturnToDashboard}
+            >
+              <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>Return to Dashboard</Text>
+            </TouchableOpacity>
+          </View>
         </View>
       </ScrollView>
+
+      {/* Calendar Modal */}
+      <Modal
+        visible={showCalendar}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setShowCalendar(false)}
+      >
+        <View style={styles.modalBackground}>
+          <View style={styles.calendarModal}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Select Available Time Slots</Text>
+              <Text style={styles.modalSubtitle}>
+                Please select at least 5 time slots that work for you
+              </Text>
+              <Text style={styles.selectedCount}>
+                Selected: {selectedTimeSlots.length} slots
+              </Text>
+            </View>
+            
+            <FlatList
+              data={timeSlots}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.timeSlot,
+                    selectedTimeSlots.includes(item.id) && styles.selectedTimeSlot
+                  ]}
+                  onPress={() => toggleTimeSlot(item.id)}
+                >
+                  <Text style={[
+                    styles.timeSlotText,
+                    selectedTimeSlots.includes(item.id) && styles.selectedTimeSlotText
+                  ]}>
+                    {item.display}
+                  </Text>
+                </TouchableOpacity>
+              )}
+              style={styles.timeSlotList}
+            />
+            
+            <View style={styles.modalActions}>
+              <TouchableOpacity 
+                style={styles.cancelButton}
+                onPress={() => setShowCalendar(false)}
+              >
+                <Text style={styles.cancelButtonText}>Cancel</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[
+                  styles.submitButton,
+                  selectedTimeSlots.length < 5 && styles.disabledButton
+                ]}
+                onPress={handleScheduleSubmit}
+                disabled={selectedTimeSlots.length < 5}
+              >
+                <Text style={styles.submitButtonText}>Submit Availability</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -235,6 +389,145 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     backgroundColor: '#fff',
     borderRadius: 16,
+  },
+  actionCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 24,
+    marginVertical: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  actionCardTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 8,
+  },
+  actionCardSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 20,
+  },
+  actionButton: {
+    backgroundColor: '#5271FF',
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    alignItems: 'center',
+  },
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderWidth: 2,
+    borderColor: '#5271FF',
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#5271FF',
+  },
+  modalBackground: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  calendarModal: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 20,
+    width: '90%',
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    alignItems: 'center',
+    marginBottom: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  modalSubtitle: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  selectedCount: {
+    fontSize: 14,
+    color: '#5271FF',
+    fontWeight: '600',
+  },
+  timeSlotList: {
+    maxHeight: 300,
+  },
+  timeSlot: {
+    padding: 12,
+    borderRadius: 8,
+    backgroundColor: '#f5f5f5',
+    marginBottom: 8,
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  selectedTimeSlot: {
+    backgroundColor: '#5271FF',
+    borderColor: '#5271FF',
+  },
+  timeSlotText: {
+    fontSize: 14,
+    color: '#333',
+    textAlign: 'center',
+  },
+  selectedTimeSlotText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+  },
+  cancelButton: {
+    flex: 1,
+    paddingVertical: 12,
+    marginRight: 8,
+    borderRadius: 8,
+    backgroundColor: '#f0f0f0',
+    alignItems: 'center',
+  },
+  cancelButtonText: {
+    color: '#666',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  submitButton: {
+    flex: 1,
+    paddingVertical: 12,
+    marginLeft: 8,
+    borderRadius: 8,
+    backgroundColor: '#5271FF',
+    alignItems: 'center',
+  },
+  disabledButton: {
+    backgroundColor: '#ccc',
+  },
+  submitButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 

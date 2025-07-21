@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { summaryCollection } from '../firebase/firebaseConfig'; // Adjust path as needed
-import { query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { query, where, getDocs, orderBy, limit } from '@react-native-firebase/firestore';
 
 interface Emotion {
     label: string;

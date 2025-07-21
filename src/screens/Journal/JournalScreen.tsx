@@ -10,9 +10,11 @@ import {
 import { SessionBoxes } from '../../components';
 import { useAllSummaryListener } from '../../hooks/useSummaryListener';
 import { JournalScreenProps } from '../../constants';
+import { useAuth } from '../../context/AuthContext';
 
 export default function JournalScreen({ navigation }: JournalScreenProps) {
-  const { sessionSummary, loading, error } = useAllSummaryListener('gADXwFiz2WfZaMgWLrffyr7Ookw2');
+  const { currentUser } = useAuth();
+  const { sessionSummary, loading, error } = useAllSummaryListener(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2');
   console.log(sessionSummary)
   return (
     <SafeAreaView style={styles.container}>

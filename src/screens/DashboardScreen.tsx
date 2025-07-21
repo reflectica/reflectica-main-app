@@ -2,73 +2,66 @@ import React from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StyleSheet, Text, View, Dimensions, ScrollView, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { useSessionAndSurroundingScores } from '../hooks/useSessionAndSurroundingScores'; // Hook for data retrieval
-import { useEmotionsAboveThreshold } from '../hooks/useEmotionsAboveThreshold'; // Hook for emotions retrieval
-import FadedGraph from '../components/graph/FadedGraph'; // Line chart component
-import BarGraph from '../components/graph/BarGraph'; // Bar chart component
-import DonutChartComponent from '../components/graph/PieChartComponent'; // Donut chart component
-import { useAllSummaryListener } from '../hooks/useSummaryListener'; // Hook to fetch session summaries
-import { SessionBoxes } from '../components'; // Component to display each session
+import FadedGraph from '../components/graph/FadedGraph';
+import BarGraph from '../components/graph/BarGraph';
+import DonutChartComponent from '../components/graph/PieChartComponent';
+import { useAppData } from '../hooks/useAppData';
+import { SessionBoxes } from '../components';
 import { DashboardScreenProps } from '../constants';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
-// Utility function to calculate averages
-const calculateAverage = (scores: (number | null)[]) => {
-  const validScores = scores.filter(score => score !== null && !isNaN(score)) as number[];
-  if (validScores.length === 0) return 0; // Return 0 if no valid scores
-  const total = validScores.reduce((sum, score) => sum + score, 0);
-  return total / validScores.length;
-};
-
-// Sanitize data to remove NaN values
-const sanitizeData = (data: (number | null)[]): number[] => {
-  return data.filter((value): value is number => value !== null && !isNaN(value));
-};
-
-// Function to get color with opacity
-const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const { currentUser } = useAuth();
 
-  // Use the hook to fetch last 30 days of scores
   const {
     loading,
     error,
+    sessionSummary,
+    recentSessionSummary,
+    recentFeeling,
     mentalHealthScores,
-    phq9Scores, // 30-day PHQ-9 scores
-    gad7Scores,
+    last30DaysScores,
+    emotions,
     cbtScores,
+    gad7Scores,
+    phq9Scores,
     psqiScores,
     pssScores,
     rosenbergScores,
     sfqScores,
     ssrsScores,
-  } = useSessionAndSurroundingScores(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2', ''); // No sessionId needed here
-  const { sessionSummary, loading: sessionsLoading, error: sessionsError } = useAllSummaryListener(
-    currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2'
-  );
+  } = useAppData(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2');
 
-  // Get the 3 most recent sessions
-  const recentSessions = Array.isArray(sessionSummary)
-    ? sessionSummary.slice(-3).reverse()
+  const recentSessions = Array.isArray(recentSessionSummary)
+    ? recentSessionSummary
     : [];
-  const totalSessions = Array.isArray(sessionSummary) ? sessionSummary.length : 0;
 
-  // Fetch emotions with scores above 0.1 from the last 30 sessions
-  const { emotionsAboveThreshold } = useEmotionsAboveThreshold('gADXwFiz2WfZaMgWLrffyr7Ookw2');
-  const validEmotions = emotionsAboveThreshold.filter(emotion => emotion.score !== null);
+  const calculateAverage = (scores: (number | null)[]) => {
+    const validScores = scores.filter(score => score !== null && !isNaN(score)) as number[];
+    if (validScores.length === 0) return 0;
+    const total = validScores.reduce((sum, score) => sum + score, 0);
+    return total / validScores.length;
+  };
+
+  const sanitizeData = (data: (number | null)[]): number[] => {
+    return data.filter((value): value is number => value !== null && !isNaN(value));
+  };
+
+  const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
+
+  const totalSessions = Array.isArray(sessionSummary) ? sessionSummary.length : 0;
+  
   const normalizeEmotions = (emotions: { label: string, score: number }[]) => {
     const totalScore = emotions.reduce((sum, emotion) => sum + emotion.score, 0);
+    if (totalScore === 0) return [];
     return emotions.map(emotion => ({
       label: emotion.label,
-      percentage: Math.round((emotion.score / totalScore) * 100), // Normalize to percentage
+      percentage: Math.round((emotion.score / totalScore) * 100),
     }));
   };
 
-
-  // Calculate the averages for each DSM score
   const sanitizedPhq9Scores = sanitizeData(phq9Scores);
   const sanitizedGad7Scores = sanitizeData(gad7Scores);
   const sanitizedCbtScores = sanitizeData(cbtScores);
@@ -79,7 +72,6 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const sanitizedSsrsScores = sanitizeData(ssrsScores);
   const sanitizedMentalHealthScores = sanitizeData(mentalHealthScores);
 
-  // Calculate the averages for each DSM score
   const averagePHQ9 = calculateAverage(sanitizedPhq9Scores);
   const averageGAD7 = calculateAverage(sanitizedGad7Scores);
   const averageCBT = calculateAverage(sanitizedCbtScores);
@@ -89,48 +81,33 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
   const averageSFQ = calculateAverage(sanitizedSfqScores);
   const averageSSRS = calculateAverage(sanitizedSsrsScores);
 
-  // Find top 3 emotions based on their average score
-  const emotionAverages: { label: string, score: number }[] = [];
-  const emotionMap: { [key: string]: number[] } = {};
+  const filteredEmotions = emotions.filter(emotion => emotion.score > 0.1);
+  const topEmotions = filteredEmotions
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3);
 
-  // Use 'validEmotions' instead of 'emotionsAboveThreshold'
-  validEmotions.forEach((emotion) => {
-    if (!emotionMap[emotion.label]) {
-      emotionMap[emotion.label] = [];
-    }
-    if (emotion.score !== null) {
-      emotionMap[emotion.label].push(emotion.score);
-    }
-  });
-  
-
-  Object.keys(emotionMap).forEach((label) => {
-    const scores = emotionMap[label];
-    const average = calculateAverage(scores);
-    emotionAverages.push({ label, score: average });
-  });
-
-  // Sort emotions by score and take the top 3
-  const topEmotions = emotionAverages.sort((a, b) => b.score - a.score).slice(0, 3);
-
-  // Normalize top emotions for the pie chart
   const normalizedTopEmotions = normalizeEmotions(topEmotions);
 
-  // Generate pie data for the chart component
   const pieData = normalizedTopEmotions.map((emotion, index) => ({
     label: emotion.label,
     percentage: emotion.percentage,
-    color: getColorWithOpacity(1 - index * 0.3), // Fade color for each emotion
+    color: getColorWithOpacity(1 - index * 0.3),
   }));
 
-  const handleStartSessionPress = () => navigation.navigate('InSession');
+  // Updated handlers with session type parameters
+  const handleStartDiagnosticPress = () => {
+    navigation.navigate('InSession', { sessionType: 'diagnostic' });
+  };
+
+  const handleStartTherapyPress = () => {
+    navigation.navigate('InSession', { sessionType: 'guidedTherapy' });
+  };
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>Dashboard</Text>
 
-        {/* Top Section: Current Score and Line Chart 
         <View style={styles.topSection}>
           <View style={styles.scoreContainer}>
             <Text style={styles.boldText}>Current Score</Text>
@@ -148,15 +125,18 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
             <FadedGraph data={sanitizedMentalHealthScores} />
           </View>
         </View>
-*/}
-        {/* Start Session Button */}
+
+        {/* Updated session button section with two buttons */}
         <View style={styles.sessionButtonWrapper}>
-          <TouchableOpacity style={styles.sessionButton} onPress={handleStartSessionPress}>
-            <Text style={styles.sessionButtonText}>Start a Session</Text>
+          <TouchableOpacity style={styles.sessionButton} onPress={handleStartDiagnosticPress}>
+            <Text style={styles.sessionButtonText}>Start Diagnostic</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity style={styles.sessionTherapyButton} onPress={handleStartTherapyPress}>
+            <Text style={styles.sessionTherapyButtonText}>Start Personalized Therapy</Text>
           </TouchableOpacity>
         </View>
 
-        {/* DSM Marker Scores Section */}
         <Text style={styles.sectionTitle}>Overall DSM Marker Scores This Month</Text>
         <View style={styles.section}>
           <BarGraph
@@ -167,26 +147,35 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
               { label: 'PSQI', value: averagePSQI },
               { label: 'SFQ', value: averageSFQ },
               { label: 'PSS', value: averagePSS },
+              { label: 'Rosenberg', value: averageRosenberg },
               { label: 'SSRS', value: averageSSRS },
             ]}
           />
         </View>
 
-        {/* Emotional Model States Section */}
         <Text style={styles.sectionTitle}>Emotional State Modeling</Text>
         <View style={styles.pieChartContainer}>
-
           <View style={styles.pieChartWrapper}>
-            <DonutChartComponent data={pieData} />
-            <View style={styles.legendContainer}>
-              {pieData.map((item, index) => (
-                <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
-                  {item.label} ({item.percentage}%)
-                </Text>
-              ))}
-            </View>
+            {pieData.length > 0 ? (
+              <>
+                <DonutChartComponent data={pieData} />
+                <View style={styles.legendContainer}>
+                  {pieData.map((item, index) => (
+                    <Text key={index} style={[styles.emotionalStateText, { color: item.color }]}>
+                      {item.label} ({item.percentage}%)
+                    </Text>
+                  ))}
+                </View>
+              </>
+            ) : (
+              <View style={styles.noDataContainer}>
+                <Text style={styles.noDataText}>No emotional data available</Text>
+                <Text style={styles.noDataSubtext}>Complete a session to see your emotional patterns</Text>
+              </View>
+            )}
           </View>
         </View>
+
         <View style={styles.sessionCard}>
           <Text style={styles.exploreTitle}>Explore Recent Sessions</Text>
           {recentSessions.length > 0 ? (
@@ -203,12 +192,15 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
                     });
                   }}
                 >
-                  <SessionBoxes id={sessionNumber} description={data.shortSummary} />
+                  <SessionBoxes id={sessionNumber} description={data.description} />
                 </TouchableOpacity>
               );
             })
           ) : (
-            <Text>No recent sessions available.</Text>
+            <View style={styles.noSessionsContainer}>
+              <Text style={styles.noSessionsText}>No recent sessions available</Text>
+              <Text style={styles.noSessionsSubtext}>Start your first session to see your progress here!</Text>
+            </View>
           )}
         </View>
       </ScrollView>
@@ -232,7 +224,6 @@ const styles = StyleSheet.create({
     lineHeight: 30.48,
     textAlign: 'center',
   },
-
   topSection: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -251,7 +242,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 15,
-    width: screenWidth * 0.5, // Adjusted width
+    width: screenWidth * 0.5,
     alignItems: 'center',
     height: 150,
   },
@@ -268,28 +259,43 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   sessionButtonWrapper: {
-    backgroundColor: '#4B7BEC',
+    backgroundColor: '#5271FF',
     borderRadius: 15,
     paddingVertical: 25,
     width: '90%',
-    height: 135,
+    height: 160, // Increased height to accommodate two buttons
     alignItems: 'center',
     justifyContent: 'center',
     marginVertical: 15,
+    gap: 12, // Space between buttons
   },
   sessionButton: {
     backgroundColor: '#fff',
     borderRadius: 15,
-    paddingVertical: 20,
-    paddingHorizontal: 40,
-    width: '60%',
+    paddingVertical: 15, // Slightly reduced padding to fit two buttons
+    paddingHorizontal: 30,
+    width: '75%', // Slightly wider to accommodate longer text
     alignItems: 'center',
-
   },
   sessionButtonText: {
-    color: '#4B7BEC',
-    fontSize: 18,
+    color: '#5271FF',
+    fontSize: 16, // Slightly smaller font to fit longer text
     fontWeight: '700',
+    textAlign: 'center',
+  },
+   sessionTherapyButton: {
+    backgroundColor: '5271FF',
+    borderRadius: 15,
+    paddingVertical: 15, // Slightly reduced padding to fit two buttons
+    paddingHorizontal: 30,
+    width: '75%', // Slightly wider to accommodate longer text
+    alignItems: 'center',
+  },
+  sessionTherapyButtonText: {
+    color: '#fff',
+    fontSize: 16, // Slightly smaller font to fit longer text
+    fontWeight: '700',
+    textAlign: 'center',
   },
   sectionTitle: {
     fontSize: 18,
@@ -316,7 +322,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
     borderRadius: 15,
     padding: 16,
-
     width: '90%',
   },
   pieChartWrapper: {
@@ -334,12 +339,44 @@ const styles = StyleSheet.create({
     paddingRight: 60,
     fontSize: 14,
   },
+  noDataContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 40,
+  },
+  noDataText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  noDataSubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
+  },
   sessionCard: {
     backgroundColor: '#fff',
     borderRadius: 15,
     padding: 16,
     width: '90%',
     marginBottom: 12,
+  },
+  noSessionsContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  noSessionsText: {
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '600',
+    marginBottom: 8,
+  },
+  noSessionsSubtext: {
+    fontSize: 14,
+    color: '#999',
+    textAlign: 'center',
   },
 });
 

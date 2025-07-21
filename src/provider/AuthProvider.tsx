@@ -20,88 +20,56 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({children}: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
-    null,
-  );
+  const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<boolean>(false);
   const recaptchaVerifier = useRef(null);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      GoogleSignin.configure({
-        webClientId: Config.GOOGLE_CLIENT_ID,
-        // nonce: 'your_nonce'
-      });
+    console.log('AuthProvider: Setting up auth listener - SINGLE TIME');
+    
+    GoogleSignin.configure({
+      webClientId: Config.GOOGLE_CLIENT_ID,
+    });
 
-      // const biometricsEnabled = await isBiometricsEnabled();
-      // if (biometricsEnabled) {
-      //   await handleLogin(); // Attempts biometric login first
-      // }
+    // Single auth state listener
+    const unsubscribe = auth().onAuthStateChanged(user => {
+      console.log('AuthProvider: Auth state changed:', user ? 'logged in' : 'logged out');
+      
+      if (user) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+        console.log("User logged in:", user.email);
+      } else {
+        setCurrentUser(null);
+        setIsLoggedIn(false);
+        console.log("User logged out");
+      }
+    });
 
-      // Subscribe to auth state changes
-      const unsubscribe = auth().onAuthStateChanged(user => {
-        if (user) {
-          setCurrentUser(user);
-          setIsLoggedIn(true);
-          console.log("User logged in:", user);
-        } else {
-          setCurrentUser(null);
-          setIsLoggedIn(false);
-          console.log("User logged out");
-        }
-      });
-
-      return unsubscribe; // Unsubscribe on component unmount
-    }
-
-    initializeAuth();
-  }, []);
+    return () => {
+      console.log('AuthProvider: Cleaning up auth listener');
+      unsubscribe();
+    };
+  }, []); // EMPTY dependency array - this is crucial!
 
   const loginWithEmail = useCallback(
     async (email: string, password: string) => {
       try {
-        const userCredential = await auth().signInWithEmailAndPassword(
-          email,
-          password,
-        );
+        const userCredential = await auth().signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
-        console.log("USER FOR LOGIN WITH EMAIL:", user)
+        console.log("USER FOR LOGIN WITH EMAIL:", user);
 
         setCurrentUser(user);
         setIsLoggedIn(true);
         console.log('WELCOME BACK:', user);
-
-        // Check if it's the first login
-        // const isFirstLogin = await EncryptedStorage.getItem('firstLogin');
-        // if (!isFirstLogin) {
-        //   Alert.alert('Would you like to enable biometrics for future logins?');
-        //   await EncryptedStorage.setItem('firstLogin', 'false');
-        //   await enableBiometrics(); // Enable biometrics for future logins
-        // }
-
-      } catch (error) {
-        const typedError = error as {code: string; message: string};
-        console.log(typedError.code + ': ' + typedError.message);
+      } catch (error: any) {
+        console.log(error.code + ': ' + error.message);
         Alert.alert('Error', 'Wrong password/email!');
       }
     },
     [],
   );
-
- // Handle login logic
- const handleLogin = useCallback(async () => {
-  const biometricsEnabled = await isBiometricsEnabled();
-  if (biometricsEnabled) {
-    const success = await loginWithBiometrics();
-    if (!success) {
-      console.log('Fallback to email/password login');
-    }
-  } else {
-    console.log('Biometrics not enabled, use email/password login.');
-    // Fallback to email/password login UI (handled in your login screen)
-  }
-}, []);
 
   const handleLogout = useCallback(async () => {
     await auth().signOut();
@@ -111,10 +79,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   }, []);
 
   const value = {
-    // signInWithGoogle,
-    // signupWithEmail,
     loginWithEmail,
-    // confirmPhoneAuthCode,
     handleLogout,
     isLoggedIn,
     currentUser,

@@ -1,6 +1,7 @@
 // SessionDetail.tsx
 import React, { useState, useEffect } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../../context/AuthContext';
 import { StyleSheet, Text, View, Dimensions, ActivityIndicator, ScrollView, TouchableOpacity} from 'react-native';
 import { SessionDetailScreenProps, SessionDetailProp } from '../../constants';
 import {
@@ -21,12 +22,12 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const { session, sessionNumber } = route.params;
   const [sessionDetails, setSessionDetails] = useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-
+  const { currentUser } = useAuth();
   const {
     mentalHealthScores,
     loading: hookLoading,
     error: hookError,
-  } = useSessionAndSurroundingScores('gADXwFiz2WfZaMgWLrffyr7Ookw2', session.sessionId);
+  } = useSessionAndSurroundingScores(currentUser?.uid || 'gADXwFiz2WfZaMgWLrffyr7Ookw2', session.sessionId);
 
   const [lineLabels, setLineLabels] = useState<string[]>([]);
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);

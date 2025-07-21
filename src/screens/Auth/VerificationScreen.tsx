@@ -13,7 +13,7 @@ import {
 import {formatTime} from '../../utils/formatTime.ts';
 import {useDispatch, useSelector} from 'react-redux';
 import {loginUser} from '../../features/auth/authSlices.ts';
-import {collection, addDoc, getDocs, where, query} from 'firebase/firestore';
+import {collection, addDoc, getDocs, where, query} from '@react-native-firebase/firestore';
 import {db} from '../../firebase/firebaseConfig.ts';
 import {VerificationScreenProps} from '../../constants';
 

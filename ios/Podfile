@@ -39,5 +39,17 @@ target 'reflectica_main_app' do
       :mac_catalyst_enabled => false,
       # :ccache_enabled => true
     )
+    # Fix for BoringSSL-GRPC warnings
+    installer.pods_project.targets.each do |target|
+      if target.name == 'BoringSSL-GRPC'
+        target.source_build_phase.files.each do |file|
+          if file.settings && file.settings['COMPILER_FLAGS']
+            flags = file.settings['COMPILER_FLAGS'].split
+            flags.reject! { |flag| flag == '-GCC_WARN_INHIBIT_ALL_WARNINGS' }
+            file.settings['COMPILER_FLAGS'] = flags.join(' ')
+          end
+        end
+      end
+    end
   end
 end

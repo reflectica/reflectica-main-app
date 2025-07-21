@@ -1,33 +1,18 @@
-import { initializeApp } from 'firebase/app';
-import { collection, getFirestore } from 'firebase/firestore';
-import ReactNativeAsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  getAuth,
-  initializeAuth,
-  getReactNativePersistence,
-} from 'firebase/auth';
-import Config from "react-native-config";
+import auth from '@react-native-firebase/auth';
+import firestore from '@react-native-firebase/firestore';
 
+// React Native Firebase doesn't need manual initialization
+// It reads from google-services.json (Android) and GoogleService-Info.plist (iOS)
+console.log('React Native Firebase configured');
 
-const firebaseConfig = { 
-  apiKey: Config.FIREBASE_API_KEY,
-  authDomain: Config.FIREBASE_AUTH_DOMAIN,
-  databaseURL: Config.FIREBASE_DATABASE_URL,
-  projectId: Config.FIREBASE_PROJECT_ID,
-  storageBucket: Config.FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: Config.FIREBASE_MESSAGING_SENDER_ID,
-  appId: Config.FIREBASE_APP_ID,};
+// Export React Native Firebase modules
+export { default as auth } from '@react-native-firebase/auth';
+export { default as firestore } from '@react-native-firebase/firestore';
 
-const app = initializeApp(firebaseConfig);
-console.log('Firebase initialized');
-initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage),
-});
+// Helper functions for collections
+export const getUserCollection = () => firestore().collection('users');
+export const getSummaryCollection = () => firestore().collection('summary'); // Changed from 'summaries'
 
-const fbAuth = getAuth(app);
-const db = getFirestore(app);
-
-const userCollection = collection(db, 'users');
-const summaryCollection = collection(db, 'summaries');
-
-export { app, fbAuth, db, userCollection, summaryCollection };
+// For backward compatibility
+export const userCollection = getUserCollection();
+export const summaryCollection = getSummaryCollection();

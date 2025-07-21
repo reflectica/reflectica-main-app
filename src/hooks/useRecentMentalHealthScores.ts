@@ -1,6 +1,6 @@
 import {useState, useEffect, useCallback} from 'react';
 import {summaryCollection} from '../firebase/firebaseConfig';
-import {query, where, getDocs, orderBy, limit} from 'firebase/firestore';
+import {query, where, getDocs, orderBy, limit} from '@react-native-firebase/firestore';
 
 export const useRecentMentalHealthScores = (userId: string) => {
   const [mentalHealthScores, setMentalHealthScores] = useState<number[]>([]);

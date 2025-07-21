@@ -1,4 +1,5 @@
 export {default as ButtonTemplate} from './ButtonTemplate';
+export {default as BottomTranscript} from './BottomTranscript';
 export {default as MainTemplate} from './MainTemplate';
 export {default as Loading} from './Loading';
 export {default as SessionBoxes} from './SessionBoxes';

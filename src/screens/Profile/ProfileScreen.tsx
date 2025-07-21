@@ -17,7 +17,7 @@ import {Calendar, LocaleConfig} from 'react-native-calendars';
 import {useSelector} from 'react-redux';
 import {selectUser} from '../../features/auth/authSelectors.ts'; // import the selector
 import {db} from '../../firebase/firebaseConfig.ts';
-import {collection, getDocs, setDoc, where, query} from 'firebase/firestore';
+import {collection, getDocs, setDoc, where, query} from '@react-native-firebase/firestore';
 import {ProfileScreenProps} from '../../constants';
 
 const screenHeight = Dimensions.get('window').height;

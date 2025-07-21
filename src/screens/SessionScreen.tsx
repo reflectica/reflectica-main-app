@@ -7,8 +7,8 @@ import { doc, updateDoc } from 'firebase/firestore';
 import RNFS from 'react-native-fs';
 import { SessionScreenProps } from '../constants/ParamList';
 import Sound from 'react-native-sound';
-import axios from 'axios';
-import { useAuth } from '../context/AuthContext';
+import { updateDoc, doc } from '@react-native-firebase/firestore';
+import { userCollection } from '../firebase/firebaseConfig';
 import { useDiagnosticStatus } from '../hooks/useDiagnosticStatus'; // Import the custom hook
 import { userCollection } from '../firebase/firebaseConfig';
 import { v4 as uuidv4 } from 'uuid';

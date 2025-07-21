@@ -14,7 +14,7 @@ export type RootStackParamList = {
   PrivacySetting: undefined;
   Profile: undefined;
   MainApp: {screen: string};
-  InSession: undefined;
+  InSession: { sessionType: 'diagnostic' | 'guidedTherapy' };
   PostSession: {session: any};
   Onboarding: undefined;
   Login: undefined;
