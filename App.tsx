@@ -21,6 +21,8 @@ import {
   SignupScreen,
   VerificationScreen,
   EmailSignupScreen,
+  MFASetupScreen,
+  SecurityQuestionScreen,
 } from './src/screens/Auth';
 import { SessionDetail, JournalScreen } from './src/screens/Journal';
 // import {cloud, log, question, setting} from './src/assets/nav';
@@ -203,6 +205,16 @@ function App(): React.JSX.Element {
             <Stack.Screen
               name="Notification"
               component={NotificationScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="MFASetup"
+              component={MFASetupScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SecurityQuestion"
+              component={SecurityQuestionScreen}
               options={{ headerShown: false }}
             />
           </>

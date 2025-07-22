@@ -5,3 +5,5 @@ export {default as PhonenumberScreen} from './PhonenumberScreen';
 export {default as SignupScreen} from './SignupScreen';
 export {default as VerificationScreen} from './VerificationScreen';
 export {default as OnboardingScreen} from './OnboardingScreen';
+export {default as MFASetupScreen} from './MFASetupScreen';
+export {default as SecurityQuestionScreen} from './SecurityQuestionScreen';
