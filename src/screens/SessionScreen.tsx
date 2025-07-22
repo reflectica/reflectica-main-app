@@ -11,13 +11,16 @@ import Sound from 'react-native-sound';
 import { updateDoc, doc } from 'firebase/firestore';
 import { userCollection } from '../firebase/firebaseConfig';
 import { useDiagnosticStatus } from '../hooks/useDiagnosticStatus'; // Import the custom hook
+import { logSessionStart, logSessionEnd, logPHIAccess } from '../utils/auditLogger';
+import { getSecureEndpoint, createSecureApiConfig } from '../utils/apiConfig';
+import { validateUserAccess, validateSessionId, sanitizeInput } from '../utils/accessControl';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
-  const { currentUser } = useAuth();
+  const { currentUser, extendSession } = useAuth();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
   const [isSpanish, setIsSpanish] = useState<boolean>(false); // Toggle between English and Spanish
@@ -25,6 +28,18 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   // Use the custom hook to check diagnostic status
   const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+
+  // Log session start when component mounts
+  useEffect(() => {
+    const logSessionStartEvent = async () => {
+      if (currentUser?.uid) {
+        await logSessionStart(currentUser.uid, sessionId);
+        // Log PHI access for session data
+        await logPHIAccess(currentUser.uid, 'therapy_session', sessionId);
+      }
+    };
+    logSessionStartEvent();
+  }, [currentUser, sessionId]);
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -60,6 +75,9 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   };
 
   const handleRecordingToggle = async (newRecordingState: boolean) => {
+    // Extend session on user interaction (HIPAA compliance)
+    extendSession();
+    
     if (newRecordingState) {
       await startRecording();
     } else {
@@ -69,18 +87,37 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
-      const promptToSubmit = transcript;
-      const therapyMode = isREBT ? 'REBT' : 'CBT'; // Determine therapy mode
-      const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'; // Replace with dynamic user ID if available
-      const diagnosticMode = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
+      // Extend session on user interaction (HIPAA compliance)
+      extendSession();
 
-      const response = await axios.post('http://localhost:3006/chat', {
-        prompt: promptToSubmit,
+      // HIPAA Access Control and Input Validation
+      const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
+      validateUserAccess(currentUser?.uid, userId);
+      
+      if (!validateSessionId(sessionId)) {
+        throw new Error('Invalid session ID format');
+      }
+
+      const sanitizedTranscript = sanitizeInput(transcript);
+      const therapyMode = isREBT ? 'REBT' : 'CBT';
+      const diagnosticMode = isDiagnostic ? 'diagnostic' : 'therapy';
+
+      // Log PHI access for therapy data processing
+      await logPHIAccess(userId, 'therapy_conversation', sessionId);
+
+      // Use secure HTTPS endpoint
+      const apiConfig = createSecureApiConfig({
+        'X-User-ID': userId,
+        'X-Session-ID': sessionId,
+      });
+
+      const response = await axios.post(getSecureEndpoint('CHAT'), {
+        prompt: sanitizedTranscript,
         userId: userId,
         sessionId: sessionId,
-        therapyMode: therapyMode, // Send therapy mode
-        sessionType: diagnosticMode, // Send session type
-      });
+        therapyMode: therapyMode,
+        sessionType: diagnosticMode,
+      }, apiConfig);
 
       const base64Audio = response.data.audio;
       const filePath = `${RNFS.DocumentDirectoryPath}/audio.mp3`;
@@ -109,44 +146,71 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
       setTranscript('');
     } catch (error) {
-      console.error(error);
+      console.error('Session submit error:', error);
+      // Log the error for audit purposes
+      if (currentUser?.uid) {
+        await logPHIAccess(currentUser.uid, 'therapy_conversation_error', sessionId);
+      }
     }
   };
 
   const handleEndSession = async () => {
-    const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
-    const language = isSpanish ? 'es-ES' : 'en-US'; // Use the selected language
-    const therapyMode = isREBT ? 'REBT' : 'CBT'; // Use the selected therapy mode
-    const sessionType = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
-
     try {
-      await axios.post('http://localhost:3006/session/endSession', {
+      // Extend session on user interaction (HIPAA compliance)
+      extendSession();
+
+      const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
+      const language = isSpanish ? 'es-ES' : 'en-US';
+      const therapyMode = isREBT ? 'REBT' : 'CBT';
+      const sessionType = isDiagnostic ? 'diagnostic' : 'therapy';
+
+      // HIPAA Access Control
+      validateUserAccess(currentUser?.uid, userId);
+
+      // Log session end
+      await logSessionEnd(userId, sessionId);
+
+      // Use secure HTTPS endpoint
+      const apiConfig = createSecureApiConfig({
+        'X-User-ID': userId,
+        'X-Session-ID': sessionId,
+      });
+
+      const response = await axios.post(getSecureEndpoint('END_SESSION'), {
         userId: userId,
         sessionId: sessionId,
         language: language,
-        sessionType: sessionType, // Send session type
-      })
-        .then(async res => {
-          if (isDiagnostic) {
-            // Mark diagnostic as completed in Firebase
-            const userDocRef = doc(userCollection, userId);
-            await updateDoc(userDocRef, { hasCompletedDiagnostic: true });
-            setIsDiagnostic(false);
-          }
-          setSessionId(uuidv4());
-          navigation.navigate('PostSession', { session: res.data });
-        })
-        .catch(error => console.log(error));
+        sessionType: sessionType,
+      }, apiConfig);
+
+      if (isDiagnostic) {
+        // Mark diagnostic as completed in Firebase
+        const userDocRef = doc(userCollection, userId);
+        await updateDoc(userDocRef, { hasCompletedDiagnostic: true });
+        setIsDiagnostic(false);
+      }
+      
+      setSessionId(uuidv4());
+      navigation.navigate('PostSession', { session: response.data });
+
     } catch (error) {
-      console.error(error);
+      console.error('End session error:', error);
+      // Log the error for audit purposes
+      if (currentUser?.uid) {
+        await logPHIAccess(currentUser.uid, 'session_end_error', sessionId);
+      }
     }
   };
 
   const toggleLanguage = () => {
+    // Extend session on user interaction (HIPAA compliance)
+    extendSession();
     setIsSpanish((prevState) => !prevState);
   };
 
   const toggleTherapyMode = () => {
+    // Extend session on user interaction (HIPAA compliance)
+    extendSession();
     setIsREBT((prevState) => !prevState);
   };
 

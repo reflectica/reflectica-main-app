@@ -2,6 +2,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { summaryCollection } from '../firebase/firebaseConfig';
 import { query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { validateUserAccess, validateUserId, AccessControlError } from '../utils/accessControl';
+import { logPHIAccess, logDataAccess } from '../utils/auditLogger';
+import { useAuth } from '../context/AuthContext';
 
 type SessionData = {
   sessionId: string;
@@ -26,6 +29,8 @@ type AllSessionData = {
 };
 
 export const useSessionAndSurroundingScores = (userId: string, sessionId: string) => {
+  const { currentUser } = useAuth();
+  
   // State for surrounding 7 sessions
   const [mentalHealthScores, setMentalHealthScores] = useState<(number | null)[]>([]);
   
@@ -47,19 +52,27 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     setLoading(true);
     setError(null);
 
-    if (!userId || !sessionId) {
-      setLoading(false);
-      console.log('User ID or Session ID is missing.');
-      return;
-    }
-
     try {
-      console.log('Fetching sessions for user:', userId);
+      // HIPAA Access Control: Validate user access
+      const validatedUserId = validateUserId(userId);
+      validateUserAccess(currentUser?.uid, validatedUserId);
+
+      // Log PHI access for audit trail
+      await logPHIAccess(validatedUserId, 'mental_health_scores', sessionId);
+      await logDataAccess(validatedUserId, 'summaries', 'READ');
+
+      if (!sessionId) {
+        setLoading(false);
+        console.log('Session ID is missing.');
+        return;
+      }
+
+      console.log('Fetching sessions for user:', validatedUserId);
 
       // Fetch all sessions for the user, ordered by time
       const allSessionsQuery = query(
         summaryCollection,
-        where('uid', '==', userId),
+        where('uid', '==', validatedUserId),
         orderBy('time', 'asc') // Order by time in ascending order
       );
 
@@ -116,29 +129,35 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
       setMentalHealthScores(scoresArray); // Set only surrounding 7 sessions
     } catch (err) {
       console.error('Error fetching scores:', err);
-      setError(err instanceof Error ? err : new Error('Error fetching scores'));
+      if (err instanceof AccessControlError) {
+        setError(new Error('Access denied: You can only view your own data'));
+      } else {
+        setError(err instanceof Error ? err : new Error('Error fetching scores'));
+      }
     } finally {
       setLoading(false);
     }
-  }, [userId, sessionId]);
+  }, [userId, sessionId, currentUser]);
 
   const fetchAllScores = useCallback(async () => {
     setLoading(true);
     setError(null);
 
-    if (!userId) {
-      setLoading(false);
-      console.log('User ID is missing.');
-      return;
-    }
-
     try {
-      console.log('Fetching last 30 sessions for user:', userId);
+      // HIPAA Access Control: Validate user access
+      const validatedUserId = validateUserId(userId);
+      validateUserAccess(currentUser?.uid, validatedUserId);
+
+      // Log PHI access for audit trail
+      await logPHIAccess(validatedUserId, 'normalized_scores');
+      await logDataAccess(validatedUserId, 'summaries', 'READ');
+
+      console.log('Fetching last 30 sessions for user:', validatedUserId);
 
       // Fetch the last 30 sessions for the user
       const last30SessionsQuery = query(
         summaryCollection,
-        where('uid', '==', userId),
+        where('uid', '==', validatedUserId),
         orderBy('time', 'desc'),
         limit(30) // Limit to last 30 sessions
       );
@@ -219,11 +238,15 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
 
     } catch (err) {
       console.error('Error fetching last 30 sessions:', err);
-      setError(err instanceof Error ? err : new Error('Error fetching last 30 sessions'));
+      if (err instanceof AccessControlError) {
+        setError(new Error('Access denied: You can only view your own data'));
+      } else {
+        setError(err instanceof Error ? err : new Error('Error fetching last 30 sessions'));
+      }
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentUser]);
 
   useEffect(() => {
     fetchScores();
