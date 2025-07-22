@@ -11,13 +11,15 @@ import Sound from 'react-native-sound';
 import { updateDoc, doc } from 'firebase/firestore';
 import { userCollection } from '../firebase/firebaseConfig';
 import { useDiagnosticStatus } from '../hooks/useDiagnosticStatus'; // Import the custom hook
+import { auditLogger } from '../utils/auditLogger';
+import Config from 'react-native-config';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
 
 const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   const [sessionId, setSessionId] = useState<string>(uuidv4());
-  const { currentUser } = useAuth();
+  const { currentUser, onActivity } = useAuth();
   const [isRecording, setIsRecording] = useState<boolean>(false);
   const [transcript, setTranscript] = useState<string>('');
   const [isSpanish, setIsSpanish] = useState<boolean>(false); // Toggle between English and Spanish
@@ -25,6 +27,17 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   // Use the custom hook to check diagnostic status
   const { isDiagnostic, setIsDiagnostic, loading, error } = useDiagnosticStatus(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+
+  // Get secure API endpoint from config or use secure default
+  const getApiEndpoint = () => {
+    const baseUrl = Config.API_BASE_URL || 'https://api.reflectica.com';
+    return baseUrl;
+  };
+
+  // Track user activity for session timeout
+  const trackActivity = () => {
+    onActivity();
+  };
 
   useEffect(() => {
     const onSpeechResults = (e: SpeechResultsEvent) => {
@@ -35,13 +48,19 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
     Voice.onSpeechResults = onSpeechResults;
 
+    // Log session start when component mounts
+    if (currentUser?.uid) {
+      auditLogger.logSessionActivity(currentUser.uid, 'start', sessionId);
+    }
+
     return () => {
       Voice.destroy().then(Voice.removeAllListeners);
     };
-  }, []);
+  }, [currentUser?.uid, sessionId]);
 
   const startRecording = async () => {
     try {
+      trackActivity(); // Track user activity
       setIsRecording(true);
       const language = isSpanish ? 'es-ES' : 'en-US'; // Use Spanish if toggled, else English
       await Voice.start(language);
@@ -52,6 +71,7 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   const stopRecording = async () => {
     try {
+      trackActivity(); // Track user activity
       await Voice.stop();
       setIsRecording(false);
     } catch (e) {
@@ -69,17 +89,46 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
 
   const handleSubmit = async () => {
     try {
+      trackActivity(); // Track user activity
+      
       const promptToSubmit = transcript;
       const therapyMode = isREBT ? 'REBT' : 'CBT'; // Determine therapy mode
       const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'; // Replace with dynamic user ID if available
       const diagnosticMode = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
 
-      const response = await axios.post('http://localhost:3006/chat', {
+      // Log session interaction
+      if (currentUser?.uid) {
+        await auditLogger.logPhiAccess(
+          currentUser.uid,
+          'therapy_session_interaction',
+          sessionId,
+          {
+            therapyMode,
+            sessionType: diagnosticMode,
+            hasTranscript: !!transcript,
+          }
+        );
+      }
+
+      // Use secure API endpoint
+      const apiEndpoint = getApiEndpoint();
+      
+      const response = await axios.post(`${apiEndpoint}/chat`, {
         prompt: promptToSubmit,
         userId: userId,
         sessionId: sessionId,
         therapyMode: therapyMode, // Send therapy mode
         sessionType: diagnosticMode, // Send session type
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Version': '1.0.0',
+          'X-Client-Type': 'react-native',
+        },
+        timeout: 30000, // 30 second timeout
+        httpsAgent: {
+          rejectUnauthorized: true, // Ensure SSL certificate validation
+        },
       });
 
       const base64Audio = response.data.audio;
@@ -114,17 +163,37 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   };
 
   const handleEndSession = async () => {
+    trackActivity(); // Track user activity
+    
     const userId = currentUser?.uid ?? 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1';
     const language = isSpanish ? 'es-ES' : 'en-US'; // Use the selected language
     const therapyMode = isREBT ? 'REBT' : 'CBT'; // Use the selected therapy mode
     const sessionType = isDiagnostic ? 'diagnostic' : 'therapy'; // Determine session type
 
+    // Log session end
+    if (currentUser?.uid) {
+      await auditLogger.logSessionActivity(currentUser.uid, 'end', sessionId);
+    }
+
     try {
-      await axios.post('http://localhost:3006/session/endSession', {
+      // Use secure API endpoint
+      const apiEndpoint = getApiEndpoint();
+      
+      await axios.post(`${apiEndpoint}/session/endSession`, {
         userId: userId,
         sessionId: sessionId,
         language: language,
         sessionType: sessionType, // Send session type
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+          'X-App-Version': '1.0.0',
+          'X-Client-Type': 'react-native',
+        },
+        timeout: 30000, // 30 second timeout
+        httpsAgent: {
+          rejectUnauthorized: true, // Ensure SSL certificate validation
+        },
       })
         .then(async res => {
           if (isDiagnostic) {
@@ -143,10 +212,12 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
   };
 
   const toggleLanguage = () => {
+    trackActivity(); // Track user activity
     setIsSpanish((prevState) => !prevState);
   };
 
   const toggleTherapyMode = () => {
+    trackActivity(); // Track user activity
     setIsREBT((prevState) => !prevState);
   };
 
@@ -179,7 +250,10 @@ const SessionScreen: React.FC<SessionScreenProps> = ({ navigation }) => {
           {/* Back Button */}
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => navigation.goBack()}
+            onPress={() => {
+              trackActivity(); // Track user activity
+              navigation.goBack();
+            }}
           >
             <Text style={styles.backButtonText}>Back</Text>
           </TouchableOpacity>

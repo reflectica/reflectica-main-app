@@ -3,9 +3,10 @@ import { useQuery } from 'react-query';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs, orderBy} from 'firebase/firestore';
 import {SessionBoxesProp, SessionDetailProp} from '../constants';
+import { accessControl } from '../utils/accessControl';
 
 
-export const useAllSummaryListener = (userId: string) => {
+export const useAllSummaryListener = (userId: string, currentUserId?: string | null) => {
   const [sessionSummary, setSessionSummary] = useState<SessionDetailProp[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | string | null>(null);
@@ -17,6 +18,20 @@ export const useAllSummaryListener = (userId: string) => {
     if (!userId) {
       setLoading(false);
       console.log('User ID is missing.');
+      return;
+    }
+
+    // Validate access control - user can only access their own PHI data
+    const accessResult = await accessControl.validatePhiAccess(
+      currentUserId,
+      userId,
+      'session_summaries'
+    );
+
+    if (!accessResult.granted) {
+      console.error('Access denied:', accessResult.reason);
+      setError(accessResult.reason || 'Access denied');
+      setLoading(false);
       return;
     }
 
@@ -46,7 +61,7 @@ export const useAllSummaryListener = (userId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentUserId]);
 
   useEffect(() => {
     fetchSessions();
@@ -56,7 +71,7 @@ export const useAllSummaryListener = (userId: string) => {
 };
 
 
-export const useRecentSummaryListener = (userId: string) => {
+export const useRecentSummaryListener = (userId: string, currentUserId?: string | null) => {
   const [recentSessionSummary, setRecentSessionSummary] = useState<
     SessionBoxesProp[]
   >([]);
@@ -71,6 +86,20 @@ export const useRecentSummaryListener = (userId: string) => {
     if (!userId) {
       setLoading(false);
       console.log('User ID is missing.');
+      return;
+    }
+
+    // Validate access control - user can only access their own PHI data
+    const accessResult = await accessControl.validatePhiAccess(
+      currentUserId,
+      userId,
+      'recent_session_summaries'
+    );
+
+    if (!accessResult.granted) {
+      console.error('Access denied:', accessResult.reason);
+      setError(accessResult.reason || 'Access denied');
+      setLoading(false);
       return;
     }
 
@@ -109,7 +138,7 @@ export const useRecentSummaryListener = (userId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentUserId]);
 
   useEffect(() => {
     fetchRecentSessions();
