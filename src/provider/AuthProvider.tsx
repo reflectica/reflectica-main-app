@@ -1,4 +1,4 @@
-import React, {useRef, useState, useCallback, ReactNode} from 'react';
+import React, {useRef, useState, useCallback, ReactNode, useEffect} from 'react';
 import {Alert} from 'react-native';
 import {userCollection} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
 import {addDoc} from 'firebase/firestore';
@@ -11,6 +11,8 @@ import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
 import {onAuthStateChanged} from 'firebase/auth';
 import Config from "react-native-config";
+import { logUserLogin, logUserLogout, logFailedAuth } from '../utils/auditLogger';
+import { useSessionTimeout } from '../hooks/useSessionTimeout';
 
 interface AuthProviderProps {
   children: ReactNode;
@@ -23,6 +25,29 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<boolean>(false);
   const recaptchaVerifier = useRef(null);
+
+  // Initialize session timeout with HIPAA-compliant settings
+  const { extendSession } = useSessionTimeout({
+    timeoutMinutes: 15, // HIPAA requirement: 15 minutes max
+    warningMinutes: 2,  // Warn 2 minutes before timeout
+    onTimeout: () => {
+      Alert.alert(
+        'Session Expired',
+        'Your session has expired due to inactivity. Please log in again.',
+        [{ text: 'OK' }]
+      );
+    },
+    onWarning: () => {
+      Alert.alert(
+        'Session Warning',
+        'Your session will expire in 2 minutes due to inactivity. Tap OK to extend your session.',
+        [
+          { text: 'OK', onPress: extendSession },
+          { text: 'Logout', onPress: handleLogout }
+        ]
+      );
+    }
+  });
 
   GoogleSignin.configure({
     webClientId: Config.GOOGLE_CLIENT_ID,
@@ -137,9 +162,16 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
         setCurrentUser(user);
         setIsLoggedIn(true);
         console.log('WELCOME BACK:', user);
+        
+        // Log successful login for HIPAA audit trail
+        await logUserLogin(user.uid);
       } catch (error) {
         const typedError = error as {code: string; message: string};
         console.log(typedError.code + ': ' + typedError.message);
+        
+        // Log failed authentication attempt
+        await logFailedAuth(email, typedError.message);
+        
         Alert.alert('Error', 'Wrong password/email!');
       }
     },
@@ -147,9 +179,40 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
   );
 
   const handleLogout = useCallback(async () => {
+    const userId = currentUser?.uid;
+    
+    // Log logout for HIPAA audit trail
+    if (userId) {
+      await logUserLogout(userId);
+    }
+    
+    // Clear session data
     setCurrentUser(null);
     setIsLoggedIn(false);
     setNewUser(false);
+    
+    // Sign out from Firebase
+    try {
+      await auth().signOut();
+    } catch (error) {
+      console.error('Error signing out:', error);
+    }
+  }, [currentUser]);
+
+  // Monitor Firebase auth state changes
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged((user) => {
+      if (user) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+      } else {
+        setCurrentUser(null);
+        setIsLoggedIn(false);
+        setNewUser(false);
+      }
+    });
+
+    return unsubscribe;
   }, []);
 
   const value = {
@@ -162,6 +225,7 @@ export const AuthProvider = ({children}: AuthProviderProps) => {
     currentUser,
     newUser,
     recaptchaVerifier,
+    extendSession, // Expose session extension for manual user activity
   };
 
   return (

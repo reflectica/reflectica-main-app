@@ -15,6 +15,7 @@ interface AuthContextProps {
   //   code: string,
   // ) => Promise<void>;
   handleLogout: () => Promise<void>;
+  extendSession: () => void; // Session timeout extension for HIPAA compliance
   recaptchaVerifier: any; // Define the type appropriately
 }
 
