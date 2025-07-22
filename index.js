@@ -6,6 +6,7 @@ import {Provider} from 'react-redux';
 import {AppRegistry} from 'react-native';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import {AuthProvider} from './src/provider/AuthProvider';
+import {SecurityProvider} from './src/provider/SecurityProvider';
 import store from './src/features/store';
 import App from './App';
 import {name as appName} from './app.json';
@@ -16,11 +17,13 @@ import 'react-native-reanimated';
 const Main = () => {
   return (
     <Provider store={store}>
-      <AuthProvider>
-        <SafeAreaProvider>
-          <App />
-        </SafeAreaProvider>
-      </AuthProvider>
+      <SecurityProvider>
+        <AuthProvider>
+          <SafeAreaProvider>
+            <App />
+          </SafeAreaProvider>
+        </AuthProvider>
+      </SecurityProvider>
     </Provider>
   );
 };

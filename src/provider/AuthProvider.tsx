@@ -1,6 +1,6 @@
-import React, {useRef, useState, useCallback, ReactNode} from 'react';
+import React, {useRef, useState, useCallback, ReactNode, useEffect} from 'react';
 import {Alert} from 'react-native';
-import {userCollection} from '../firebase/firebaseConfig'; // Import your Firebase authentication instance and Google auth provider
+import {userCollection} from '../firebase/firebaseConfig';
 import {addDoc} from 'firebase/firestore';
 import {
   GoogleSignin,
@@ -9,7 +9,8 @@ import {
 import auth from '@react-native-firebase/auth';
 import {FirebaseAuthTypes} from '@react-native-firebase/auth';
 import {AuthContext} from '../context/AuthContext';
-import {onAuthStateChanged} from 'firebase/auth';
+import {useSecurityContext} from '../context/SecurityContext';
+import {loginAttemptManager, passwordValidator, securityLogger} from '../utils/securityHelpers';
 import Config from "react-native-config";
 
 interface AuthProviderProps {
@@ -17,146 +18,138 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider = ({children}: AuthProviderProps) => {
-  const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(
-    null,
-  );
+  const [currentUser, setCurrentUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [newUser, setNewUser] = useState<boolean>(false);
   const recaptchaVerifier = useRef(null);
+  const {actions: securityActions} = useSecurityContext();
 
   GoogleSignin.configure({
     webClientId: Config.GOOGLE_CLIENT_ID,
-    // nonce: 'your_nonce',
   });
 
-  // const signInWithGoogle = useCallback(async () => {
-  //   try {
-  //     await GoogleSignin.hasPlayServices();
-  //     const {idToken} = await GoogleSignin.signIn();
-  //     const googleCredential = auth.GoogleAuthProvider.credential(idToken);
-  //     const userCredential = await auth().signInWithCredential(
-  //       googleCredential,
-  //     );
-  //     setCurrentUser(userCredential.user);
-  //     // console.log("idToken:", idToken)
-  //     // console.log('googleCredential', googleCredential)
-  //     // console.log("userCredential", userCredential)
-  //     // console.log("user", userCredential.user)
-
-  //     // console.log("additionalUserInfo", userCredential.additionalUserInfo.profile)
-
-  //     if (userCredential.additionalUserInfo?.isNewUser) {
-  //       console.log('WELCOME NOOBIE!');
-  //       setNewUser(true);
-  //       const userDocData = {
-  //         uid: userCredential.user.uid,
-  //         email: userCredential.user.email,
-  //         firstname:
-  //           userCredential.additionalUserInfo?.profile?.given_name || null,
-  //         lastname:
-  //           userCredential.additionalUserInfo?.profile?.family_name || null,
-  //         imageUrl: userCredential.user?.photoURL || null,
-  //       };
-
-  //       try {
-  //         addDoc(userCollection, userDocData).then(docRef =>
-  //           console.log('Document written with ID:', docRef.id),
-  //         );
-  //       } catch (error) {
-  //         console.error('cannot add new user to firestore:', error);
-  //       }
-  //     } else {
-  //       console.log('WELCOME BACK NOOBIE!');
-  //     }
-
-  //     setIsLoggedIn(true);
-
-  //     // return result
-  //   } catch (error) {
-  //     const typedError = error as {code: string; message: string};
-
-  //     if (typedError.code === statusCodes.SIGN_IN_CANCELLED) {
-  //       Alert.alert('Cancel');
-  //       console.error('Google Sign-In Cancelled');
-  //     } else if (typedError.code === statusCodes.IN_PROGRESS) {
-  //       Alert.alert('Signin in progress');
-  //       console.error('Sign-In already in progress'); // operation (eg. sign in) already in progress
-  //     } else if (typedError.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-  //       Alert.alert('PLAY_SERVICES_NOT_AVAILABLE');
-  //       console.error('Google Play services not available or outdated'); // play services not available or outdated
-  //     } else {
-  //       console.error('Non-Google Sign-In Error:', typedError.message); // an error that's not related to google sign in occurred
-  //     }
-  //   }
-  //   return undefined;
-  // }, []);
-
-  // const signupWithEmail = useCallback(
-  //   async (email: string, password: string) => {
-  //     try {
-  //       const userCredential = await auth().createUserWithEmailAndPassword(
-  //         email,
-  //         password,
-  //       );
-  //       const user = userCredential.user;
-  //       setCurrentUser(user);
-
-  //       console.log('WELCOME NEW:', user);
-
-  //       const userDocData = {
-  //         uid: user.uid,
-  //         email: user.email,
-  //       };
-
-  //       try {
-  //         addDoc(userCollection, userDocData).then(docRef =>
-  //           console.log('Document written with ID:', docRef.id),
-  //         );
-  //         setNewUser(true);
-  //         setIsLoggedIn(true);
-  //       } catch (error) {
-  //         console.error('cannot add new user to firestore:', error);
-  //       }
-  //     } catch (error) {
-  //       const typedError = error as {code: string; message: string};
-  //       console.log(typedError.code + ': ' + typedError.message);
-  //       Alert.alert('Error', typedError.message);
-  //     }
-  //   },
-  //   [],
-  // );
-
+  // Enhanced login with security features
   const loginWithEmail = useCallback(
     async (email: string, password: string) => {
       try {
-        const userCredential = await auth().signInWithEmailAndPassword(
-          email,
-          password,
-        );
+        // Check account lockout first
+        const isLocked = await loginAttemptManager.isAccountLocked(email);
+        if (isLocked) {
+          const lockoutTime = await loginAttemptManager.getLockoutTimeRemaining(email);
+          const minutes = Math.ceil(lockoutTime / 60000);
+          Alert.alert(
+            'Account Locked',
+            `Account is temporarily locked due to too many failed attempts. Please try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`
+          );
+          return;
+        }
+
+        // Validate password complexity for new passwords (if required)
+        const passwordValidation = passwordValidator.validateComplexity(password);
+        if (!passwordValidation.isValid) {
+          Alert.alert('Password Requirements', passwordValidation.errors.join('\n\n'));
+          return;
+        }
+
+        const userCredential = await auth().signInWithEmailAndPassword(email, password);
         const user = userCredential.user;
+        
+        // Reset login attempts on successful login
+        await loginAttemptManager.resetLoginAttempts(email);
+        await securityActions.handleLoginAttempt(email, true);
+        
         setCurrentUser(user);
         setIsLoggedIn(true);
+        
+        // Start security session
+        securityActions.startSession();
+        
+        // Log security event
+        securityLogger.logSecurityEvent({
+          type: 'login',
+          userId: user.uid,
+          details: {method: 'email', timestamp: Date.now()},
+        });
+        
         console.log('WELCOME BACK:', user);
       } catch (error) {
         const typedError = error as {code: string; message: string};
         console.log(typedError.code + ': ' + typedError.message);
+        
+        // Handle failed login attempt
+        await securityActions.handleLoginAttempt(email, false);
+        
+        // Log failed attempt
+        securityLogger.logSecurityEvent({
+          type: 'login',
+          details: {
+            method: 'email',
+            success: false,
+            error: typedError.code,
+            timestamp: Date.now(),
+          },
+        });
+        
         Alert.alert('Error', 'Wrong password/email!');
       }
     },
-    [],
+    [securityActions],
   );
 
+  // Enhanced logout with security cleanup
   const handleLogout = useCallback(async () => {
-    setCurrentUser(null);
-    setIsLoggedIn(false);
-    setNewUser(false);
-  }, []);
+    try {
+      // End security session
+      securityActions.endSession();
+      
+      // Clear sensitive data
+      await securityActions.clearSensitiveData();
+      
+      // Log security event
+      if (currentUser) {
+        securityLogger.logSecurityEvent({
+          type: 'logout',
+          userId: currentUser.uid,
+          details: {timestamp: Date.now()},
+        });
+      }
+      
+      // Firebase logout
+      await auth().signOut();
+      
+      setCurrentUser(null);
+      setIsLoggedIn(false);
+      setNewUser(false);
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
+  }, [currentUser, securityActions]);
+
+  // Setup session timeout handling
+  useEffect(() => {
+    if (isLoggedIn) {
+      // Session timeout will be handled by SecurityProvider
+      securityActions.startSession();
+    }
+  }, [isLoggedIn, securityActions]);
+
+  // Listen for auth state changes
+  useEffect(() => {
+    const unsubscribe = auth().onAuthStateChanged((user) => {
+      if (user && !isLoggedIn) {
+        setCurrentUser(user);
+        setIsLoggedIn(true);
+        securityActions.startSession();
+      } else if (!user && isLoggedIn) {
+        handleLogout();
+      }
+    });
+
+    return unsubscribe;
+  }, [isLoggedIn, securityActions, handleLogout]);
 
   const value = {
-    // signInWithGoogle,
-    // signupWithEmail,
     loginWithEmail,
-    // confirmPhoneAuthCode,
     handleLogout,
     isLoggedIn,
     currentUser,

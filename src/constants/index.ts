@@ -21,3 +21,5 @@ export {type EmailLoginScreenProps} from './ParamList';
 export {type SettingScreenProps} from './ParamList';
 export {type SupportScreenProps} from './ParamList';
 export {type EmailSignupScreenProps} from './ParamList';
+export {type MFASetupScreenProps} from './ParamList';
+export {type SecurityQuestionScreenProps} from './ParamList';

@@ -20,6 +20,8 @@ export type RootStackParamList = {
   PhoneNumber: undefined;
   Verification: {fullPhoneNumber: string; confirmationResult: any};
   Notification: undefined;
+  MFASetup: {isFirstTime?: boolean};
+  SecurityQuestion: {mode?: 'setup' | 'verify'; onComplete?: () => void};
 };
 
 export type VerificationScreenProps = {
@@ -87,4 +89,14 @@ export type EmailSignupScreenProps = {
 export type SessionDetailScreenProps = {
   navigation: StackNavigationProp<RootStackParamList, 'SessionDetail'>;
   route: RouteProp<RootStackParamList, 'SessionDetail'>;
+};
+
+export type MFASetupScreenProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'MFASetup'>;
+  route?: RouteProp<RootStackParamList, 'MFASetup'>;
+};
+
+export type SecurityQuestionScreenProps = {
+  navigation: StackNavigationProp<RootStackParamList, 'SecurityQuestion'>;
+  route?: RouteProp<RootStackParamList, 'SecurityQuestion'>;
 };

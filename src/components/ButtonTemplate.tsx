@@ -9,18 +9,28 @@ interface ButtonTemplateProps {
   stylebtn: string;
   action: () => void;
   styling?: Object;
+  disabled?: boolean;
 }
 export default function ButtonTemplate({
   title,
   stylebtn,
   action,
   styling,
+  disabled = false,
 }: ButtonTemplateProps) {
   return (
     <TouchableOpacity
-      style={[stylebtn === 'purple' ? purpleBtn.btn : clearBtn.btn, styling]}
-      onPress={action}>
-      <Text style={stylebtn == 'purple' ? purpleBtn.text : clearBtn.text}>
+      style={[
+        stylebtn === 'purple' ? purpleBtn.btn : clearBtn.btn, 
+        styling,
+        disabled && styles.disabledBtn
+      ]}
+      onPress={disabled ? undefined : action}
+      disabled={disabled}>
+      <Text style={[
+        stylebtn == 'purple' ? purpleBtn.text : clearBtn.text,
+        disabled && styles.disabledText
+      ]}>
         {title}
       </Text>
     </TouchableOpacity>
@@ -64,5 +74,15 @@ const clearBtn = StyleSheet.create({
     color: '#5271FF',
     lineHeight: 24,
     fontFamily: 'Montserrat',
+  },
+});
+
+const styles = StyleSheet.create({
+  disabledBtn: {
+    backgroundColor: '#CCCCCC',
+    borderColor: '#CCCCCC',
+  },
+  disabledText: {
+    color: '#666666',
   },
 });
