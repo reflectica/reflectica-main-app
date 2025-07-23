@@ -10,10 +10,13 @@ import {
 import { SessionBoxes } from '../../components';
 import { useAllSummaryListener } from '../../hooks/useSummaryListener';
 import { JournalScreenProps } from '../../constants';
+import { useAuth } from '../../context/AuthContext';
 
 export default function JournalScreen({ navigation }: JournalScreenProps) {
+  const { currentUser, onActivity } = useAuth();
   const { sessionSummary, loading, error } = useAllSummaryListener(
-    'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'
+    currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+    currentUser?.uid
   );
 
   return (
@@ -26,6 +29,7 @@ export default function JournalScreen({ navigation }: JournalScreenProps) {
               <TouchableOpacity
                 key={index} // Add key prop for performance
                 onPress={() => {
+                  onActivity(); // Track user activity
                   console.log('LOGGING SESSION ID:', data.sessionId);
                   navigation.navigate('SessionDetail', {
                     session: data,

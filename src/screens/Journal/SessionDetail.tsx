@@ -11,6 +11,7 @@ import {
   SelfEsteemBarComponent,
 } from '../../components';
 import { useSessionAndSurroundingScores } from '../../hooks';
+import { useAuth } from '../../context/AuthContext';
 
 const screenHeight = Dimensions.get('window').height;
 const screenWidth = Dimensions.get('window').width;
@@ -19,12 +20,13 @@ const SessionDetail: React.FC<SessionDetailScreenProps> = ({ route }) => {
   const { session, sessionNumber } = route.params;
   const [sessionDetails, setSessionDetails] = useState<SessionDetailProp | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const { currentUser, onActivity } = useAuth();
 
   const {
     mentalHealthScores,
     loading: hookLoading,
     error: hookError,
-  } = useSessionAndSurroundingScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId);
+  } = useSessionAndSurroundingScores(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', session.sessionId, currentUser?.uid);
 
   const [lineLabels, setLineLabels] = useState<string[]>([]);
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);

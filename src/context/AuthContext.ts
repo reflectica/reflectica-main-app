@@ -16,6 +16,7 @@ interface AuthContextProps {
   // ) => Promise<void>;
   handleLogout: () => Promise<void>;
   recaptchaVerifier: any; // Define the type appropriately
+  onActivity: () => void; // Activity tracker for session timeout
 }
 
 export const AuthContext = createContext<AuthContextProps | undefined>(

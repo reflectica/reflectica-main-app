@@ -1,8 +1,9 @@
 import {useState, useEffect, useCallback} from 'react';
 import {summaryCollection} from '../firebase/firebaseConfig';
 import {query, where, getDocs, orderBy, limit} from 'firebase/firestore';
+import { accessControl } from '../utils/accessControl';
 
-export const useRecentMentalHealthScores = (userId: string) => {
+export const useRecentMentalHealthScores = (userId: string, currentUserId?: string | null) => {
   const [mentalHealthScores, setMentalHealthScores] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<Error | null>(null);
@@ -14,6 +15,20 @@ export const useRecentMentalHealthScores = (userId: string) => {
     if (!userId) {
       setLoading(false);
       console.log('User ID is missing.');
+      return;
+    }
+
+    // Validate access control - user can only access their own PHI data
+    const accessResult = await accessControl.validatePhiAccess(
+      currentUserId,
+      userId,
+      'recent_mental_health_scores'
+    );
+
+    if (!accessResult.granted) {
+      console.error('Access denied:', accessResult.reason);
+      setError(new Error(accessResult.reason || 'Access denied'));
+      setLoading(false);
       return;
     }
 
@@ -47,7 +62,7 @@ export const useRecentMentalHealthScores = (userId: string) => {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentUserId]);
 
   useEffect(() => {
     fetchRecentScores();

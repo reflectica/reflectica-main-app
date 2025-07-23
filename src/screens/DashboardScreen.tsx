@@ -30,7 +30,7 @@ const sanitizeData = (data: (number | null)[]): number[] => {
 // Function to get color with opacity
 const getColorWithOpacity = (opacity: number) => `rgba(82, 113, 255, ${opacity})`;
 const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
-  const { currentUser } = useAuth();
+  const { currentUser, onActivity } = useAuth();
 
   // Use the hook to fetch last 30 days of scores
   const {
@@ -45,9 +45,10 @@ const DashboardScreen: React.FC<DashboardScreenProps> = ({ navigation }) => {
     rosenbergScores,
     sfqScores,
     ssrsScores,
-  } = useSessionAndSurroundingScores(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', ''); // No sessionId needed here
+  } = useSessionAndSurroundingScores(currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1', '', currentUser?.uid); // No sessionId needed here
   const { sessionSummary, loading: sessionsLoading, error: sessionsError } = useAllSummaryListener(
-    currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1'
+    currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+    currentUser?.uid
   );
 
   // Get the 3 most recent sessions

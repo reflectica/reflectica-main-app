@@ -2,6 +2,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { summaryCollection } from '../firebase/firebaseConfig';
 import { query, where, getDocs, orderBy, limit } from 'firebase/firestore';
+import { accessControl } from '../utils/accessControl';
+import { auditLogger } from '../utils/auditLogger';
 
 type SessionData = {
   sessionId: string;
@@ -25,7 +27,7 @@ type AllSessionData = {
   time: any; // Firestore Timestamp for the session time
 };
 
-export const useSessionAndSurroundingScores = (userId: string, sessionId: string) => {
+export const useSessionAndSurroundingScores = (userId: string, sessionId: string, currentUserId?: string | null) => {
   // State for surrounding 7 sessions
   const [mentalHealthScores, setMentalHealthScores] = useState<(number | null)[]>([]);
   
@@ -50,6 +52,20 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     if (!userId || !sessionId) {
       setLoading(false);
       console.log('User ID or Session ID is missing.');
+      return;
+    }
+
+    // Validate access control - user can only access their own PHI data
+    const accessResult = await accessControl.validatePhiAccess(
+      currentUserId,
+      userId,
+      'session_mental_health_scores'
+    );
+
+    if (!accessResult.granted) {
+      console.error('Access denied:', accessResult.reason);
+      setError(new Error(accessResult.reason || 'Access denied'));
+      setLoading(false);
       return;
     }
 
@@ -120,7 +136,7 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     } finally {
       setLoading(false);
     }
-  }, [userId, sessionId]);
+  }, [userId, sessionId, currentUserId]);
 
   const fetchAllScores = useCallback(async () => {
     setLoading(true);
@@ -129,6 +145,20 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     if (!userId) {
       setLoading(false);
       console.log('User ID is missing.');
+      return;
+    }
+
+    // Validate access control - user can only access their own PHI data
+    const accessResult = await accessControl.validatePhiAccess(
+      currentUserId,
+      userId,
+      'session_all_scores'
+    );
+
+    if (!accessResult.granted) {
+      console.error('Access denied:', accessResult.reason);
+      setError(new Error(accessResult.reason || 'Access denied'));
+      setLoading(false);
       return;
     }
 
@@ -223,7 +253,7 @@ export const useSessionAndSurroundingScores = (userId: string, sessionId: string
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, currentUserId]);
 
   useEffect(() => {
     fetchScores();
