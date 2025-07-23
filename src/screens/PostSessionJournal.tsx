@@ -9,6 +9,7 @@ import {
 import { View, Text, SafeAreaView, StyleSheet, ScrollView } from 'react-native';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { useRecentMentalHealthScores } from '../hooks';
+import { useAuth } from '../context/AuthContext';
 
 type SessionParams = {
   session: {
@@ -25,6 +26,7 @@ type PostSessionJournalRouteProp = RouteProp<Record<string, SessionParams>, stri
 const PostSessionJournal: React.FC = () => {
   const route = useRoute<PostSessionJournalRouteProp>();
   const session = route.params?.session;
+  const { currentUser, onActivity } = useAuth();
 
   const [dsmScores, setDsmScores] = useState<Record<string, any>>({});
   const [emotions, setEmotions] = useState<Array<{ label: string; score: number; percentage?: number; opacity?: number }>>([]);
@@ -32,7 +34,10 @@ const PostSessionJournal: React.FC = () => {
   const [lineData, setLineData] = useState<number[]>([]);
   const [lineLabels, setLineLabels] = useState<string[]>([]);
 
-  const { mentalHealthScores } = useRecentMentalHealthScores('R5Jx5iGt0EXwOFiOoGS9IuaYiRu1');
+  const { mentalHealthScores } = useRecentMentalHealthScores(
+    currentUser?.uid || 'R5Jx5iGt0EXwOFiOoGS9IuaYiRu1',
+    currentUser?.uid
+  );
 
   useEffect(() => {
     if (session) {
